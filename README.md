@@ -1,14 +1,14 @@
-procmon
+Procmon
 =======
 
 Procmon alternative for Linux
 
 
 This is a kernel module that hijacks sys_calls and printfs messages whenever a sys_call is called.
-In the future, instead of printfs-ing messages, some kind of messages will be sent to a UI which will
+In the future, instead of printfs-ing messages, some kind of events will be sent to an UI which will
 be similar to what Procmon (for Windows) offers right now.
 
-Keep in mind that this is a WIP and you can end up with a totally freezed kernel!
+Keep in mind that this is a WIP and you can end up with a totally frozen kernel!
 
 
 In order to build this module you'll need some basic stuff (make, gcc) and the headers of the kernel 
@@ -19,6 +19,7 @@ Loading the module isn't any different from loading any other module. ```insmod 
 loading it and ```rmmod procmon.ko``` for unloading it.
 
 To start the actual hijack process, once loaded the module, run ```echo 1 /proc/procmon```.
+
 To stop it just run ```echo 0 /proc/procmon```.
 
 Also keep in mind that unloading the module without stopping it previously will *probably* cause
