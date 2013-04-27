@@ -13,6 +13,8 @@ endif
 
 all:
 	@make -C $(KDIR) M=$(PWD) modules
+	@qmake-qt5 -o Makefile-ui
+	@make -f Makefile-ui
 
 unistd_32.h: /usr/include/asm/unistd_32.h
 	@sed -e 's/__NR_/__NR32_/g' $< > $@
@@ -20,3 +22,5 @@ unistd_32.h: /usr/include/asm/unistd_32.h
 clean:
 	@make -C $(KDIR) M=$(PWD) clean
 	@rm unistd_32.h &>/dev/null || true
+	@make -f Makefile-ui clean
+	@rm Makefile-ui
