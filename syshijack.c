@@ -82,8 +82,15 @@ void *get_writable_sct(void *sct_addr){
 }
 
 static int read_proc(char *buf, char **start, off_t offset, int count, int *eof, void *data){
-	sprintf(buf, "%s\n", proc_data);
-	return 0;
+	int ret;
+	if(offset > 0){
+		ret  = 0;
+	} else {
+		memcpy(buf, proc_data, 1);
+		ret = 1;
+	}
+
+	return ret;
 }
 
 static int write_proc(struct file *file, const char __user *buf, unsigned long len, void *data){
