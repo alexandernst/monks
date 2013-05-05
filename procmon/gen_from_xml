@@ -1,0 +1,9 @@
+Client:
+
+qdbusxml2cpp -v -c DemoIf -p demoif.h:demoif.cpp com.nokia.Demo.xml
+
+-------------------------------------------------------------------------------------
+
+Server:
+
+qdbusxml2cpp -c DemoIfAdaptor -a demoifadaptor.h:demoifadaptor.cpp com.nokia.Demo.xml

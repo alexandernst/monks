@@ -1,16 +1,9 @@
-QT       += core gui
-CONFIG += c++11
-LIBS += -lkmod
+TEMPLATE = subdirs
+SUBDIRS = lkm_loader procmon
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+CONFIG += ordered
 
-TARGET = procmon
-TEMPLATE = app
-MAKEFILE = "Makefile-ui"
+app.path = /media/HDD/Proyectos/procmon
+app.files += procmon/procmon
 
-SOURCES += main.cpp\
-        procmon.cpp
-
-HEADERS  += procmon.h
-
-FORMS    += procmon.ui
+INSTALLS += app
