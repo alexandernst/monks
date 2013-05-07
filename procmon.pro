@@ -1,4 +1,4 @@
-TEMPLATE = subdirs
-SUBDIRS = lkm_loader procmonui
+CONFIG   += ordered
 
-CONFIG += ordered
+TEMPLATE = subdirs
+SUBDIRS  = lkm_loader procmonui
