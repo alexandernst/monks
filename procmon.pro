@@ -1,9 +1,4 @@
 TEMPLATE = subdirs
-SUBDIRS = lkm_loader procmon
+SUBDIRS = lkm_loader ui
 
 CONFIG += ordered
-
-app.path = /media/HDD/Proyectos/procmon
-app.files += procmon/procmon
-
-INSTALLS += app
