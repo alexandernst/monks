@@ -1,5 +1,5 @@
-#ifndef PROCMONDBUS_H
-#define PROCMONDBUS_H
+#ifndef PROCMONUIDBUS_H
+#define PROCMONUIDBUS_H
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
