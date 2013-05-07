@@ -1,4 +1,5 @@
 #include "procmonui.h"
+#include "ui_procmonui.h"
 
 //#include <unistd.h>
 #include <QFile>
