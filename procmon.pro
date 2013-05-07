@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
-SUBDIRS = lkm_loader ui
+SUBDIRS = lkm_loader procmonui
 
 CONFIG += ordered
