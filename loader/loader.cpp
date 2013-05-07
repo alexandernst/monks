@@ -3,7 +3,7 @@
 // -1 = error
 //  0 = not loaded
 //  1 = loaded
-int LKM_Loader::check(){
+int Loader::check(){
     ctx = kmod_new(NULL, &null_config);
     if(ctx == NULL){
         ret = -1;
@@ -30,7 +30,7 @@ int LKM_Loader::check(){
 // -1 = error
 //  0 = loaded OK
 //  1 = loaded KO
-int LKM_Loader::load(){
+int Loader::load(){
     ctx = kmod_new(NULL, &null_config);
     if(ctx == NULL){
         ret = -1;
@@ -51,7 +51,7 @@ int LKM_Loader::load(){
 // -1 = error
 //  0 = unloaded OK
 //  1 = unloaded KO
-int LKM_Loader::unload(){
+int Loader::unload(){
     ctx = kmod_new(NULL, &null_config);
     if(ctx == NULL){
         ret = -1;

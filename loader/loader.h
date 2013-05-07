@@ -13,7 +13,7 @@
 #define PROCMON_PATH "./procmon.ko"
 #define PROCMON_NAME "procmon"
 
-class LKM_Loader : public QObject{
+class Loader : public QObject{
     Q_OBJECT
 
     public Q_SLOTS:

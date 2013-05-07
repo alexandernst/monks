@@ -12,11 +12,11 @@ class QStringList;
 class QVariant;
 QT_END_NAMESPACE
 
-class LKM_LoaderDBus: public QDBusAbstractAdaptor{
+class LoaderDBus: public QDBusAbstractAdaptor{
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "com.procmon.lkm_loader")
+    Q_CLASSINFO("D-Bus Interface", "com.procmon.loader")
     Q_CLASSINFO("D-Bus Introspection", ""
-                "  <interface name='com.procmon.lkm_loader'>              \n"
+                "  <interface name='com.procmon.loader'>                  \n"
                 "    <method name='check'>                                \n"
                 "      <arg direction='out' type='i' name='ret' />        \n"
                 "    </method>                                            \n"
@@ -28,8 +28,8 @@ class LKM_LoaderDBus: public QDBusAbstractAdaptor{
                 "    </method>                                            \n"
                 "  </interface>                                           \n")
     public:
-        LKM_LoaderDBus(QObject *parent);
-        virtual ~LKM_LoaderDBus();
+        LoaderDBus(QObject *parent);
+        virtual ~LoaderDBus();
 
     public Q_SLOTS:
         int check();

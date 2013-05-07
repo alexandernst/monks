@@ -17,12 +17,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    LKM_Loader *loader = new LKM_Loader();
+    Loader *loader = new Loader();
 
-    new LKM_LoaderDBus(loader);
+    new LoaderDBus(loader);
     QDBusConnection connection = QDBusConnection::systemBus();
-    if(!connection.registerService("com.procmon.lkm_loader")){
-        qCritical("Could not register service!\nMake sure you copied com.procmon.lkm_loader.conf file to /etc/dbus-1/system.d/");
+    if(!connection.registerService("com.procmon.loader")){
+        qCritical("Could not register service!\nMake sure you copied com.procmon.loader.conf file to /etc/dbus-1/system.d/");
         return 1;
     }
     if(!connection.registerObject("/", loader)){
