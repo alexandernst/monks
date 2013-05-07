@@ -16,12 +16,12 @@ class ProcmonDBus: public QDBusAbstractAdaptor{
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "com.procmon.procmonui")
     Q_CLASSINFO("D-Bus Introspection", ""
-"  <interface name='com.procmon.procmonui'>\n"
-"    <method name=\"add_syscall_data\">\n"
-"      <arg direction=\"in\" type=\"s\" name=\"data\"/>\n"
-"    </method>\n"
-"  </interface>\n"
-        "")
+                "  <interface name='com.procmon.procmonui'>               \n"
+                "    <method name=\"add_syscall_data\">                   \n"
+                "      <arg direction=\"in\" type=\"s\" name=\"data\"/>   \n"
+                "    </method>                                            \n"
+                "  </interface>                                           \n")
+
 	public:
 	    ProcmonDBus(QObject *parent);
 	    virtual ~ProcmonDBus();
