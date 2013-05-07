@@ -13,3 +13,4 @@ SOURCES         += main.cpp lkm_loader.cpp lkm_loaderdbus.cpp
 HEADERS         += lkm_loader.h lkm_loaderdbus.h
 
 QMAKE_POST_LINK += cp $$PWD/lkm_loader $$PWD/../lkm_loader
+QMAKE_POST_LINK += cp $$PWD/com.procmon.lkm_loader.conf $$PWD/../com.procmon.lkm_loader.conf

@@ -8,8 +8,8 @@ int main(int argc, char *argv[]){
     ProcmonUI *procmon = new ProcmonUI;
 
     new ProcmonDBus(procmon);
-    QDBusConnection connection = QDBusConnection::sessionBus();
-    connection.registerService("com.procmon.procmon");
+    QDBusConnection connection = QDBusConnection::systemBus();
+    connection.registerService("com.procmon.procmonui");
     connection.registerObject("/", procmon);
 
     procmon->show();
