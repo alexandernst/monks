@@ -1,11 +1,11 @@
-#include "ui.h"
-#include "uidbus.h"
+#include "procmonui.h"
+#include "procmonuidbus.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]){
     QApplication app(argc, argv);
 
-    Procmon *procmon = new Procmon;
+    ProcmonUI *procmon = new ProcmonUI;
 
     new ProcmonDBus(procmon);
     QDBusConnection connection = QDBusConnection::sessionBus();
