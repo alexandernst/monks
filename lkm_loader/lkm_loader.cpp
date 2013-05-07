@@ -1,5 +1,4 @@
 #include "lkm_loader.h"
-#include <QDebug>
 
 // -1 = error
 //  0 = not loaded

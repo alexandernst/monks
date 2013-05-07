@@ -2,6 +2,7 @@ QT       += core dbus
 QT       -= gui
 CONFIG += c++11
 CONFIG -= app_bundle console
+QMAKE_CXXFLAGS += -std=c++0x
 
 LIBS += -lkmod
 

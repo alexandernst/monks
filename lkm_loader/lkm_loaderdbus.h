@@ -1,8 +1,8 @@
 #ifndef LKM_LOADERDBUS_H
 #define LKM_LOADERDBUS_H
 
-#include <QtCore/QObject>
-#include <QtDBus/QtDBus>
+#include <QObject>
+#include <QtDBus>
 QT_BEGIN_NAMESPACE
 class QByteArray;
 template<class T> class QList;

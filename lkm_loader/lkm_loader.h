@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <libkmod.h>
 
-#include <QtCore>
+#include <QCoreApplication>
 
 #define PROCMON_PATH "./procmon.ko"
 #define PROCMON_NAME "procmon"
