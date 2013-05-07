@@ -18,7 +18,12 @@ moc_*.cpp
 qrc_*.cpp
 *-build-*
 
+Makefile
+procmon
+lkm_loader
+
 procmonui/procmon
 procmonui/Makefile
+
 lkm_loader/lkm_loader
 lkm_loader/Makefile
