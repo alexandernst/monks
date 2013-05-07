@@ -24,6 +24,7 @@ lkm_loader
 
 procmonui/procmon
 procmonui/Makefile
+procmonui/ui_procmonui.h
 
 lkm_loader/lkm_loader
 lkm_loader/Makefile
