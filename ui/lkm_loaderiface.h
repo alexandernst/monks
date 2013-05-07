@@ -21,8 +21,17 @@ class LKM_LoaderIface: public QDBusAbstractInterface{
         LKM_LoaderIface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
         ~LKM_LoaderIface();
 
-    public Q_SLOTS: inline QDBusPendingReply<int> check(){
+    public Q_SLOTS:
+        inline QDBusPendingReply<int> check(){
             return asyncCall(QLatin1String("check"));
+        }
+
+        inline QDBusPendingReply<int> load(){
+            return asyncCall(QLatin1String("load"));
+        }
+
+        inline QDBusPendingReply<int> unload(){
+            return asyncCall(QLatin1String("unload"));
         }
 };
 

@@ -1,5 +1,5 @@
-#include "procmon.h"
-#include "procmondbus.h"
+#include "ui.h"
+#include "uidbus.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]){

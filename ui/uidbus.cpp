@@ -1,4 +1,4 @@
-#include "procmondbus.h"
+#include "uidbus.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
