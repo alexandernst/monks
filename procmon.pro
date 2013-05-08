@@ -1,4 +1,6 @@
 CONFIG   += ordered
 
 TEMPLATE = subdirs
-SUBDIRS  = loader procmonui
+SUBDIRS  = procmon loader procmonui
+
+procmon.makefile = Makefile
