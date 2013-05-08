@@ -1,7 +1,7 @@
 #ifndef PROCMONUI_H
 #define PROCMONUI_H
 
-#include "lkm_loaderiface.h"
+#include "loaderiface.h"
 
 #include <QMainWindow>
 #include <QtDBus/QtDBus>
