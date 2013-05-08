@@ -12,5 +12,6 @@ TEMPLATE        = app
 SOURCES         += main.cpp loader.cpp loaderdbus.cpp
 HEADERS         += loader.h loaderdbus.h
 
-QMAKE_POST_LINK += cp $$PWD/lkm_loader $$PWD/../loader;
-QMAKE_POST_LINK += cp $$PWD/com.procmon.loader.conf $$PWD/../com.procmon.loader.conf;
+QMAKE_POST_LINK += mkdir -p $$PWD/../build;
+QMAKE_POST_LINK += cp $$PWD/loader $$PWD/../build/loader;
+QMAKE_POST_LINK += cp $$PWD/com.procmon.loader.conf $$PWD/../build/com.procmon.loader.conf;
