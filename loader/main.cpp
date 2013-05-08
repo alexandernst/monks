@@ -1,5 +1,5 @@
-#include "lkm_loader.h"
-#include "lkm_loaderdbus.h"
+#include "loader.h"
+#include "loaderdbus.h"
 #include <QCoreApplication>
 
 #define PROCMON_PATH "./procmon.ko"

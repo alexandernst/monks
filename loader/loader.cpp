@@ -1,4 +1,4 @@
-#include "lkm_loader.h"
+#include "loader.h"
 
 // -1 = error
 //  0 = not loaded

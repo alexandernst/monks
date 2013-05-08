@@ -1,4 +1,4 @@
-#include "lkm_loaderdbus.h"
+#include "loaderdbus.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
