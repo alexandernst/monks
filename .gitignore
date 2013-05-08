@@ -19,6 +19,7 @@ qrc_*.cpp
 *-build-*
 
 Makefile
+build
 
 procmonui/procmon
 procmonui/Makefile
