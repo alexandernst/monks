@@ -27,7 +27,7 @@ class ProcmonUI : public QMainWindow{
         int UNLOADED[4] = {1, 0, 0, 0};
 
         Ui::MainWindow *ui;
-        LKM_LoaderIface *lkm_loaderiface;
+        LoaderIface *lkm_loaderiface;
         int get_loaded_state();
         int change_loaded_state(int state);
         int change_running_state(int state);

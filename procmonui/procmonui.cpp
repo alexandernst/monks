@@ -14,7 +14,7 @@
 ProcmonUI::ProcmonUI(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    lkm_loaderiface = new LKM_LoaderIface("com.procmon.lkm_loader", "/", QDBusConnection::systemBus(), 0);
+    lkm_loaderiface = new LoaderIface("com.procmon.lkm_loader", "/", QDBusConnection::systemBus(), 0);
 
     if(!lkm_loaderiface->isValid()){
         QProcess *lkm_loader = new QProcess();

@@ -1,5 +1,5 @@
-#ifndef LKM_LOADERIFACE_H
-#define LKM_LOADERIFACE_H
+#ifndef LOADERIFACE_H
+#define LOADERIFACE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
@@ -10,7 +10,7 @@
 #include <QtCore/QVariant>
 #include <QtDBus/QtDBus>
 
-class LKM_LoaderIface: public QDBusAbstractInterface{
+class LoaderIface: public QDBusAbstractInterface{
     Q_OBJECT
     public:
         static inline const char *staticInterfaceName(){
@@ -18,8 +18,8 @@ class LKM_LoaderIface: public QDBusAbstractInterface{
         }
 
     public:
-        LKM_LoaderIface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
-        ~LKM_LoaderIface();
+        LoaderIface(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
+        ~LoaderIface();
 
     public Q_SLOTS:
         inline QDBusPendingReply<int> check(){
@@ -37,7 +37,7 @@ class LKM_LoaderIface: public QDBusAbstractInterface{
 
 namespace com {
   namespace procmon {
-    typedef ::LKM_LoaderIface lkm_loader;
+    typedef ::LoaderIface lkm_loader;
   }
 }
 #endif
