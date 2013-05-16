@@ -2,7 +2,6 @@
 #define PROCMONUI_H
 
 #include "loaderiface.h"
-
 #include <QMainWindow>
 #include <QtDBus/QtDBus>
 

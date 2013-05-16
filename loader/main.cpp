@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
 
     QCoreApplication app(argc, argv);
 
-    app.setApplicationName("lkm_loader");
+    app.setApplicationName("loader");
     app.setOrganizationDomain("procmon");
 
     if(setuid(0) != 0){

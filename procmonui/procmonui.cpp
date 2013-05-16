@@ -14,13 +14,13 @@
 ProcmonUI::ProcmonUI(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    lkm_loaderiface = new LoaderIface("com.procmon.lkm_loader", "/", QDBusConnection::systemBus(), 0);
+    lkm_loaderiface = new LoaderIface("com.procmon.loader", "/", QDBusConnection::systemBus(), 0);
 
     if(!lkm_loaderiface->isValid()){
-        QProcess *lkm_loader = new QProcess();
-        qDebug() << QString("%1/lkm_helper").arg(QFileInfo(QDir::currentPath()).absolutePath());
+        QProcess *loader = new QProcess();
+        qDebug() << QString("%1/loader").arg(QDir::currentPath());
 
-        lkm_loader->startDetached(QString("%1/lkm_helper").arg(QFileInfo(QDir::currentPath()).absolutePath()));
+        loader->startDetached(QString("%1/loader").arg(QDir::currentPath()));
     }
 
     if(change_loaded_state(-1) == 0){
