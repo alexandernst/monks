@@ -13,16 +13,22 @@ Keep in mind that this is a WIP and you can end up with a totally frozen kernel!
 
 In order to build this module you'll need some basic stuff (make, gcc) and the headers of the kernel 
 you're running on.
-Once you have all those you just need to run ```make```.
+Once you have all those you just need to run ```make``` inside the ```procmon_kmodule``` folder.
 
 Loading the module isn't any different from loading any other module. ```insmod procmon.ko``` for 
 loading it and ```rmmod procmon.ko``` for unloading it.
 
-To start the actual hijack process, once loaded the module, run ```echo 1 /proc/procmon```.
+To start the actual hijack process, once loaded the module, run ```echo 1 > /proc/procmon```.
 Once started, you'll probably want to run ```dmesg -w``` (or ```dmesg``` if your kernel doesn't support ```-w```)
 in another console to see an actual outpu.
 
-To stop it just run ```echo 0 /proc/procmon```.
+To stop it just run ```echo 0 > /proc/procmon```.
 
 Also keep in mind that unloading the module without stopping it previously will *probably* cause
 some bad stuff, maybe even data loss. You have been warned.
+
+The UI part will be based on ```rbcurses```. You'll need Ruby 1.9.3 or newer to play with this part.
+First you need to build the Ruby C extension that will allow playing with ```kmod``` from Ruby. Go to the
+```procmon``` and run ```ruby extconf.rb``` and then ```make```. If everything went fine you'll be able to
+go to the main directory and run ```ruby procmon.rb``` (which, for now, will just check if the module is loadad,
+and if it isn't it will load it and unload it).
