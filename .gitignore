@@ -21,9 +21,12 @@ qrc_*.cpp
 Makefile
 build
 
-procmonui/procmon
-procmonui/Makefile
-procmonui/ui_procmonui.h
+procmon/
+!procmon/extconf.rb
+!procmon/lkm.c
 
-lkm_loader/lkm_loader
-lkm_loader/Makefile
+procmon_kmodule/
+!procmon_kmodule/hookfns.c
+!procmon_kmodule/syshijack.c
+!procmon_kmodule/syshijack.h
+!procmon_kmodule/Makefile
