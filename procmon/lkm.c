@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include <errno.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -78,7 +79,7 @@ static VALUE load(VALUE self, VALUE kmod_path){
 			err = kmod_module_insert_module(mod, 0, NULL);
 			if(err != 0){
 				ret = -1;
-				printf("Error: %s\n", strerror(-err));
+				printf("Error 1: %s\n", strerror(-err));
 			}else{
 				ret = 0;
 			}
@@ -122,10 +123,34 @@ static VALUE unload(VALUE self, VALUE kmod_name){
 	return INT2NUM(ret);
 }
 
+//0 == ok, 1 == ko
 static VALUE start(VALUE self){
-	return INT2NUM(0);
+	int ret = 0;
+	FILE *fp = fopen("/proc/procmon", "w");
+	if(fp == NULL){
+		ret = 1;
+		printf("Error: Can't start hijacking sys calls.\n");
+	}else{
+		fprintf(fp, "%c", '1');
+		fclose(fp);
+		ret = 0;
+	}
+
+	return INT2NUM(ret);
 }
 
+//0 == ok, 1 == ko
 static VALUE stop(VALUE self){
-	return INT2NUM(0);
+	int ret = 0;
+	FILE *fp = fopen("/proc/procmon", "w");
+	if(fp == NULL){
+		ret = 1;
+		printf("Error: Can't start hijacking sys calls.\n");
+	}else{
+		fprintf(fp, "%c", '0');
+		fclose(fp);
+		ret = 0;
+	}
+
+	return INT2NUM(ret);
 }
