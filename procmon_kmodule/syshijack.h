@@ -13,18 +13,24 @@
 #include "unistd_32.h"
 #endif
 
-#define HOOK(F) real_sys_read = sys_call_table[F]; sys_call_table[F] = hooked_sys_read;
+
+//F, RF and FF stand for:
+//F = FUNCTION as defined in include/linux/syscalls.h
+//RF = REAL FUNCTION as in the function in which we will save F
+//FF = FAKE FUNCTION as in the function which we'll be using to fake F
+
+#define HOOK(F, RF, FF) RF = sys_call_table[F]; sys_call_table[F] = FF;
 #ifdef CONFIG_IA32_EMULATION
-	#define HOOK_IA32(F) ia32_sys_call_table[F] = hooked_sys_read;
+	#define HOOK_IA32(F, RF, FF) ia32_sys_call_table[F] = FF;
 #else
-	#define HOOK_IA32(F)
+	#define HOOK_IA32(F, RF, FF)
 #endif
 
-#define UNHOOK(F) sys_call_table[F] = real_sys_read;
+#define UNHOOK(F, RF) sys_call_table[F] = RF;
 #ifdef CONFIG_IA32_EMULATION
-	#define UNHOOK_IA32(F) ia32_sys_call_table[F] = real_sys_read;
+	#define UNHOOK_IA32(F, RF) ia32_sys_call_table[F] = RF;
 #else
-	#define UNHOOK_IA32(F)
+	#define UNHOOK_IA32(F, RF)
 #endif
 
 extern void **sys_call_table;
