@@ -22,15 +22,11 @@
 #define HOOK(F, RF, FF) RF = sys_call_table[F]; sys_call_table[F] = FF;
 #ifdef CONFIG_IA32_EMULATION
 	#define HOOK_IA32(F, RF, FF) ia32_sys_call_table[F] = FF;
-#else
-	#define HOOK_IA32(F, RF, FF)
 #endif
 
 #define UNHOOK(F, RF) sys_call_table[F] = RF;
 #ifdef CONFIG_IA32_EMULATION
 	#define UNHOOK_IA32(F, RF) ia32_sys_call_table[F] = RF;
-#else
-	#define UNHOOK_IA32(F, RF)
 #endif
 
 extern void **sys_call_table;
