@@ -33,26 +33,25 @@ void hook_calls(void){
 #endif
 
 
+
+	HOOK(__NR_read, real_sys_read, hooked_sys_read);
 #ifdef __NR_read32
-#define F __NR_read32
-#else
-#define F __NR_read
+	HOOK_IA32(__NR_read32, real_sys_read, hooked_sys_read);
 #endif
-HOOK(F, real_sys_read, hooked_sys_read); HOOK_IA32(F, real_sys_read, hooked_sys_read);
-#undef F
+
 
 
 }
 
 void unhook_calls(void){
 
+
+
+	UNHOOK(__NR_read, real_sys_read);
 #ifdef __NR_read32
-#define F __NR_read32
-#else
-#define F __NR_read
+	UNHOOK_IA32(__NR_read32, real_sys_read);
 #endif
-UNHOOK(F, real_sys_read); UNHOOK_IA32(F, real_sys_read);
-#undef F
+
 
 
 	vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
