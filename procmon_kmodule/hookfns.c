@@ -10,18 +10,32 @@
 //19:26:02,6182319	SDFSSvc.exe		288		QueryStandardInformationFile	C:\Archivos de programa\Spybot - Search & Destroy 2\Includes\HostScan.csbs1	SUCCESS		AllocationSize: 0, EndOfFile: 0, NumberOfLinks: 1, DeletePending: False, Directory: False
 
 
+/*****************************************************************************\
+| (For each syscall) Define a function which we will use to save the REAL     |
+| syscall function and define a FAKE function which we will use to replace    |
+| the REAL one.                                                               |
+| Also, do that for x86 and x64 cases, AND for the special IA32 case.         |
+\*****************************************************************************/
+
+/* __NR_read / __NR_read32 */
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 	if(count == 1 && fd == 0)
 		printk(KERN_INFO "intercepted sys_read from %s\n", current->comm);
 	return real_sys_read(fd, buf, count);
 }
+#ifdef CONFIG_IA32_EMULATION
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
 	if(count == 1 && fd == 0)
 		printk(KERN_INFO "intercepted sys_read32 from %s\n", current->comm);
 	return real_sys_read32(fd, buf, count);
 }
+#endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
 
 void hook_calls(void){
 	sys_call_table = get_writable_sct(get_sys_call_table());
@@ -38,27 +52,41 @@ void hook_calls(void){
 	}
 #endif
 
+/*****************************************************************************\
+| This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
+| each syscall.                                                               |
+| The macros HOOK and HOOK_IA32 replace the REAL functions with the FAKE      |
+| ones. See syshijack.h for more info.                                        |
+\*****************************************************************************/
 
-
+/* __NR_read / __NR_read32 */
 	HOOK(__NR_read, real_sys_read, hooked_sys_read);
 #ifdef __NR_read32
 	HOOK_IA32(__NR_read32, real_sys_read32, hooked_sys_read32);
 #endif
 
-
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
 
 }
 
 void unhook_calls(void){
 
+/*****************************************************************************\
+| This is where we restore the REAL functions, aka, undo what HOOK and        |
+| HOOK_IA32 did.                                                              |
+\*****************************************************************************/
 
-
+/* __NR_read / __NR_read32 */
 	UNHOOK(__NR_read, real_sys_read);
 #ifdef __NR_read32
 	UNHOOK_IA32(__NR_read32, real_sys_read32);
 #endif
 
-
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
 
 	vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
 #ifdef CONFIG_IA32_EMULATION
