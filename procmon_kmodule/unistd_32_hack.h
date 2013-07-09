@@ -11,6 +11,7 @@
 | When we're on x64 and ia32 emulation is enabled, we'll search for the       |
 | <asm/unistd_32.h> file, replace all "__NR_xxx" with "_NR32_xxx" and then    |
 | use them for the ia32 syscall table.                                        |
+| All this is done with perl, in Kbuild.                                      |
 \*****************************************************************************/
 
 #ifdef CONFIG_IA32_EMULATION
