@@ -2,7 +2,7 @@
 
 obj-m += procmon.o
 
-procmon-y += syshijack.o hookfns.o
+procmon-y += syshijack.o hookfns.o utils.o
 
 $(obj)/syshijack.o: $(obj)/unistd_32.h
 
