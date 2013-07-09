@@ -4,6 +4,7 @@
 #include <linux/sched.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/fdtable.h>
 #include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/proc_fs.h>
@@ -13,11 +14,13 @@
 #include "unistd_32.h"
 #endif
 
-
-//F, RF and FF stand for:
-//F = FUNCTION as defined in include/linux/syscalls.h
-//RF = REAL FUNCTION as in the function in which we will save F
-//FF = FAKE FUNCTION as in the function which we'll be using to fake F
+/*****************************************************************************\
+| HOOK MACROS                                                                 |
+| F, RF and FF stand for:                                                     |
+| F = FUNCTION as defined in include/linux/syscalls.h                         |
+| RF = REAL FUNCTION as in the function in which we will save F               |
+| FF = FAKE FUNCTION as in the function which we'll be using to fake F        |
+\*****************************************************************************/
 
 #define HOOK(F, RF, FF) RF = sys_call_table[F]; sys_call_table[F] = FF;
 #ifdef CONFIG_IA32_EMULATION
@@ -28,6 +31,10 @@
 #ifdef CONFIG_IA32_EMULATION
 	#define UNHOOK_IA32(F, RF) ia32_sys_call_table[F] = RF;
 #endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
 
 extern void **sys_call_table;
 #ifdef CONFIG_IA32_EMULATION
@@ -59,6 +66,15 @@ struct idtr{
 	void *base;
 } __attribute__ ((packed));
 
+typedef struct syscall_intercept_info{
+	char *pname;
+	pid_t pid;
+	char *operation;
+	char *path;
+	unsigned int result;
+	char *details;
+} syscall_info;
+
 void *get_writable_sct(void *sct_addr);
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
 #ifdef __i386__
@@ -74,3 +90,14 @@ void *get_sys_call_table(void);
 
 void hook_calls(void);
 void unhook_calls(void);
+
+/*****************************************************************************\
+| Utils                                                                       |
+\*****************************************************************************/
+
+void print_info(syscall_info *i);
+char *path_from_fd(unsigned int fd);
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
