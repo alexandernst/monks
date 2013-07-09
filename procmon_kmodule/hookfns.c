@@ -1,15 +1,5 @@
 #include "syshijack.h"
 
-//TODO
-//GLOBAL HOOK with format:
-//Time				Process name	PID		Operation						Path																		Result		Detail
-
-//19:25:37,7981199	lsass.exe		696		RegOpenKey						HKLM\SECURITY\Policy														SUCCESS		Desired Access: Read/Write
-//19:25:53,7759095	svchost.exe		1116	CreateFile						C:\WINDOWS\system32\drivers\msfs.sys										SUCCESS		Desired Access: Read EA, Read Attributes, Read Control, Disposition: Open, Options: , Attributes: n/a, ShareMode: Read, Write, Delete, AllocationSize: n/a, Impersonating: NT AUTHORITY\SYSTEM, OpenResult: Opened
-//19:25:55,1153041	wmiprvse.exe	3292	RegQueryValue					HKLM\SYSTEM\WPA\MediaCenter\Installed										SUCCESS		Type: REG_DWORD, Length: 4, Data: 0
-//19:26:02,6182319	SDFSSvc.exe		288		QueryStandardInformationFile	C:\Archivos de programa\Spybot - Search & Destroy 2\Includes\HostScan.csbs1	SUCCESS		AllocationSize: 0, EndOfFile: 0, NumberOfLinks: 1, DeletePending: False, Directory: False
-
-
 /*****************************************************************************\
 | (For each syscall) Define a function which we will use to save the REAL     |
 | syscall function and define a FAKE function which we will use to replace    |
@@ -20,16 +10,46 @@
 /* __NR_read / __NR_read32 */
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
+	ssize_t r;
+	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+
+	r = real_sys_read(fd, buf, count);
+
+	i->pname = current->comm;
+	i->pid = current->pid;
+	i->operation = "READ";
+	i->path = path_from_fd(fd);
+	i->result = r;
+	i->details = "No details ATM";
+
 	if(count == 1 && fd == 0)
-		printk(KERN_INFO "intercepted sys_read from %s\n", current->comm);
-	return real_sys_read(fd, buf, count);
+		print_info(i);
+
+	kfree(i);
+
+	return r;
 }
 #ifdef CONFIG_IA32_EMULATION
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
+	ssize_t r;
+	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+
+	r = real_sys_read32(fd, buf, count);
+
+	i->pname = current->comm;
+	i->pid = current->pid;
+	i->operation = "READ32";
+	i->path = path_from_fd(fd);
+	i->result = r;
+	i->details = "No details ATM";
+
 	if(count == 1 && fd == 0)
-		printk(KERN_INFO "intercepted sys_read32 from %s\n", current->comm);
-	return real_sys_read32(fd, buf, count);
+		print_info(i);
+
+	kfree(i);
+
+	return r;
 }
 #endif
 
@@ -59,10 +79,10 @@ void hook_calls(void){
 | ones. See syshijack.h for more info.                                        |
 \*****************************************************************************/
 
-/* __NR_read / __NR_read32 */
+/* __NR_read / __NR32_read */
 	HOOK(__NR_read, real_sys_read, hooked_sys_read);
-#ifdef __NR_read32
-	HOOK_IA32(__NR_read32, real_sys_read32, hooked_sys_read32);
+#ifdef __NR32_read
+	HOOK_IA32(__NR32_read, real_sys_read32, hooked_sys_read32);
 #endif
 
 /*****************************************************************************\
@@ -80,8 +100,8 @@ void unhook_calls(void){
 
 /* __NR_read / __NR_read32 */
 	UNHOOK(__NR_read, real_sys_read);
-#ifdef __NR_read32
-	UNHOOK_IA32(__NR_read32, real_sys_read32);
+#ifdef __NR32_read
+	UNHOOK_IA32(__NR32_read, real_sys_read32);
 #endif
 
 /*****************************************************************************\
