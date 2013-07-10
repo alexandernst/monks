@@ -4,8 +4,9 @@
 | because this way we'll only get the identifiers of one of the archs, the    |
 | one that we're currently compiling on.                                      |
 | Also, even if we could trick somehow the compiler to include both           |
-| identifiers, there another problem: We will get different values with same  |
-| names. Example: __NR_read and __NR_read, both have the same name, but on    |
+| identifiers, there is another problem: We will get different values with    |
+| the same name.                                                              |
+| Example: __NR_read and __NR_read, both have the same name, but on           |
 | x86 it's value is N, while on x64 it's value is M. That's why we need to do |
 | some magic.                                                                 |
 | When we're on x64 and ia32 emulation is enabled, we'll search for the       |
