@@ -21,6 +21,7 @@ void print_info(syscall_info *i){
 char *path_from_fd(unsigned int fd){
 	char *tmp;
 	char *pathname = "";
+	char *rpathname = "";
 
 	struct file *file;
 	struct path path;
@@ -30,7 +31,7 @@ char *path_from_fd(unsigned int fd){
 	file = fcheck_files(files, fd);
 	if (!file) {
 		spin_unlock(&files->file_lock);
-		return pathname;
+		return rpathname;
 	}
 
 	path = file->f_path;
@@ -41,7 +42,7 @@ char *path_from_fd(unsigned int fd){
 	tmp = (char *)__get_free_page(GFP_TEMPORARY);
 	if(!tmp){
 		path_put(&path);
-		return pathname;
+		return rpathname;
 	}
 
 	pathname = d_path(&path, tmp, PAGE_SIZE);
@@ -49,10 +50,12 @@ char *path_from_fd(unsigned int fd){
 
 	if(IS_ERR(pathname)){
 		free_page((unsigned long)tmp);
-		return pathname;
+		return rpathname;
 	}
+
+	rpathname = kstrdup(pathname, GFP_KERNEL);
 	
 	free_page((unsigned long)tmp);
 	
-	return pathname;
+	return rpathname;
 }

