@@ -21,7 +21,7 @@ void print_info(syscall_info *i){
 char *path_from_fd(unsigned int fd){
 	char *tmp;
 	char *pathname = "";
-	char *rpathname = "";
+	char *rpathname = kmalloc(1, GFP_KERNEL);
 
 	struct file *file;
 	struct path path;
