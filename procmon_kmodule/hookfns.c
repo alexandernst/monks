@@ -5,6 +5,7 @@
 | syscall function and define a FAKE function which we will use to replace    |
 | the REAL one.                                                               |
 | Also, do that for x86 and x64 cases, AND for the special IA32 case.         |
+| A list of all syscalls can be retrieved using man (man syscalls).           |
 \*****************************************************************************/
 
 /* __NR_read / __NR_read32 */
