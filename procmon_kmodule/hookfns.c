@@ -37,6 +37,8 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 
 	r = real_sys_read32(fd, buf, count);
 
+	unhook_calls();
+
 	i->pname = current->comm;
 	i->pid = current->pid;
 	i->operation = "READ32";
@@ -49,6 +51,8 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 
 	kfree(i->path);
 	kfree(i);
+
+	hook_calls();
 
 	return r;
 }
