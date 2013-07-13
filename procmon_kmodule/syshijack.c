@@ -3,9 +3,9 @@
 static char proc_data[1];
 static struct proc_dir_entry *proc_write_entry;
 
-void **sys_call_table;
+void **sys_call_table = NULL;
 #ifdef CONFIG_IA32_EMULATION
-void **ia32_sys_call_table;
+void **ia32_sys_call_table = NULL;
 #endif
 
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)

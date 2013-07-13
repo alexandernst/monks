@@ -16,7 +16,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 
 	r = real_sys_read(fd, buf, count);
 
-	unhook_calls();
+	//unhook_calls();
 
 	i->pname = current->comm;
 	i->pid = current->pid;
@@ -31,7 +31,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 	kfree(i->path);
 	kfree(i);
 
-	hook_calls();
+	//hook_calls();
 
 	return r;
 }
@@ -43,7 +43,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 
 	r = real_sys_read32(fd, buf, count);
 
-	unhook_calls();
+	//unhook_calls();
 
 	i->pname = current->comm;
 	i->pid = current->pid;
@@ -58,7 +58,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 	kfree(i->path);
 	kfree(i);
 
-	hook_calls();
+	//hook_calls();
 
 	return r;
 }
@@ -69,17 +69,21 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 \*****************************************************************************/
 
 void hook_calls(void){
-	sys_call_table = get_writable_sct(get_sys_call_table());
 	if(sys_call_table == NULL){
-		printk(KERN_INFO "sys_call_table is NULL\n");
-		return;
+		sys_call_table = get_writable_sct(get_sys_call_table());
+		if(sys_call_table == NULL){
+			printk(KERN_INFO "sys_call_table is NULL\n");
+			return;
+		}
 	}
 #ifdef CONFIG_IA32_EMULATION
-	ia32_sys_call_table = get_writable_sct(get_ia32_sys_call_table());
 	if(ia32_sys_call_table == NULL){
-		vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
-		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
-		return;
+		ia32_sys_call_table = get_writable_sct(get_ia32_sys_call_table());
+		if(ia32_sys_call_table == NULL){
+			vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
+			printk(KERN_INFO "ia32_sys_call_table is NULL\n");
+			return;
+		}
 	}
 #endif
 
