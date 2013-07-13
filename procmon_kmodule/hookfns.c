@@ -16,6 +16,8 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 
 	r = real_sys_read(fd, buf, count);
 
+	unhook_calls();
+
 	i->pname = current->comm;
 	i->pid = current->pid;
 	i->operation = "READ";
@@ -26,7 +28,10 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 	if(count == 1 && fd == 0)
 		print_info(i);
 
+	kfree(i->path);
 	kfree(i);
+
+	hook_calls();
 
 	return r;
 }
