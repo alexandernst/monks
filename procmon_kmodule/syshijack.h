@@ -24,7 +24,7 @@
 
 #define HOOK(F, RF, FF) RF = sys_call_table[F]; sys_call_table[F] = FF;
 #ifdef CONFIG_IA32_EMULATION
-	#define HOOK_IA32(F, RF, FF) ia32_sys_call_table[F] = FF;
+	#define HOOK_IA32(F, RF, FF) RF = ia32_sys_call_table[F]; ia32_sys_call_table[F] = FF;
 #endif
 
 #define UNHOOK(F, RF) sys_call_table[F] = RF;
