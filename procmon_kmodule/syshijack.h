@@ -8,11 +8,42 @@
 #include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/proc_fs.h>
+#include <linux/semaphore.h>
 
 #include <asm/unistd.h>
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"
 #endif
+
+/*****************************************************************************\
+| Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
+| Method 1 will use kernel pages and vmap                                     |
+| Method 2 will use virtual address                                           |
+| Method 3 will disable cr0, reg 16                                           |
+\*****************************************************************************/
+
+#define method 2
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| Define debug macro                                                          |
+\*****************************************************************************/
+
+#define debug 1
+#if debug == 1
+#define DEBUG(...) printk(__VA_ARGS__);
+#else
+#define DEBUG(...)
+#endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
 
 /*****************************************************************************\
 | HOOK MACROS                                                                 |

