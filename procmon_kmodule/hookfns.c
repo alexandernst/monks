@@ -69,19 +69,8 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 \*****************************************************************************/
 
 void hook_calls(void){
-	sys_call_table = get_writable_sct(get_sys_call_table());
-	if(sys_call_table == NULL){
-		printk(KERN_INFO "sys_call_table is NULL\n");
+	if(!get_sct() || !set_sct_rw())
 		return;
-	}
-#ifdef CONFIG_IA32_EMULATION
-	ia32_sys_call_table = get_writable_sct(get_ia32_sys_call_table());
-	if(ia32_sys_call_table == NULL){
-		vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
-		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
-		return;
-	}
-#endif
 
 /*****************************************************************************\
 | This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
@@ -100,9 +89,13 @@ void hook_calls(void){
 |                                      END                                    |
 \*****************************************************************************/
 
+	if(!get_sct() || !set_sct_ro())
+		return;
 }
 
 void unhook_calls(void){
+	if(!get_sct() || !set_sct_rw())
+		return;
 
 /*****************************************************************************\
 | This is where we restore the REAL functions, aka, undo what HOOK and        |
@@ -119,8 +112,6 @@ void unhook_calls(void){
 |                                      END                                    |
 \*****************************************************************************/
 
-	vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
-#ifdef CONFIG_IA32_EMULATION
-	vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK));
-#endif
+	if(!get_sct() || !set_sct_ro())
+		return;
 }

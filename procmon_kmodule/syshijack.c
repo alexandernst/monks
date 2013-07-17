@@ -1,12 +1,59 @@
 #include "syshijack.h"
 
+/*****************************************************************************\
+| Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
+| Method 1 will use kernel pages and vmap                                     |
+| Method 2 will use virtual address                                           |
+| Method 3 will disable cr0, reg 16                                           |
+\*****************************************************************************/
+
+#define method 1
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| /proc related vars                                                          |
+\*****************************************************************************/
+
 static char proc_data[1];
 static struct proc_dir_entry *proc_write_entry;
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| Pointers to the system call table                                           |
+\*****************************************************************************/
 
 void **sys_call_table = NULL;
 #ifdef CONFIG_IA32_EMULATION
 void **ia32_sys_call_table = NULL;
 #endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| If method 3 is set, this will contain the value of cr0, bit 16              |
+\*****************************************************************************/
+
+unsigned long orig_cr0;
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| Functions to get the address of the system call table on each arch          |
+\*****************************************************************************/
 
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
 #ifdef __i386__
@@ -62,6 +109,16 @@ void *get_sys_call_table(void){
 }
 #endif
 
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| Methods to get/set the system call table to RW or RO                         |
+\*****************************************************************************/
+
+//Method 1
 void *get_writable_sct(void *sct_addr){
 	struct page *p[2];
 	void *sct;
@@ -80,6 +137,106 @@ void *get_writable_sct(void *sct_addr){
 	sct = vmap(p, 2, VM_MAP, PAGE_KERNEL);
 	return sct == NULL ? NULL : sct + offset_in_page(sct_addr);
 }
+
+//Method 2
+int make_rw(unsigned long address){
+	unsigned int level;
+	pte_t *pte = lookup_address(address, &level);
+	if(pte->pte &~ _PAGE_RW)
+		pte->pte |= _PAGE_RW;
+	return 0;
+}
+
+int make_ro(unsigned long address){
+	unsigned int level;
+	pte_t *pte = lookup_address(address, &level);
+	pte->pte = pte->pte &~ _PAGE_RW;
+	return 0;
+}
+
+//Method 3
+unsigned long clear_and_return_cr0(void){
+	unsigned long cr0 = 0;
+	unsigned long ret;
+	asm volatile("movq %%cr0, %%rax" : "=a"(cr0));
+	ret = cr0;
+	cr0 &= 0xfffffffffffeffff;
+	asm volatile("movq %%rax, %%cr0" : : "a"(cr0));
+	return ret;
+}
+
+void setback_cr0(unsigned long val){
+	asm volatile("movq %%rax, %%cr0" : : "a"(val));
+}
+
+//General
+int get_sct(void){
+	int ret = 1;
+
+	sys_call_table = get_sys_call_table();
+	if(sys_call_table == NULL){
+		printk(KERN_INFO "sys_call_table is NULL\n");
+		ret = 0;
+	}
+
+#ifdef CONFIG_IA32_EMULATION
+	ia32_sys_call_table = get_ia32_sys_call_table();
+	if(ia32_sys_call_table == NULL){
+		vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
+		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
+		ret = 0;
+	}
+#endif
+
+	return ret;
+}
+
+int set_sct_rw(void){
+#if method == 1
+	sys_call_table = get_writable_sct(sys_call_table);
+#elif method == 2
+	make_rw((unsigned long)sys_call_table);
+#elif method == 3
+	orig_cr0 = clear_and_return_cr0(); //call only once for both archs
+#endif
+#ifdef CONFIG_IA32_EMULATION
+#if method == 1
+	ia32_sys_call_table = get_writable_sct(ia32_sys_call_table);
+#elif method == 2
+	make_rw((unsigned long)ia32_sys_call_table);
+#endif
+#endif
+
+	return 1;
+}
+
+int set_sct_ro(void){
+#if method == 1
+	vunmap((void*)((unsigned long)sys_call_table & PAGE_MASK));
+#elif method == 2
+	make_ro((unsigned long)sys_call_table);
+#elif method == 3
+	setback_cr0(orig_cr0); //call only once for both archs
+#endif
+#ifdef CONFIG_IA32_EMULATION
+#if method == 1
+	vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK));
+#elif method == 2
+	make_ro((unsigned long)ia32_sys_call_table);
+#endif
+#endif
+
+	return 1;
+}
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| /proc methods related to the control of procmon                             |
+\*****************************************************************************/
 
 static int read_proc(char *buf, char **start, off_t offset, int count, int *eof, void *data){
 	int ret;
@@ -109,6 +266,15 @@ static int write_proc(struct file *file, const char __user *buf, unsigned long l
 	return len;
 }
 
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
+| Main methods: _init and _exit                                               |
+\*****************************************************************************/
+
 static int __init hook_init(void){
 	proc_write_entry = create_proc_entry("procmon", 0666, NULL);
 	if(!proc_write_entry){
@@ -123,6 +289,10 @@ static int __init hook_init(void){
 static void __exit hook_exit(void){
 	remove_proc_entry("procmon", NULL);
 }
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
 
 module_init(hook_init);
 module_exit(hook_exit);
