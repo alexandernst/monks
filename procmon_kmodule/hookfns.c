@@ -1,12 +1,5 @@
 #include "syshijack.h"
 
-//struct semaphore name;
-//#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37)
-//static DECLARE_MUTEX(name);
-//#else
-//static DEFINE_SEMAPHORE(name);
-//#endif
-
 /*****************************************************************************\
 | (For each syscall) Define a function which we will use to save the REAL     |
 | syscall function and define a FAKE function which we will use to replace    |
