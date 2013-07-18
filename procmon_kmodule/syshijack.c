@@ -1,5 +1,7 @@
 #include "syshijack.h"
 
+struct semaphore _sm;
+
 /*****************************************************************************\
 | /proc related vars                                                          |
 \*****************************************************************************/
@@ -276,6 +278,7 @@ static int write_proc(struct file *file, const char __user *buf, unsigned long l
 \*****************************************************************************/
 
 static int __init hook_init(void){
+	sema_init(&_sm, 1);
 	proc_write_entry = create_proc_entry("procmon", 0666, NULL);
 	if(!proc_write_entry){
 		printk(KERN_INFO "Error creating proc entry\n");

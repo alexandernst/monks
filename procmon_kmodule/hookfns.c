@@ -1,5 +1,12 @@
 #include "syshijack.h"
 
+//struct semaphore name;
+//#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37)
+//static DECLARE_MUTEX(name);
+//#else
+//static DEFINE_SEMAPHORE(name);
+//#endif
+
 /*****************************************************************************\
 | (For each syscall) Define a function which we will use to save the REAL     |
 | syscall function and define a FAKE function which we will use to replace    |
@@ -69,8 +76,10 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 \*****************************************************************************/
 
 void hook_calls(void){
-	if(!get_sct() || !set_sct_rw())
-		return;
+
+	down_interruptible(&_sm);
+
+	if(get_sct() && set_sct_rw()){
 
 /*****************************************************************************\
 | This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
@@ -80,22 +89,26 @@ void hook_calls(void){
 \*****************************************************************************/
 
 /* __NR_read / __NR32_read */
-	HOOK(__NR_read, real_sys_read, hooked_sys_read);
+		HOOK(__NR_read, real_sys_read, hooked_sys_read);
 #ifdef __NR32_read
-	HOOK_IA32(__NR32_read, real_sys_read32, hooked_sys_read32);
+		HOOK_IA32(__NR32_read, real_sys_read32, hooked_sys_read32);
 #endif
 
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
 
-	if(!get_sct() || !set_sct_ro())
-		return;
+		set_sct_ro();
+	}
+	
+	up(&_sm);
 }
 
 void unhook_calls(void){
-	if(!get_sct() || !set_sct_rw())
-		return;
+
+	down_interruptible(&_sm);
+
+	if(get_sct() && set_sct_rw()){
 
 /*****************************************************************************\
 | This is where we restore the REAL functions, aka, undo what HOOK and        |
@@ -103,15 +116,17 @@ void unhook_calls(void){
 \*****************************************************************************/
 
 /* __NR_read / __NR_read32 */
-	UNHOOK(__NR_read, real_sys_read);
+		UNHOOK(__NR_read, real_sys_read);
 #ifdef __NR32_read
-	UNHOOK_IA32(__NR32_read, real_sys_read32);
+		UNHOOK_IA32(__NR32_read, real_sys_read32);
 #endif
 
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
 
-	if(!get_sct() || !set_sct_ro())
-		return;
+		set_sct_ro();
+	}
+
+	up(&_sm);
 }
