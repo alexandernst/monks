@@ -15,6 +15,8 @@
 #include "unistd_32.h"
 #endif
 
+extern struct semaphore _sm;
+
 /*****************************************************************************\
 | Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
 | Method 1 will use kernel pages and vmap                                     |
@@ -53,14 +55,24 @@
 | FF = FAKE FUNCTION as in the function which we'll be using to fake F        |
 \*****************************************************************************/
 
-#define HOOK(F, RF, FF) RF = sys_call_table[F]; sys_call_table[F] = FF;
+#define HOOK(F, RF, FF)           \
+DEBUG("HOOKING " #F "\n");        \
+RF = sys_call_table[F];           \
+sys_call_table[F] = FF;
 #ifdef CONFIG_IA32_EMULATION
-	#define HOOK_IA32(F, RF, FF) RF = ia32_sys_call_table[F]; ia32_sys_call_table[F] = FF;
+#define HOOK_IA32(F, RF, FF)      \
+DEBUG("HOOKING_IA32 " #F "\n");   \
+RF = ia32_sys_call_table[F];      \
+ia32_sys_call_table[F] = FF;
 #endif
 
-#define UNHOOK(F, RF) sys_call_table[F] = RF;
+#define UNHOOK(F, RF)             \
+DEBUG("UNHOOKING " #F "\n");      \
+sys_call_table[F] = RF;
 #ifdef CONFIG_IA32_EMULATION
-	#define UNHOOK_IA32(F, RF) ia32_sys_call_table[F] = RF;
+#define UNHOOK_IA32(F, RF)        \
+DEBUG("UNHOOKING_IA32 " #F "\n"); \
+ia32_sys_call_table[F] = RF;
 #endif
 
 /*****************************************************************************\
