@@ -14,7 +14,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 
-	r = real_sys_read(fd, buf, count);
+	r = (*real_sys_read)(fd, buf, count);
 
 	//unhook_calls();
 
@@ -41,7 +41,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 
-	r = real_sys_read32(fd, buf, count);
+	r = (*real_sys_read32)(fd, buf, count);
 
 	//unhook_calls();
 
