@@ -163,7 +163,7 @@ int get_sct(void){
 
 	sys_call_table = get_sys_call_table();
 	if(sys_call_table == NULL){
-		printk(KERN_INFO "sys_call_table is NULL\n");
+		DEBUG(KERN_INFO "sys_call_table is NULL\n");
 		ret = 0;
 	}else{
 		DEBUG(KERN_INFO "get_sct sct: %p\n", sys_call_table);
@@ -173,7 +173,7 @@ int get_sct(void){
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(ia32_sys_call_table == NULL){
 		vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK)); //KEEP?
-		printk(KERN_INFO "ia32_sys_call_table is NULL\n");
+		DEBUG(KERN_INFO "ia32_sys_call_table is NULL\n");
 		ret = 0;
 	}else{
 		DEBUG(KERN_INFO "get_sct ia32_sct: %p\n", ia32_sys_call_table);
@@ -281,7 +281,7 @@ static int __init hook_init(void){
 	sema_init(&_sm, 1);
 	proc_write_entry = create_proc_entry("procmon", 0666, NULL);
 	if(!proc_write_entry){
-		printk(KERN_INFO "Error creating proc entry\n");
+		DEBUG(KERN_INFO "Error creating proc entry\n");
 		return -ENOMEM;
 	}
 	proc_write_entry->read_proc = read_proc;

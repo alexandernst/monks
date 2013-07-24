@@ -1,7 +1,7 @@
 #include "syshijack.h"
 
 void print_info(syscall_info *i){
-	printk(KERN_INFO
+	DEBUG(KERN_INFO
 		"%s"      /* Process name */
 		"%15u"    /* PID          */
 		"%10s"    /* Operation    */
