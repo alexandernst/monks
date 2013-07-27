@@ -11,12 +11,13 @@
 /* __NR_read / __NR_read32 */
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
+
+	unhook_calls();
+
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 
 	r = (*real_sys_read)(fd, buf, count);
-
-	//unhook_calls();
 
 	i->pname = current->comm;
 	i->pid = current->pid;
@@ -31,19 +32,20 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 	kfree(i->path);
 	kfree(i);
 
-	//hook_calls();
+	hook_calls();
 
 	return r;
 }
 #ifdef CONFIG_IA32_EMULATION
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
+
+	unhook_calls();
+
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 
 	r = (*real_sys_read32)(fd, buf, count);
-
-	//unhook_calls();
 
 	i->pname = current->comm;
 	i->pid = current->pid;
@@ -58,7 +60,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 	kfree(i->path);
 	kfree(i);
 
-	//hook_calls();
+	hook_calls();
 
 	return r;
 }
