@@ -82,6 +82,11 @@ ia32_sys_call_table[F] = RF;
 |                                      END                                    |
 \*****************************************************************************/
 
+
+/*****************************************************************************\
+| Main Procmon functions                                                      |
+\*****************************************************************************/
+
 extern void **sys_call_table;
 #ifdef CONFIG_IA32_EMULATION
 extern void **ia32_sys_call_table;
@@ -112,15 +117,6 @@ struct idtr{
 	void *base;
 } __attribute__ ((packed));
 
-typedef struct syscall_intercept_info{
-	char *pname;
-	pid_t pid;
-	char *operation;
-	char *path;
-	unsigned int result;
-	char *details;
-} syscall_info;
-
 void *get_writable_sct(void *sct_addr);
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
 #ifdef __i386__
@@ -148,12 +144,18 @@ void hook_calls(void);
 void unhook_calls(void);
 
 /*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+
+/*****************************************************************************\
 | Control                                                                     |
 \*****************************************************************************/
 
 extern char proc_data[1];
 extern struct proc_dir_entry *proc_write_entry;
 extern const struct file_operations proc_file_fops;
+
 ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff_t *pos);
 ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff_t *pos);
 
@@ -165,6 +167,15 @@ ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff
 /*****************************************************************************\
 | Utils                                                                       |
 \*****************************************************************************/
+
+typedef struct syscall_intercept_info{
+	char *pname;
+	pid_t pid;
+	char *operation;
+	char *path;
+	unsigned int result;
+	char *details;
+} syscall_info;
 
 void print_info(syscall_info *i);
 char *path_from_fd(unsigned int fd);
