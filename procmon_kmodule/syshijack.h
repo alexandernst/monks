@@ -1,3 +1,6 @@
+#ifndef SYSHIJACK_H_INCLUDED
+#define SYSHIJACK_H_INCLUDED
+
 #include <asm/page.h>
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
@@ -28,6 +31,9 @@ extern struct semaphore _sm;
 \*****************************************************************************/
 
 #define method 3
+
+//If method 3 is set, this will contain the value of cr0, bit 16
+extern unsigned long orig_cr0;
 
 /*****************************************************************************\
 |                                      END                                    |
@@ -183,3 +189,5 @@ char *path_from_fd(unsigned int fd);
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+#endif
