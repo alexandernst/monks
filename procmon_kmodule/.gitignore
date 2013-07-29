@@ -1,5 +1,6 @@
 *
 !.gitignore
+!control.c
 !utils.c
 !hookfns.c
 !syshijack.c
