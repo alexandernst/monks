@@ -1,9 +1,10 @@
 #include <asm/page.h>
+#include <asm/uaccess.h>
+#include <asm/unistd.h>
+
 #include <linux/mm.h>
 #include <linux/init.h>
 #include <linux/slab.h>
-#include <linux/slab_def.h>
-#include <asm/uaccess.h>
 #include <linux/sched.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -13,7 +14,6 @@
 #include <linux/proc_fs.h>
 #include <linux/semaphore.h>
 
-#include <asm/unistd.h>
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"
 #endif
