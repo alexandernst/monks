@@ -206,7 +206,6 @@ int get_sct(void){
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(ia32_sys_call_table == NULL){
-		vunmap((void*)((unsigned long)ia32_sys_call_table & PAGE_MASK)); //KEEP?
 		DEBUG(KERN_INFO "ia32_sys_call_table is NULL\n");
 		ret = 0;
 	}else{
