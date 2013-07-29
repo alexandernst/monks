@@ -1,5 +1,7 @@
+#include <asm/page.h>
 #include <linux/mm.h>
 #include <linux/init.h>
+#include <linux/slab.h>
 #include <asm/uaccess.h>
 #include <linux/sched.h>
 #include <linux/kernel.h>

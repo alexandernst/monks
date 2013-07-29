@@ -3,11 +3,46 @@
 struct semaphore _sm;
 
 /*****************************************************************************\
-| /proc related vars                                                          |
+| /proc vars and methods related to the control of procmon                    |
 \*****************************************************************************/
 
 static char proc_data[1];
 static struct proc_dir_entry *proc_write_entry;
+
+static ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff_t *pos){
+	int ret;
+	if(*pos == 0){
+		memcpy(buf, proc_data, 1);
+		*pos = (loff_t)1;
+		ret = 1;
+	}else{
+		ret = 0;
+	}
+	return ret;
+}
+
+static ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff_t *pos){
+	
+	if(count > 2)
+		return -EINVAL;
+
+	if(copy_from_user(proc_data, buf, 1))
+		return -EFAULT;
+
+	if(strcmp("1", proc_data) == 0){
+		hook_calls();
+	}else if(strcmp("0", proc_data) == 0){
+		unhook_calls();
+	}
+	
+	return count;
+}
+
+static const struct file_operations proc_file_fops = {
+	.owner = THIS_MODULE,
+	.read  = read_proc,
+	.write = write_proc,
+};
 
 /*****************************************************************************\
 |                                      END                                    |
@@ -237,55 +272,17 @@ int set_sct_ro(void){
 
 
 /*****************************************************************************\
-| /proc methods related to the control of procmon                             |
-\*****************************************************************************/
-
-static int read_proc(char *buf, char **start, off_t offset, int count, int *eof, void *data){
-	int ret;
-	if(offset > 0){
-		ret  = 0;
-	} else {
-		memcpy(buf, proc_data, 1);
-		ret = 1;
-	}
-
-	return ret;
-}
-
-static int write_proc(struct file *file, const char __user *buf, unsigned long len, void *data){
-	if(len > 2)
-		return -EINVAL;
-
-	if(copy_from_user(proc_data, buf, 1))
-		return -EFAULT;
-
-	if(strcmp("1", proc_data) == 0){
-		hook_calls();
-	}else if(strcmp("0", proc_data) == 0){
-		unhook_calls();
-	}
-	
-	return len;
-}
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-
-/*****************************************************************************\
 | Main methods: _init and _exit                                               |
 \*****************************************************************************/
 
 static int __init hook_init(void){
 	sema_init(&_sm, 1);
-	proc_write_entry = create_proc_entry("procmon", 0666, NULL);
-	if(!proc_write_entry){
+	
+	proc_write_entry = proc_create("procmon", 0666, NULL, &proc_file_fops);
+	if(proc_write_entry == NULL){
 		DEBUG(KERN_INFO "Error creating proc entry\n");
 		return -ENOMEM;
 	}
-	proc_write_entry->read_proc = read_proc;
-	proc_write_entry->write_proc = write_proc;
 	return 0;
 }
 
