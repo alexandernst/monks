@@ -12,7 +12,7 @@
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
-	unhook_calls();
+	//unhook_calls();
 
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
@@ -32,7 +32,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 	kfree(i->path);
 	kfree(i);
 
-	hook_calls();
+	//hook_calls();
 
 	return r;
 }
@@ -40,7 +40,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
 
-	unhook_calls();
+	//unhook_calls();
 
 	ssize_t r;
 	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
@@ -60,7 +60,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 	kfree(i->path);
 	kfree(i);
 
-	hook_calls();
+	//hook_calls();
 
 	return r;
 }
