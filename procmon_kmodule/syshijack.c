@@ -22,7 +22,6 @@ static ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff
 }
 
 static ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff_t *pos){
-	
 	if(count > 2)
 		return -EINVAL;
 
