@@ -19,7 +19,7 @@ Loading the module isn't any different from loading any other module. ```insmod 
 loading it and ```rmmod procmon.ko``` for unloading it.
 
 To start the actual hijack process, once loaded the module, run ```echo 1 > /proc/procmon```.
-Once started, you'll probably want to run ```dmesg -w``` (or ```dmesg``` if your kernel doesn't support ```-w```)
+Once started, you'll probably want to run ```dmesg -w``` (or ```watch -n 0.1 -t 'dmesg | tail -50'``` if your kernel doesn't support ```-w```)
 in another console to see an actual output.
 
 To stop it just run ```echo 0 > /proc/procmon```.
