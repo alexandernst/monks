@@ -12,57 +12,72 @@
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
-	//unhook_calls();
-
 	ssize_t r;
-	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
-
 	r = (*real_sys_read)(fd, buf, count);
 
-	i->pname = current->comm;
-	i->pid = current->pid;
-	i->operation = "READ";
-	i->path = path_from_fd(fd);
-	i->result = r;
-	i->details = "No details ATM";
+	if(!is_active()){
 
-	if(count == 1 && fd == 0)
-		print_info(i);
+		return r;
 
-	kfree(i->path);
-	kfree(i);
+	}else{
 
-	//hook_calls();
+		deactivate();
 
-	return r;
+		syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+
+		i->pname = current->comm;
+		i->pid = current->pid;
+		i->operation = "READ";
+		i->path = path_from_fd(fd);
+		i->result = r;
+		i->details = "No details ATM";
+
+		if(count == 1 && fd == 0)
+			print_info(i);
+
+		kfree(i->path);
+		kfree(i);
+
+		activate();
+
+		return r;
+
+	}
 }
 #ifdef CONFIG_IA32_EMULATION
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
 
-	//unhook_calls();
-
 	ssize_t r;
-	syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
-
 	r = (*real_sys_read32)(fd, buf, count);
 
-	i->pname = current->comm;
-	i->pid = current->pid;
-	i->operation = "READ32";
-	i->path = path_from_fd(fd);
-	i->result = r;
-	i->details = "No details ATM";
+	if(!is_active()){
 
-	if(count == 1 && fd == 0)
-		print_info(i);
+		return r;
 
-	kfree(i->path);
-	kfree(i);
+	}else{
 
-	//hook_calls();
+		deactivate();
 
-	return r;
+		syscall_info *i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+
+		i->pname = current->comm;
+		i->pid = current->pid;
+		i->operation = "READ32";
+		i->path = path_from_fd(fd);
+		i->result = r;
+		i->details = "No details ATM";
+
+		if(count == 1 && fd == 0)
+			print_info(i);
+
+		kfree(i->path);
+		kfree(i);
+
+		activate();
+
+		return r;
+	}
 }
 #endif
 

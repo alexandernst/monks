@@ -4,8 +4,20 @@
 | /proc vars and methods related to the control of procmon                    |
 \*****************************************************************************/
 
-char proc_data[1];
+char proc_data[1] = "0";
 struct proc_dir_entry *proc_write_entry;
+
+void activate(void){
+	memcpy(proc_data, "1", 1);
+}
+
+void deactivate(void){
+	memcpy(proc_data, "0", 1);
+}
+
+int is_active(void){
+	return strcmp("1", proc_data) == 0;
+}
 
 ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff_t *pos){
 	int ret;
@@ -27,9 +39,9 @@ ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff
 		return -EFAULT;
 
 	if(strcmp("1", proc_data) == 0){
-		hook_calls();
+		activate();
 	}else if(strcmp("0", proc_data) == 0){
-		unhook_calls();
+		deactivate();
 	}
 	
 	return count;

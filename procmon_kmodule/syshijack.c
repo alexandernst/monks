@@ -225,10 +225,16 @@ static int __init hook_init(void){
 		DEBUG(KERN_INFO "Error creating proc entry\n");
 		return -ENOMEM;
 	}
+
+	hook_calls();
+
 	return 0;
 }
 
 static void __exit hook_exit(void){
+	deactivate(); //just in case user did not deactivate
+	unhook_calls();
+
 	remove_proc_entry("procmon", NULL);
 }
 
