@@ -32,8 +32,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 		i->result = r;
 		i->details = "No details ATM";
 
-		if(count == 1 && fd == 0)
-			print_info(i);
+		print_info(i);
 
 		kfree(i->path);
 		kfree(i);
