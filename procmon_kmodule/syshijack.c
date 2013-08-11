@@ -232,7 +232,9 @@ static int __init hook_init(void){
 }
 
 static void __exit hook_exit(void){
-	deactivate(); //just in case user did not deactivate
+	if(is_active()){ //just in case user did not deactivate
+		deactivate();
+	}
 	unhook_calls();
 
 	remove_proc_entry("procmon", NULL);
