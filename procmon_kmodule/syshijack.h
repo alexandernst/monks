@@ -15,13 +15,13 @@
 #include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/proc_fs.h>
-#include <linux/semaphore.h>
+#include <linux/spinlock.h>
 
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"
 #endif
 
-extern struct semaphore _sm;
+extern spinlock_t _sl;
 
 /*****************************************************************************\
 | Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
