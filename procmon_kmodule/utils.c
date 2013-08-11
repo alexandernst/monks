@@ -2,12 +2,12 @@
 
 void print_info(syscall_info *i){
 	printk(KERN_INFO
-		"%s"      /* Process name */
-		"%15u"    /* PID          */
-		"%10s"    /* Operation    */
-		"%15s"    /* Path         */
-		"%50u"    /* Result       */
-		"%20s\n", /* Details      */
+		"%-15.10s"     /* Process name */
+		"%10u"         /* PID          */
+		" %-15.10s"    /* Operation    */
+		"%-50.45s"     /* Path         */
+		"%10u"         /* Result       */
+		" %-20.20s\n", /* Details      */
 
 		i->pname,
 		i->pid,
