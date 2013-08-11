@@ -95,7 +95,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 void hook_calls(void){
 
 	unsigned long flags;
-	spin_lock_irqsave(&_sl, flags);
+	raw_spin_lock_irqsave(&_sl, flags);
 
 	if(get_sct() && set_sct_rw()){
 
@@ -108,7 +108,7 @@ void hook_calls(void){
 		set_sct_ro();
 	}
 	
-	spin_unlock_irqrestore(&_sl, flags);
+	raw_spin_unlock_irqrestore(&_sl, flags);
 }
 
 /*****************************************************************************\
@@ -124,7 +124,7 @@ void hook_calls(void){
 void unhook_calls(void){
 
 	unsigned long flags;
-	spin_lock_irqsave(&_sl, flags);
+	raw_spin_lock_irqsave(&_sl, flags);
 
 	if(get_sct() && set_sct_rw()){
 
@@ -137,7 +137,7 @@ void unhook_calls(void){
 		set_sct_ro();
 	}
 
-	spin_unlock_irqrestore(&_sl, flags);
+	raw_spin_unlock_irqrestore(&_sl, flags);
 }
 
 /*****************************************************************************\

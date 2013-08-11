@@ -1,6 +1,6 @@
 #include "syshijack.h"
 
-spinlock_t _sl;
+raw_spinlock_t _sl;
 unsigned long orig_cr0;
 
 /*****************************************************************************\
@@ -218,7 +218,7 @@ int set_sct_ro(void){
 \*****************************************************************************/
 
 static int __init hook_init(void){
-	spin_lock_init(&_sl);
+	raw_spin_lock_init(&_sl);
 	
 	proc_write_entry = proc_create("procmon", 0666, NULL, &proc_file_fops);
 	if(proc_write_entry == NULL){

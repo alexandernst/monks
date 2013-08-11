@@ -21,7 +21,7 @@
 #include "unistd_32.h"
 #endif
 
-extern spinlock_t _sl;
+extern raw_spinlock_t _sl;
 
 /*****************************************************************************\
 | Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
