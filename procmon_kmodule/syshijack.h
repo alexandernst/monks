@@ -24,10 +24,9 @@
 
 #include "utils.h"
 #include "control.h"
+#include "hookfns.h"
 #include "syscalls_hash.h"
 #include "control_ro_rw_syscall_table.h"
-
-extern raw_spinlock_t _sl;
 
 /*****************************************************************************\
 | Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
