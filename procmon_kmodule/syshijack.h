@@ -1,8 +1,6 @@
 #ifndef SYSHIJACK_H_INCLUDED
 #define SYSHIJACK_H_INCLUDED
 
-#include "syscalls_hash.h"
-
 #include <asm/page.h>
 #include <asm/unistd.h>
 #include <asm/uaccess.h>
@@ -23,6 +21,9 @@
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"
 #endif
+
+#include "control.h"
+#include "syscalls_hash.h"
 
 extern raw_spinlock_t _sl;
 
@@ -153,25 +154,6 @@ int set_sct_ro(void);
 
 void hook_calls(void);
 void unhook_calls(void);
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-
-/*****************************************************************************\
-| Control                                                                     |
-\*****************************************************************************/
-
-extern char proc_data[1];
-extern struct proc_dir_entry *proc_write_entry;
-extern const struct file_operations proc_file_fops;
-
-void activate(void);
-void deactivate(void);
-int is_active(void);
-ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff_t *pos);
-ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff_t *pos);
 
 /*****************************************************************************\
 |                                      END                                    |
