@@ -24,7 +24,7 @@
 
 #include "utils.h"
 #include "control.h"
-#include "hookfns.h"
+#include "fns.h"
 #include "syscalls_hash.h"
 #include "control_ro_rw_syscall_table.h"
 
