@@ -5,6 +5,7 @@
 !Makefile
 
 !uthash.h
+!control.h
 !syshijack.h
 !syscalls_hash.h
 !unistd_32_hack.h
