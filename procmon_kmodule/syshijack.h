@@ -2,8 +2,8 @@
 #define SYSHIJACK_H_INCLUDED
 
 #include <asm/page.h>
-#include <asm/uaccess.h>
 #include <asm/unistd.h>
+#include <asm/uaccess.h>
 
 #include <linux/mm.h>
 #include <linux/init.h>
@@ -182,7 +182,8 @@ typedef struct syscall_intercept_info{
 	pid_t pid;
 	char *operation;
 	char *path;
-	unsigned int result;
+	//unsigned int result;
+	char *result;
 	char *details;
 } syscall_info;
 

@@ -29,8 +29,16 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 		i->pid = current->pid;
 		i->operation = "READ";
 		i->path = path_from_fd(fd);
-		i->result = r;
-		i->details = "No details ATM";
+
+		char s[255];
+		if(IS_ERR((void *)r)){
+			i->result = "Error";
+			sprintf(s, "Errno %zd", r);
+		}else{
+			i->result = "Ok";
+			sprintf(s, "Read %zd bytes (was requested to read %zd)", r, count);
+		}
+		i->details = s;
 
 		print_info(i);
 
@@ -64,8 +72,16 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 		i->pid = current->pid;
 		i->operation = "READ32";
 		i->path = path_from_fd(fd);
-		i->result = r;
-		i->details = "No details ATM";
+
+		char s[255];
+		if(IS_ERR((void *)r)){
+			i->result = "Error";
+			sprintf(s, "Errno %zd", r);
+		}else{
+			i->result = "Ok";
+			sprintf(s, "Read %zd bytes (was requested to read %zd)", r, count);
+		}
+		i->details = s;
 
 		if(count == 1 && fd == 0)
 			print_info(i);

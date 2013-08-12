@@ -6,8 +6,8 @@ void print_info(syscall_info *i){
 		"%10u"         /* PID          */
 		" %-15.10s"    /* Operation    */
 		"%-50.45s"     /* Path         */
-		"%10u"         /* Result       */
-		" %-20.20s\n", /* Details      */
+		"%-10.10s"     /* Result       */
+		" %-200.200s\n", /* Details      */
 
 		i->pname,
 		i->pid,
