@@ -70,13 +70,15 @@
 #define HOOK(F, RF, FF)                       \
 DEBUG(KERN_INFO "HOOKING " #F "\n");          \
 RF = (void *)sys_call_table[F];               \
-sys_call_table[F] = FF;
+sys_call_table[F] = FF;                       \
+REGISTER(F);
 
 #ifdef CONFIG_IA32_EMULATION
 #define HOOK_IA32(F, RF, FF)                  \
 DEBUG(KERN_INFO "HOOKING_IA32 " #F "\n");     \
 RF = (void *)ia32_sys_call_table[F];          \
-ia32_sys_call_table[F] = FF;
+ia32_sys_call_table[F] = FF;                  \
+REGISTER(F);
 #endif
 
 #define UNHOOK(F, RF)                         \
