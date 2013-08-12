@@ -24,6 +24,7 @@
 
 #include "control.h"
 #include "syscalls_hash.h"
+#include "control_ro_rw_syscall_table.h"
 
 extern raw_spinlock_t _sl;
 
@@ -32,12 +33,11 @@ extern raw_spinlock_t _sl;
 | Method 1 will use kernel pages and vmap                                     |
 | Method 2 will use virtual address                                           |
 | Method 3 will disable cr0, reg 16                                           |
+| Algo define if debugging is enabled or disabled                             |
 \*****************************************************************************/
 
 #define method 3
-
-//If method 3 is set, this will contain the value of cr0, bit 16
-extern unsigned long orig_cr0;
+#define debug 1
 
 /*****************************************************************************\
 |                                      END                                    |
@@ -48,7 +48,6 @@ extern unsigned long orig_cr0;
 | Define debug macro                                                          |
 \*****************************************************************************/
 
-#define debug 1
 #if debug == 1
 #define DEBUG(...) printk(__VA_ARGS__);
 #else
@@ -141,16 +140,6 @@ void *get_ia32_sys_call_table(void);
 #ifdef __x86_64__
 void *get_sys_call_table(void);
 #endif
-
-int make_rw(unsigned long address);
-int make_ro(unsigned long address);
-
-unsigned long clear_and_return_cr0(void);
-void setback_cr0(unsigned long val);
-
-int get_sct(void);
-int set_sct_rw(void);
-int set_sct_ro(void);
 
 void hook_calls(void);
 void unhook_calls(void);
