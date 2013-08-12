@@ -1,4 +1,4 @@
-#include "syshijack.h"
+#include "utils.h"
 
 void print_info(syscall_info *i){
 	printk(KERN_INFO

@@ -22,6 +22,7 @@
 #include "unistd_32.h"
 #endif
 
+#include "utils.h"
 #include "control.h"
 #include "syscalls_hash.h"
 #include "control_ro_rw_syscall_table.h"
@@ -143,27 +144,6 @@ void *get_sys_call_table(void);
 
 void hook_calls(void);
 void unhook_calls(void);
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-
-/*****************************************************************************\
-| Utils                                                                       |
-\*****************************************************************************/
-
-typedef struct syscall_intercept_info{
-	char *pname;
-	pid_t pid;
-	char *operation;
-	char *path;
-	char *result;
-	char *details;
-} syscall_info;
-
-void print_info(syscall_info *i);
-char *path_from_fd(unsigned int fd);
 
 /*****************************************************************************\
 |                                      END                                    |
