@@ -22,9 +22,10 @@
 #include "unistd_32.h"
 #endif
 
-#include "utils.h"
-#include "control.h"
 #include "fns.h"
+#include "utils.h"
+#include "hookfns.h"
+#include "control.h"
 #include "syscalls_hash.h"
 #include "control_ro_rw_syscall_table.h"
 
@@ -142,9 +143,6 @@ void *get_ia32_sys_call_table(void);
 #ifdef __x86_64__
 void *get_sys_call_table(void);
 #endif
-
-void hook_calls(void);
-void unhook_calls(void);
 
 /*****************************************************************************\
 |                                      END                                    |

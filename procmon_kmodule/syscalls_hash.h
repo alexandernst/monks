@@ -17,10 +17,10 @@ struct syscall_hash {
 extern struct syscall_hash *syscall_items;
 
 #define REGISTER(F)                                         \
-for(int i = 0; i < 1; i++){                                 \ //scope hack for
-	struct syscall_hash *syscall =                          \ //syscall being
-		(struct syscall_hash*)                              \ //redeclared
-		kmalloc(sizeof(struct syscall_hash), GFP_KERNEL);   \ //multiple times
+for(int i = 0; i < 1; i++){                                 \
+	struct syscall_hash *syscall =                          \
+		(struct syscall_hash*)                              \
+		kmalloc(sizeof(struct syscall_hash), GFP_KERNEL);   \
 	strncpy(syscall->name, #F, 256);                        \
 	syscall->calls_in_last_sec = 0;                         \
 	HASH_ADD_STR(syscall_items, name, syscall);             \
