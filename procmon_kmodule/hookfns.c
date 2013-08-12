@@ -57,7 +57,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
 
-	INCR_SYSCALL_REG_INFO(__NR_read);
+	INCR_SYSCALL_REG_INFO(__NR32_read);
 
 	ssize_t r;
 	r = (*real_sys_read32)(fd, buf, count);
