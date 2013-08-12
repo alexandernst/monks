@@ -4,6 +4,7 @@
 !Kbuild
 !Makefile
 
+!utils.h
 !uthash.h
 !control.h
 !syshijack.h
