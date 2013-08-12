@@ -1,6 +1,8 @@
 #ifndef SYSHIJACK_H_INCLUDED
 #define SYSHIJACK_H_INCLUDED
 
+#include "syscalls_hash.h"
+
 #include <asm/page.h>
 #include <asm/unistd.h>
 #include <asm/uaccess.h>
@@ -8,6 +10,7 @@
 #include <linux/mm.h>
 #include <linux/init.h>
 #include <linux/slab.h>
+#include <linux/delay.h>
 #include <linux/sched.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -68,6 +71,7 @@ extern unsigned long orig_cr0;
 DEBUG(KERN_INFO "HOOKING " #F "\n");          \
 RF = (void *)sys_call_table[F];               \
 sys_call_table[F] = FF;
+
 #ifdef CONFIG_IA32_EMULATION
 #define HOOK_IA32(F, RF, FF)                  \
 DEBUG(KERN_INFO "HOOKING_IA32 " #F "\n");     \
@@ -78,6 +82,7 @@ ia32_sys_call_table[F] = FF;
 #define UNHOOK(F, RF)                         \
 DEBUG(KERN_INFO "UNHOOKING " #F "\n");        \
 sys_call_table[F] = RF;
+
 #ifdef CONFIG_IA32_EMULATION
 #define UNHOOK_IA32(F, RF)                    \
 DEBUG(KERN_INFO "UNHOOKING_IA32 " #F "\n");   \
@@ -182,7 +187,6 @@ typedef struct syscall_intercept_info{
 	pid_t pid;
 	char *operation;
 	char *path;
-	//unsigned int result;
 	char *result;
 	char *details;
 } syscall_info;

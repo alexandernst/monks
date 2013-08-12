@@ -12,6 +12,8 @@
 asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
+	INCR_SYSCALL_REG_INFO(__NR_read);
+
 	ssize_t r;
 	r = (*real_sys_read)(fd, buf, count);
 
@@ -30,7 +32,7 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 		i->operation = "READ";
 		i->path = path_from_fd(fd);
 
-		char s[255];
+		char s[256];
 		if(IS_ERR((void *)r)){
 			i->result = "Error";
 			sprintf(s, "Errno %zd", r);
@@ -73,7 +75,7 @@ asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t coun
 		i->operation = "READ32";
 		i->path = path_from_fd(fd);
 
-		char s[255];
+		char s[256];
 		if(IS_ERR((void *)r)){
 			i->result = "Error";
 			sprintf(s, "Errno %zd", r);
@@ -116,6 +118,7 @@ void hook_calls(void){
 
 /* __NR_read / __NR32_read */
 		HOOK(__NR_read, real_sys_read, hooked_sys_read);
+		REGISTER(__NR_read);
 #ifdef __NR32_read
 		HOOK_IA32(__NR32_read, real_sys_read32, hooked_sys_read32);
 #endif

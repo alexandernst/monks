@@ -237,6 +237,24 @@ static void __exit hook_exit(void){
 	}
 	unhook_calls();
 
+	struct syscall_hash *item, *tmp;
+	while(true){
+		unsigned long int ncalls = 0;
+		HASH_ITER(hh, syscall_items, item, tmp){
+			ncalls += item->calls_in_last_sec;
+			item->calls_in_last_sec = 0;
+		}
+		if(ncalls == 0){
+			HASH_ITER(hh, syscall_items, item, tmp){
+				HASH_DEL(syscall_items, item);
+				kfree(item);
+			}
+			break;
+		}else{
+			msleep_interruptible(500);
+		}
+	}
+
 	remove_proc_entry("procmon", NULL);
 }
 
