@@ -4,7 +4,7 @@ ccflags-y := -std=gnu99 -g -Wall -Wno-declaration-after-statement
 
 obj-m += procmon.o
 
-procmon-y += syshijack.o hookfns.o utils.o control.o syscalls_hash.o
+procmon-y += syshijack.o hookfns.o utils.o control.o syscalls_hash.o control_ro_rw_syscall_table.o
 
 $(obj)/syshijack.o: $(obj)/unistd_32.h
 
