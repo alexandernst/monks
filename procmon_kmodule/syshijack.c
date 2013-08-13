@@ -82,8 +82,6 @@ void *get_sys_call_table(void){
 \*****************************************************************************/
 
 static int __init hook_init(void){
-	raw_spin_lock_init(&_sl);
-	
 	proc_write_entry = proc_create("procmon", 0666, NULL, &proc_file_fops);
 	if(proc_write_entry == NULL){
 		DEBUG(KERN_INFO "Error creating proc entry\n");

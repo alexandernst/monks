@@ -10,10 +10,6 @@ raw_spinlock_t _sl;
 \*****************************************************************************/
 
 void hook_calls(void){
-
-	unsigned long flags;
-	raw_spin_lock_irqsave(&_sl, flags);
-
 	if(get_sct() && set_sct_rw()){
 
 /* __NR_read / __NR32_read */
@@ -24,8 +20,6 @@ void hook_calls(void){
 
 		set_sct_ro();
 	}
-	
-	raw_spin_unlock_irqrestore(&_sl, flags);
 }
 
 /*****************************************************************************\
@@ -39,10 +33,6 @@ void hook_calls(void){
 \*****************************************************************************/
 
 void unhook_calls(void){
-
-	unsigned long flags;
-	raw_spin_lock_irqsave(&_sl, flags);
-
 	if(get_sct() && set_sct_rw()){
 
 /* __NR_read / __NR_read32 */
@@ -53,8 +43,6 @@ void unhook_calls(void){
 
 		set_sct_ro();
 	}
-
-	raw_spin_unlock_irqrestore(&_sl, flags);
 }
 
 /*****************************************************************************\

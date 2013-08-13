@@ -16,7 +16,6 @@
 #include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/proc_fs.h>
-#include <linux/spinlock.h>
 
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"

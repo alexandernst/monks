@@ -3,8 +3,6 @@
 
 #include "syshijack.h"
 
-extern raw_spinlock_t _sl;
-
 void hook_calls(void);
 void unhook_calls(void);
 
