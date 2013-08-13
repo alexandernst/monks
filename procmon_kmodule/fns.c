@@ -9,8 +9,8 @@
 \*****************************************************************************/
 
 /* __NR_read / __NR32_read */
-asmlinkage long (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
-asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
+asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
+asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
 	INCR_SYSCALL_REG_INFO(__NR_read);
 
@@ -55,8 +55,8 @@ asmlinkage long hooked_sys_read(unsigned int fd, char __user *buf, size_t count)
 }
 
 #ifdef CONFIG_IA32_EMULATION
-asmlinkage long (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
-asmlinkage long hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
+asmlinkage ssize_t (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
+asmlinkage ssize_t hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
 
 	INCR_SYSCALL_REG_INFO(__NR32_read);
 
