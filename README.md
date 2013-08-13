@@ -38,5 +38,7 @@ Why Procmon
 
 I'm completely aware of ```kprobes```, ```perf``` and all other kernel debug systems/methods. Probably all of them work better than Procmon, but they have one disadvantage: they require you to recompile the kernel or they are not enabled by default in some distros.
 
+Yet another reason: I have fun doing it! I don't seek for this project to be merged into mainline nor being used by every Linux user out there. I'm doing it for myself. Anyways, I'd be glad if it works for you too :)
+
 On the other hand, Procmon will ```just work```.
 What this module does to ```just work``` is hijack/replace all (relevant/interesting) syscalls from the syscall table. While this is risky, it will allow you to have a similar tool to Procmon for Windows, without having to recompile the kernel.
