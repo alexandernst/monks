@@ -10,7 +10,7 @@
 
 struct syscall_hash {
 	char name[256];
-	unsigned long int calls_in_last_sec;
+	unsigned long int n_calls;
 	UT_hash_handle hh;                                       
 };
 
@@ -22,7 +22,7 @@ for(int i = 0; i < 1; i++){                                 \
 		(struct syscall_hash*)                              \
 		kmalloc(sizeof(struct syscall_hash), GFP_KERNEL);   \
 	strncpy(syscall->name, #F, 256);                        \
-	syscall->calls_in_last_sec = 0;                         \
+	syscall->n_calls = 0;                                   \
 	HASH_ADD_STR(syscall_items, name, syscall);             \
 }
 
@@ -30,19 +30,21 @@ for(int i = 0; i < 1; i++){                                 \
 struct syscall_hash *item;                                  \
 HASH_FIND_STR(syscall_items, #F, item);                     \
 if(item){                                                   \
-	if(item->calls_in_last_sec == ULONG_MAX){               \
-		item->calls_in_last_sec = 1;                        \
-	}else{                                                  \
-		item->calls_in_last_sec++;                          \
-	}                                                       \
+	item->n_calls++;                                        \
+}
+
+#define DECR_SYSCALL_REG_INFO(F)                            \
+struct syscall_hash *item;                                  \
+HASH_FIND_STR(syscall_items, #F, item);                     \
+if(item){                                                   \
+	item->n_calls--;                                        \
 }
 
 #define SHOW_SYSCALL_REG_INFO(F)                            \
 struct syscall_hash *item, *tmp;                            \
 HASH_ITER(hh, syscall_items, item, tmp){                    \
 	printk(KERN_INFO "Name: %s", item->name);               \
-	printk(KERN_INFO "N calls/sec: %lu\n",                  \
-		item->calls_in_last_sec);                           \
+	printk(KERN_INFO "N calls/sec: %lu\n", item->n_calls);  \
 }
 
 /*****************************************************************************\

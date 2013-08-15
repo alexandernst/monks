@@ -103,8 +103,7 @@ static void __exit hook_exit(void){
 	while(true){
 		unsigned long int ncalls = 0;
 		HASH_ITER(hh, syscall_items, item, tmp){
-			ncalls += item->calls_in_last_sec;
-			item->calls_in_last_sec = 0;
+			ncalls += item->n_calls;
 		}
 		if(ncalls == 0){
 			HASH_ITER(hh, syscall_items, item, tmp){
