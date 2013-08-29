@@ -20,5 +20,7 @@
 !syscalls_hash.c
 !control_ro_rw_syscall_table.c
 
+!syscalls/everything.h
+
 !syscalls/read.h
 !syscalls/read.c
