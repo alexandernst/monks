@@ -22,3 +22,5 @@
 
 !/syscalls/
 !syscalls/*
+syscalls/*.cmd
+syscalls/*.o
