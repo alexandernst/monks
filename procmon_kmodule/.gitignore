@@ -4,7 +4,6 @@
 !Kbuild
 !Makefile
 
-!fns.h
 !utils.h
 !uthash.h
 !control.h
@@ -14,10 +13,12 @@
 !unistd_32_hack.h
 !control_ro_rw_syscall_table.h
 
-!fns.c
 !utils.c
 !control.c
 !hookfns.c
 !syshijack.c
 !syscalls_hash.c
 !control_ro_rw_syscall_table.c
+
+!syscalls/read.h
+!syscalls/read.c
