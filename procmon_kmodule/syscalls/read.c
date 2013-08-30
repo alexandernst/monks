@@ -50,13 +50,13 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 }
 
 #ifdef CONFIG_IA32_EMULATION
-asmlinkage ssize_t (*real_sys_read32)(unsigned int fd, char __user *buf, size_t count);
-asmlinkage ssize_t hooked_sys_read32(unsigned int fd, char __user *buf, size_t count){
+asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
+asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 
 	INCR_SYSCALL_REG_INFO(__NR32_read);
 
 	ssize_t r;
-	r = (*real_sys_read32)(fd, buf, count);
+	r = (*real_sys32_read)(fd, buf, count);
 
 	if(!is_active()){
 
