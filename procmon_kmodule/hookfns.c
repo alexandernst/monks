@@ -1,7 +1,5 @@
 #include "hookfns.h"
 
-raw_spinlock_t _sl;
-
 /*****************************************************************************\
 | This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
 | each syscall.                                                               |
