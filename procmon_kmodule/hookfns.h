@@ -11,29 +11,49 @@
 | FF = FAKE FUNCTION as in the function which we'll be using to fake F        |
 \*****************************************************************************/
 
-#define HOOK(F, RF, FF)                       \
-DEBUG(KERN_INFO "HOOKING " #F "\n");          \
-RF = (void *)sys_call_table[F];               \
-sys_call_table[F] = (void *)FF;               \
-REGISTER(F);
+#define __HOOK(F, RF, FF)			\
+do {						\
+	DEBUG(KERN_INFO "HOOK " #F "\n");	\
+	RF = (void *)sys_call_table[F];		\
+	sys_call_table[F] = (void *)FF;		\
+	REGISTER(F);				\
+} while(0)
+
+#define HOOK(name)				\
+	__HOOK(__NR_##name, real_sys_##name, hooked_sys_##name)
+
+#define __UNHOOK(F, RF)				\
+do {						\
+	DEBUG(KERN_INFO "UNHOOK " #F "\n");	\
+	sys_call_table[F] = (void *)RF;		\
+} while (0)
+
+#define UNHOOK(name)				\
+	__UNHOOK(__NR_##name, real_sys_##name)
 
 #ifdef CONFIG_IA32_EMULATION
-#define HOOK_IA32(F, RF, FF)                  \
-DEBUG(KERN_INFO "HOOKING_IA32 " #F "\n");     \
-RF = (void *)ia32_sys_call_table[F];          \
-ia32_sys_call_table[F] = (void *)FF;          \
-REGISTER(F);
-#endif
 
-#define UNHOOK(F, RF)                         \
-DEBUG(KERN_INFO "UNHOOKING " #F "\n");        \
-sys_call_table[F] = (void *)RF;
+#define __HOOK_IA32(F, RF, FF)			\
+do {						\
+	DEBUG(KERN_INFO "HOOK_IA32 " #F "\n");	\
+	RF = (void *)ia32_sys_call_table[F];	\
+	ia32_sys_call_table[F] = (void *)FF;	\
+	REGISTER(F);				\
+} while (0)
 
-#ifdef CONFIG_IA32_EMULATION
-#define UNHOOK_IA32(F, RF)                    \
-DEBUG(KERN_INFO "UNHOOKING_IA32 " #F "\n");   \
-ia32_sys_call_table[F] = (void *)RF;
-#endif
+#define HOOK_IA32(name)				\
+	__HOOK_IA32(__NR32_##name, real_sys32_##name, hooked_sys32_##name)
+
+#define __UNHOOK_IA32(F, RF)			\
+do {						\
+	DEBUG(KERN_INFO "UNHOOK_IA32 " #F "\n");\
+	ia32_sys_call_table[F] = (void *)RF;	\
+} while (0)
+
+#define UNHOOK_IA32(name)			\
+	__UNHOOK_IA32(__NR32_##name, real_sys32_##name)
+
+#endif /* CONFIG_IA32_EMULATION */
 
 /*****************************************************************************\
 |                                      END                                    |
