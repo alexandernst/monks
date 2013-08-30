@@ -11,9 +11,9 @@ void hook_calls(void){
 	if(get_sct() && set_sct_rw()){
 
 /* __NR_read / __NR32_read */
-		HOOK(__NR_read, real_sys_read, hooked_sys_read);
+		HOOK(read);
 #ifdef __NR32_read
-		HOOK_IA32(__NR32_read, real_sys_read32, hooked_sys_read32);
+		HOOK_IA32(read);
 #endif
 
 		set_sct_ro();
@@ -34,9 +34,9 @@ void unhook_calls(void){
 	if(get_sct() && set_sct_rw()){
 
 /* __NR_read / __NR_read32 */
-		UNHOOK(__NR_read, real_sys_read);
+		UNHOOK(read);
 #ifdef __NR32_read
-		UNHOOK_IA32(__NR32_read, real_sys_read32);
+		UNHOOK_IA32(read);
 #endif
 
 		set_sct_ro();

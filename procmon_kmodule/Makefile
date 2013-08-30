@@ -2,10 +2,12 @@
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
+ECHO := /bin/echo
+
 all modules:
-	@echo -ne "#ifndef EVERYTHING_H_INCLUDED\n#define EVERYTHING_H_INCLUDED\n\n" > syscalls/everything.h
+	@$(ECHO) -ne "#ifndef EVERYTHING_H_INCLUDED\n#define EVERYTHING_H_INCLUDED\n\n" > syscalls/everything.h
 	@ls -1 syscalls | grep -v "everything.h" | grep ".h$$" | awk '{print "#include ""\""$$1"\""}' >> syscalls/everything.h
-	@echo -ne "\n#endif\n" >> syscalls/everything.h
+	@$(ECHO) -ne "\n#endif\n" >> syscalls/everything.h
 	@make -C ${KDIR} M=$$PWD;
 
 clean modules_install:
