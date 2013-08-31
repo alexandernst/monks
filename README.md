@@ -42,3 +42,10 @@ Yet another reason: I have fun doing it! I don't seek for this project to be mer
 
 On the other hand, Procmon will ```just work```.
 What this module does to ```just work``` is hijack/replace all (relevant/interesting) syscalls from the syscall table. While this is risky, it will allow you to have a similar tool to Procmon for Windows, without having to recompile the kernel.
+
+Contributing
+=======
+
+Just send me patches, if they are ok I'll give you push access :)
+
+About the editing, note that I'm using ```TAB```s with 4 spaces width, so please keep it that way.
