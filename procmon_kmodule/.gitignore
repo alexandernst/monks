@@ -24,3 +24,4 @@
 !syscalls/*
 syscalls/*.cmd
 syscalls/*.o
+syscalls/everything.h
