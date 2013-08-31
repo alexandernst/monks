@@ -1,6 +1,6 @@
 #include "control_ro_rw_syscall_table.h"
 
-unsigned long orig_cr0;
+static unsigned long orig_cr0;
 
 /*****************************************************************************\
 | Methods to get/set the system call table to RW or RO                         |
@@ -90,6 +90,13 @@ int set_sct_rw(void){
 	make_rw((unsigned long)sys_call_table);
 	DEBUG(KERN_INFO "set_sct_rw method 2: %p\n", sys_call_table);
 #elif method == 3
+	/*
+	 * NOTE: On SMP systems, there is a scheduling race that must be dealt with.
+	 *       http://vulnfactory.org/blog/2011/08/12/wp-safe-or-not/
+	 */
+	preempt_disable();
+	barrier();
+
 	orig_cr0 = clear_and_return_cr0(); //call only once for both archs
 	DEBUG(KERN_INFO "set_sct_rw method 3 cr0: %lu\n", orig_cr0);
 #endif
@@ -116,6 +123,9 @@ int set_sct_ro(void){
 #elif method == 3
 	DEBUG(KERN_INFO "set_sct_ro method 3 cr0: %lu\n", orig_cr0);
 	setback_cr0(orig_cr0); //call only once for both archs
+
+	barrier();
+	preempt_enable_no_resched();
 #endif
 #ifdef CONFIG_IA32_EMULATION
 #if method == 1

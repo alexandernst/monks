@@ -3,8 +3,6 @@
 
 #include "syshijack.h"
 
-extern unsigned long orig_cr0;
-
 int make_rw(unsigned long address);
 int make_ro(unsigned long address);
 
