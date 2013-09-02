@@ -99,21 +99,8 @@ static void __exit hook_exit(void){
 	}
 	unhook_calls();
 
-	struct syscall_hash *item, *tmp;
-	while(true){
-		unsigned long int ncalls = 0;
-		HASH_ITER(hh, syscall_items, item, tmp){
-			ncalls += item->n_calls;
-		}
-		if(ncalls == 0){
-			HASH_ITER(hh, syscall_items, item, tmp){
-				HASH_DEL(syscall_items, item);
-				kfree(item);
-			}
-			break;
-		}else{
-			msleep_interruptible(500);
-		}
+	while(atomic_read(&read_counter) > 0){
+		msleep_interruptible(500);
 	}
 
 	remove_proc_entry("procmon", NULL);

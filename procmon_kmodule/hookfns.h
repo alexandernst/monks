@@ -3,6 +3,8 @@
 
 #include "syshijack.h"
 
+extern atomic_t exit_lock;
+
 /*****************************************************************************\
 | HOOK MACROS                                                                 |
 | F, RF and FF stand for:                                                     |
@@ -16,7 +18,6 @@ do{															\
 	DEBUG(KERN_INFO "HOOK " #F "\n");						\
 	RF = (void *)sys_call_table[F];							\
 	sys_call_table[F] = (void *)FF;							\
-	REGISTER(F);											\
 }while(0)
 
 #define HOOK(name)											\
@@ -38,7 +39,6 @@ do{															\
 	DEBUG(KERN_INFO "HOOK_IA32 " #F "\n");					\
 	RF = (void *)ia32_sys_call_table[F];					\
 	ia32_sys_call_table[F] = (void *)FF;					\
-	REGISTER(F);											\
 }while(0)
 
 #define HOOK_IA32(name)										\

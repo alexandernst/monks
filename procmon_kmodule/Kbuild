@@ -8,7 +8,6 @@ procmon-y += 	syshijack.o                    \
 				utils.o                        \
 				hookfns.o                      \
 				control.o                      \
-				syscalls_hash.o                \
 				control_ro_rw_syscall_table.o  \
 				syscalls/read.o
 

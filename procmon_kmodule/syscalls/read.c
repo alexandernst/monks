@@ -3,14 +3,14 @@
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
-	INCR_SYSCALL_REG_INFO(__NR_read);
+	atomic_inc(&exit_lock);
 
 	ssize_t r;
 	r = (*real_sys_read)(fd, buf, count);
 
 	if(!is_active()){
 
-		DECR_SYSCALL_REG_INFO(__NR_read);
+		atomic_dec(&exit_lock);
 
 		return r;
 
@@ -42,7 +42,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 		activate();
 
-		DECR_SYSCALL_REG_INFO(__NR_read);
+		atomic_dec(&exit_lock);
 
 		return r;
 
@@ -53,14 +53,14 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 
-	INCR_SYSCALL_REG_INFO(__NR32_read);
+	atomic_inc(&exit_lock);
 
 	ssize_t r;
 	r = (*real_sys32_read)(fd, buf, count);
 
 	if(!is_active()){
 
-		DECR_SYSCALL_REG_INFO(__NR32_read);
+		atomic_dec(&exit_lock);
 
 		return r;
 
@@ -93,7 +93,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 		activate();
 
-		DECR_SYSCALL_REG_INFO(__NR32_read);
+		atomic_dec(&exit_lock);
 
 		return r;
 	}
