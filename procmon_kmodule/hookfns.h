@@ -8,7 +8,7 @@
 struct counter_info {
 	atomic_t counter;
 	char *name;
-};
+} __attribute__((packed));
 
 extern struct counter_info __start_counters;
 extern struct counter_info __stop_counters;
