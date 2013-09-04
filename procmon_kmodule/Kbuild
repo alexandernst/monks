@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-ccflags-y := -std=gnu99 -g -Wall -Wno-declaration-after-statement
+ccflags-y := -std=gnu99 -g -Wall -Wno-declaration-after-statement -Wno-missing-braces
 
 obj-m += procmon.o
 

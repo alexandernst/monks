@@ -99,8 +99,16 @@ static void __exit hook_exit(void){
 	}
 	unhook_calls();
 
-	while(atomic_read(&read_counter) > 0){
-		msleep_interruptible(500);
+	int sw = 0;
+	while(!sw){
+		sw = 1;
+		struct counter_info *iter = &__start_counters;
+		for(; iter < &__stop_counters; ++iter){
+			if(atomic_read(&iter->counter) > 0){
+				sw = 0;
+				msleep_interruptible(500);
+			}
+		}
 	}
 
 	remove_proc_entry("procmon", NULL);

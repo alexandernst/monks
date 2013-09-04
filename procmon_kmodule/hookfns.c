@@ -1,6 +1,7 @@
 #include "hookfns.h"
 
-atomic_t exit_lock = { 0 };
+struct counter_info __start_counters;
+struct counter_info __stop_counters;
 
 /*****************************************************************************\
 | This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
