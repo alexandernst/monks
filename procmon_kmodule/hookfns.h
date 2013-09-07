@@ -26,18 +26,21 @@ do{															\
 	DEBUG(KERN_INFO "HOOK " #F "\n");						\
 	RF = (void *)sys_call_table[F];							\
 	sys_call_table[F] = (void *)FF;							\
-															\
+}while(0);
+
+#define __COUNTER_REG(F)									\
+do{															\
 	static struct counter_info __counter_info_##F			\
 	__attribute((__section__("counters")))					\
 	__attribute((__used__)) = {								\
 		.name = #F,											\
 	};														\
 	atomic_set(&__counter_info_##F.counter, 0);				\
-															\
-}while(0)
+}while(0);
 
 #define HOOK(name)											\
-	__HOOK(__NR_##name, real_sys_##name, hooked_sys_##name)
+	__HOOK(__NR_##name, real_sys_##name, hooked_sys_##name);\
+	__COUNTER_REG(__NR_##name);
 
 #define __UNHOOK(F, RF)										\
 do{															\
@@ -55,18 +58,21 @@ do{															\
 	DEBUG(KERN_INFO "HOOK_IA32 " #F "\n");					\
 	RF = (void *)ia32_sys_call_table[F];					\
 	ia32_sys_call_table[F] = (void *)FF;					\
-															\
+}while(0)
+
+#define __COUNTER_REG32(F)									\
+do{															\
 	static struct counter_info __counter_info_##F			\
 	__attribute((__section__("counters")))					\
 	__attribute((__used__)) = {								\
 		.name = #F"_32",									\
 	};														\
 	atomic_set(&__counter_info_##F.counter, 0);				\
-															\
-}while(0)
+}while(0);
 
 #define HOOK_IA32(name)										\
-	__HOOK_IA32(__NR32_##name, real_sys32_##name, hooked_sys32_##name)
+	__HOOK_IA32(__NR32_##name, real_sys32_##name, hooked_sys32_##name);\
+	__COUNTER_REG32(__NR32_##name);
 
 #define __UNHOOK_IA32(F, RF)								\
 do{															\
