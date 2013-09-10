@@ -1,6 +1,7 @@
 # -*- Makefile -*-
 
-ccflags-y := -std=gnu99 -g -Wall -Wno-declaration-after-statement -Wno-missing-braces
+ccflags-y := -std=gnu99 -s -g -Wall -Wno-declaration-after-statement
+ldflags-y := -T$(M)/linkerscript.ld
 
 obj-m += procmon.o
 
