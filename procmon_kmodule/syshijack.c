@@ -102,8 +102,9 @@ static void __exit hook_exit(void){
 	int sw = 0;
 	while(!sw){
 		sw = 1;
-		struct counter_info *iter = &__start_counters;
-		for(; iter < &__stop_counters; ++iter){
+		counter_info_t *iter = __start_counters;
+		for(; iter < __stop_counters; ++iter){
+			DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
 			if(atomic_read(&iter->counter) > 0){
 				sw = 0;
 				msleep_interruptible(500);

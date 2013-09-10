@@ -3,15 +3,13 @@
 
 #include "syshijack.h"
 
-//Warnings because of lazy GCC devs
-//http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
-struct counter_info {
+typedef struct counter_info {
 	atomic_t counter;
 	char *name;
-} __attribute__((packed));
+} __attribute__((packed)) counter_info_t;
 
-extern struct counter_info __start_counters;
-extern struct counter_info __stop_counters;
+extern counter_info_t __start_counters[];
+extern counter_info_t __stop_counters[];
 
 /*****************************************************************************\
 | HOOK MACROS                                                                 |
@@ -30,8 +28,8 @@ do{															\
 
 #define __COUNTER_REG(F)									\
 do{															\
-	static struct counter_info __counter_info_##F			\
-	__attribute((__section__("counters")))					\
+	static counter_info_t __counter_info_##F				\
+	__attribute((unused,__section__("counters")))			\
 	__attribute((__used__)) = {								\
 		.name = #F,											\
 	};														\
@@ -62,8 +60,8 @@ do{															\
 
 #define __COUNTER_REG32(F)									\
 do{															\
-	static struct counter_info __counter_info_##F			\
-	__attribute((__section__("counters")))					\
+	static counter_info_t __counter_info_##F				\
+	__attribute((unused,__section__("counters")))			\
 	__attribute((__used__)) = {								\
 		.name = #F"_32",									\
 	};														\
@@ -87,8 +85,8 @@ do{															\
 
 #define __INCR(F)											\
 do{															\
-	struct counter_info *iter = &__start_counters;			\
-	for(; iter < &__stop_counters; ++iter){					\
+	counter_info_t *iter = __start_counters;				\
+	for(; iter < __stop_counters; ++iter){					\
 		if(strcmp("__NR_" #F, iter->name) == 0){			\
 			atomic_inc(&iter->counter);						\
 		}													\
@@ -97,8 +95,8 @@ do{															\
 
 #define __DECR(F)											\
 do{															\
-	struct counter_info *iter = &__start_counters;			\
-	for(; iter < &__stop_counters; ++iter){					\
+	counter_info_t *iter = __start_counters;				\
+	for(; iter < __stop_counters; ++iter){					\
 		if(strcmp("__NR_" #F, iter->name) == 0){			\
 			atomic_dec(&iter->counter);						\
 		}													\
@@ -107,8 +105,8 @@ do{															\
 
 #define __INCR32(F)											\
 do{															\
-	struct counter_info *iter = &__start_counters;			\
-	for(; iter < &__stop_counters; ++iter){					\
+	counter_info_t *iter = __start_counters;				\
+	for(; iter < __stop_counters; ++iter){					\
 		if(strcmp("__NR_" #F "_32", iter->name) == 0){		\
 			atomic_inc(&iter->counter);						\
 		}													\
@@ -117,8 +115,8 @@ do{															\
 
 #define __DECR32(F)											\
 do{															\
-	struct counter_info *iter = &__start_counters;			\
-	for(; iter < &__stop_counters; ++iter){					\
+	counter_info_t *iter = __start_counters;				\
+	for(; iter < __stop_counters; ++iter){					\
 		if(strcmp("__NR_" #F "_32", iter->name) == 0){		\
 			atomic_dec(&iter->counter);						\
 		}													\
