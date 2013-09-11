@@ -7,7 +7,7 @@
 | ones. See syshijack.h for more info.                                        |
 \*****************************************************************************/
 
-asm(".section counters, \"aw\""); //set section allocatable and writable
+asm(".section .counters, \"aw\""); //set section allocatable and writable
 
 void hook_calls(void){
 	if(get_sct() && set_sct_rw()){

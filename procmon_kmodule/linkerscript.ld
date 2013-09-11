@@ -1,8 +1,8 @@
 SECTIONS
 {
-	counters : {
+	.counters : {
 		__start_counters = . ;
-		*(counters)
+		*(.counters)
 		__stop_counters = . ;
 	}
 }
