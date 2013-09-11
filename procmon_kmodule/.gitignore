@@ -4,6 +4,8 @@
 !Kbuild
 !Makefile
 
+!linkerscript.ld
+
 !utils.h
 !control.h
 !hookfns.h
