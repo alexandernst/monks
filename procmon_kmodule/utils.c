@@ -69,9 +69,9 @@ int vasprintf(char **ret, const char *format, va_list args){
 	*ret = 0;
 
 	count = vsnprintf(NULL, 0, format, args);
-	if (count >= 0){
+	if(count >= 0){
 		buffer = kmalloc(count + 1, GFP_KERNEL);
-		if (buffer != NULL){
+		if(buffer != NULL){
 			count = vsnprintf(buffer, count + 1, format, copy);
 			if(count < 0){
 				kfree(buffer);
