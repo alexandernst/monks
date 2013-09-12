@@ -19,6 +19,9 @@ typedef struct syscall_intercept_info{
 void print_info(syscall_info *i);
 char *path_from_fd(unsigned int fd);
 
+extern int asprintf(char **ret, const char *format, ...);
+extern int vasprintf(char **ret, const char *format, va_list args);
+
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/

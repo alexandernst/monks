@@ -59,3 +59,37 @@ char *path_from_fd(unsigned int fd){
 	
 	return rpathname;
 }
+
+int vasprintf(char **ret, const char *format, va_list args){
+	int count;
+	char *buffer;
+	va_list copy;
+	va_copy(copy, args);
+
+	*ret = 0;
+
+	count = vsnprintf(NULL, 0, format, args);
+	if (count >= 0){
+		buffer = kmalloc(count + 1, GFP_KERNEL);
+		if (buffer != NULL){
+			count = vsnprintf(buffer, count + 1, format, copy);
+			if(count < 0){
+				kfree(buffer);
+			}else{
+				*ret = buffer;
+			}
+		}
+	}
+	va_end(copy);
+
+	return count;
+}
+
+int asprintf(char **ret, const char *format, ...){
+	int count;
+	va_list args;
+	va_start(args, format);
+	count = vasprintf(ret, format, args);
+	va_end(args);
+	return(count);
+}
