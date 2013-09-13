@@ -2,7 +2,6 @@
 
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
-	char *s;
 	ssize_t r;
 	syscall_info *i;
 
@@ -29,12 +28,11 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 			if(IS_ERR((void *)r)){
 				i->result = "Error";
-				s = kasprintf(GFP_KERNEL, "Errno %zd", r);
+				i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
 			}else{
 				i->result = "Ok";
-				s = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
+				i->details = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
 			}
-			i->details = s;
 
 			print_info(i);
 
@@ -57,7 +55,6 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 #ifdef CONFIG_IA32_EMULATION
 asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
-	char *s;
 	ssize_t r;
 	syscall_info *i;
 
@@ -84,12 +81,11 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 			if(IS_ERR((void *)r)){
 				i->result = "Error";
-				s = kasprintf(GFP_KERNEL, "Errno %zd", r);
+				i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
 			}else{
 				i->result = "Ok";
-				s = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
+				i->details = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
 			}
-			i->details = s;
 
 			if(count == 1 && fd == 0)
 				print_info(i);
