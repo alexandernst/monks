@@ -20,30 +20,23 @@ extern counter_info_t __stop_counters[];
 \*****************************************************************************/
 
 #define __HOOK(F, RF, FF)									\
-do{															\
 	DEBUG(KERN_INFO "HOOK " #F "\n");						\
 	RF = (void *)sys_call_table[F];							\
-	sys_call_table[F] = (void *)FF;							\
-}while(0);
+	sys_call_table[F] = (void *)FF;
 
-#define __COUNTER_REG(F)									\
-do{															\
-	static counter_info_t __counter_info_##F				\
+#define REGISTER_SYSCALL(F)									\
+	static counter_info_t __counter_info___NR_##F			\
 	__attribute((unused, section(".counters"))) = {			\
-		.name = #F,											\
-	};														\
-	atomic_set(&__counter_info_##F.counter, 0);				\
-}while(0);
+		.counter = ATOMIC_INIT(0),							\
+		.name = "__NR_" #F,									\
+	};
 
 #define HOOK(name)											\
-	__HOOK(__NR_##name, real_sys_##name, hooked_sys_##name);\
-	__COUNTER_REG(__NR_##name);
+	__HOOK(__NR_##name, real_sys_##name, hooked_sys_##name);
 
 #define __UNHOOK(F, RF)										\
-do{															\
 	DEBUG(KERN_INFO "UNHOOK " #F "\n");						\
-	sys_call_table[F] = (void *)RF;							\
-}while(0)
+	sys_call_table[F] = (void *)RF;
 
 #define UNHOOK(name)										\
 	__UNHOOK(__NR_##name, real_sys_##name)
@@ -51,75 +44,40 @@ do{															\
 #ifdef CONFIG_IA32_EMULATION
 
 #define __HOOK_IA32(F, RF, FF)								\
-do{															\
 	DEBUG(KERN_INFO "HOOK_IA32 " #F "\n");					\
 	RF = (void *)ia32_sys_call_table[F];					\
-	ia32_sys_call_table[F] = (void *)FF;					\
-}while(0)
+	ia32_sys_call_table[F] = (void *)FF;
 
-#define __COUNTER_REG32(F)									\
-do{															\
-	static counter_info_t __counter_info_##F				\
+#define REGISTER_SYSCALL32(F)								\
+	static counter_info_t __counter_info___NR32_##F			\
 	__attribute((unused, section(".counters"))) = {			\
-		.name = #F"_32",									\
-	};														\
-	atomic_set(&__counter_info_##F.counter, 0);				\
-}while(0);
+		.counter = ATOMIC_INIT(0),							\
+		.name = "__NR32_" #F "_32",							\
+	};
 
 #define HOOK_IA32(name)										\
-	__HOOK_IA32(__NR32_##name, real_sys32_##name, hooked_sys32_##name);\
-	__COUNTER_REG32(__NR32_##name);
+	__HOOK_IA32(__NR32_##name, real_sys32_##name, hooked_sys32_##name);
 
 #define __UNHOOK_IA32(F, RF)								\
-do{															\
 	DEBUG(KERN_INFO "UNHOOK_IA32 " #F "\n");				\
-	ia32_sys_call_table[F] = (void *)RF;					\
-}while(0)
+	ia32_sys_call_table[F] = (void *)RF;
 
 #define UNHOOK_IA32(name)									\
 	__UNHOOK_IA32(__NR32_##name, real_sys32_##name)
 
 
 
-#define __INCR(F)											\
-do{															\
-	counter_info_t *iter = __start_counters;				\
-	for(; iter < __stop_counters; ++iter){					\
-		if(strcmp("__NR_" #F, iter->name) == 0){			\
-			atomic_inc(&iter->counter);						\
-		}													\
-	}														\
-}while(0)
+#define __INCR(F)	\
+	atomic_inc(&__counter_info___NR_##F.counter);
 
-#define __DECR(F)											\
-do{															\
-	counter_info_t *iter = __start_counters;				\
-	for(; iter < __stop_counters; ++iter){					\
-		if(strcmp("__NR_" #F, iter->name) == 0){			\
-			atomic_dec(&iter->counter);						\
-		}													\
-	}														\
-}while(0)
+#define __DECR(F)	\
+	atomic_dec(&__counter_info___NR_##F.counter);
 
-#define __INCR32(F)											\
-do{															\
-	counter_info_t *iter = __start_counters;				\
-	for(; iter < __stop_counters; ++iter){					\
-		if(strcmp("__NR_" #F "_32", iter->name) == 0){		\
-			atomic_inc(&iter->counter);						\
-		}													\
-	}														\
-}while(0)
+#define __INCR32(F)	\
+	atomic_inc(&__counter_info___NR32_##F.counter);
 
-#define __DECR32(F)											\
-do{															\
-	counter_info_t *iter = __start_counters;				\
-	for(; iter < __stop_counters; ++iter){					\
-		if(strcmp("__NR_" #F "_32", iter->name) == 0){		\
-			atomic_dec(&iter->counter);						\
-		}													\
-	}														\
-}while(0)
+#define __DECR32(F)	\
+	atomic_dec(&__counter_info___NR32_##F.counter);
 
 #endif /* CONFIG_IA32_EMULATION */
 
