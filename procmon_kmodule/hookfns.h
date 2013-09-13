@@ -29,7 +29,7 @@ do{															\
 #define __COUNTER_REG(F)									\
 do{															\
 	static counter_info_t __counter_info_##F				\
-	__attribute((unused,__section__(".counters"))) = {		\
+	__attribute((unused, section(".counters"))) = {			\
 		.name = #F,											\
 	};														\
 	atomic_set(&__counter_info_##F.counter, 0);				\
@@ -60,7 +60,7 @@ do{															\
 #define __COUNTER_REG32(F)									\
 do{															\
 	static counter_info_t __counter_info_##F				\
-	__attribute((unused,__section__(".counters"))) = {		\
+	__attribute((unused, section(".counters"))) = {			\
 		.name = #F"_32",									\
 	};														\
 	atomic_set(&__counter_info_##F.counter, 0);				\
