@@ -29,10 +29,10 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 			if(IS_ERR((void *)r)){
 				i->result = "Error";
-				asprintf(&s, "Errno %zd", r);
+				s = kasprintf(GFP_KERNEL, "Errno %zd", r);
 			}else{
 				i->result = "Ok";
-				asprintf(&s, "Read %zd bytes (was requested to read %zd)", r, count);
+				s = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
 			}
 			i->details = s;
 
@@ -84,10 +84,10 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 			if(IS_ERR((void *)r)){
 				i->result = "Error";
-				asprintf(&s, "Errno %zd", r);
+				s = kasprintf(GFP_KERNEL, "Errno %zd", r);
 			}else{
 				i->result = "Ok";
-				asprintf(&s, "Read %zd bytes (was requested to read %zd)", r, count);
+				s = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
 			}
 			i->details = s;
 
