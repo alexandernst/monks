@@ -3,7 +3,7 @@
 static unsigned long orig_cr0;
 
 /*****************************************************************************\
-| Methods to get/set the system call table to RW or RO                         |
+| Methods to get/set the system call table to RW or RO                        |
 \*****************************************************************************/
 
 unsigned long clear_and_return_cr0(void){
@@ -19,6 +19,14 @@ unsigned long clear_and_return_cr0(void){
 void setback_cr0(unsigned long val){
 	asm volatile("movq %%rax, %%cr0" : : "a"(val));
 }
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+/*****************************************************************************\
+| Method to get the system call table                                         |
+\*****************************************************************************/
 
 int get_sct(void){
 	int ret = 1;
@@ -69,10 +77,9 @@ int set_sct_ro(void){
 \*****************************************************************************/
 
 /*****************************************************************************\
-| This is where the magic happens. We call HOOK (and maybe HOOK_IA32) for     |
-| each syscall.                                                               |
-| The macros HOOK and HOOK_IA32 replace the REAL functions with the FAKE      |
-| ones. See syshijack.h for more info.                                        |
+| This is where the magic happens. We iterate over the .syscalls ELF section  |
+| and get the information that was stored there by __REGISTER_SYSCALL/32.     |
+| Once we have that information, we hook all the available syscalls           |
 \*****************************************************************************/
 
 void hook_calls(void){

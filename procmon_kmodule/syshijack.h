@@ -27,11 +27,7 @@
 #include "syscalls/everything.h"
 
 /*****************************************************************************\
-| Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
-| Method 1 will use kernel pages and vmap                                     |
-| Method 2 will use virtual address                                           |
-| Method 3 will disable cr0, reg 16                                           |
-| Algo define if debugging is enabled or disabled                             |
+| Define if debugging is enabled or disabled                                  |
 \*****************************************************************************/
 
 #define debug 1
