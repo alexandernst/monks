@@ -25,7 +25,6 @@
 #include "hookfns.h"
 #include "control.h"
 #include "syscalls/everything.h"
-#include "control_ro_rw_syscall_table.h"
 
 /*****************************************************************************\
 | Define which method (1, 2 or 3) will be used to set sct to RO/RW            |
@@ -35,7 +34,6 @@
 | Algo define if debugging is enabled or disabled                             |
 \*****************************************************************************/
 
-#define method 3
 #define debug 1
 
 /*****************************************************************************\

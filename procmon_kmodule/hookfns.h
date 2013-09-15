@@ -3,6 +3,8 @@
 
 #include "syshijack.h"
 
+static unsigned long orig_cr0;
+
 typedef struct counter_info {
 	atomic_t counter;
 	char *name;
@@ -70,6 +72,13 @@ extern counter_info_t __stop_counters[];
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+void setback_cr0(unsigned long val);
+unsigned long clear_and_return_cr0(void);
+
+int get_sct(void);
+int set_sct_rw(void);
+int set_sct_ro(void);
 
 void hook_calls(void);
 void unhook_calls(void);
