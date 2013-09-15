@@ -94,25 +94,13 @@ static int __init hook_init(void){
 }
 
 static void __exit hook_exit(void){
-	int sw;
-	counter_info_t *iter;
-
 	if(is_active()){ //just in case user did not deactivate
 		deactivate();
 	}
 	unhook_calls();
 
-	sw = 0;
-	while(!sw){
-		sw = 1;
-		iter = __start_counters;
-		for(; iter < __stop_counters; ++iter){
-			DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
-			if(atomic_read(&iter->counter) > 0){
-				sw = 0;
-				msleep_interruptible(500);
-			}
-		}
+	while(!safe_to_unload()){
+		msleep_interruptible(500);
 	}
 
 	remove_proc_entry("procmon", NULL);

@@ -88,8 +88,8 @@ void hook_calls(void){
 
 	if(get_sct() && set_sct_rw()){
 
-		iter = __start_counters;
-		for(; iter < __stop_counters; ++iter){
+		iter = __start_syscalls;
+		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
 				DEBUG(KERN_INFO "HOOK_IA32 %s\n", iter->name);
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
@@ -121,8 +121,8 @@ void unhook_calls(void){
 
 	if(get_sct() && set_sct_rw()){
 
-		iter = __start_counters;
-		for(; iter < __stop_counters; ++iter){
+		iter = __start_syscalls;
+		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
 				DEBUG(KERN_INFO "UNHOOK_IA32 %s\n", iter->name);
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->rf;
@@ -139,3 +139,18 @@ void unhook_calls(void){
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+int safe_to_unload(void){
+	int sw = 1;
+	counter_info_t *iter;
+
+	iter = __start_syscalls;
+	for(; iter < __stop_syscalls; ++iter){
+		DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
+		if(atomic_read(&iter->counter) > 0){
+			sw = 0;
+		}
+	}
+
+	return sw;
+}

@@ -1,8 +1,8 @@
 SECTIONS
 {
-	.counters : {
-		__start_counters = . ;
-		*(.counters)
-		__stop_counters = . ;
+	.syscalls : {
+		__start_syscalls = . ;
+		*(.syscalls)
+		__stop_syscalls = . ;
 	}
 }

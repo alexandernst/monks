@@ -12,8 +12,8 @@ typedef struct counter_info {
 	void *rf;
 } __attribute__((packed)) counter_info_t;
 
-extern counter_info_t __start_counters[];
-extern counter_info_t __stop_counters[];
+extern counter_info_t __start_syscalls[];
+extern counter_info_t __stop_syscalls[];
 
 /*****************************************************************************************\
 | HOOK MACROS                                                                             |
@@ -25,7 +25,7 @@ extern counter_info_t __stop_counters[];
 
 #define __REGISTER_SYSCALL(F)									\
 	static counter_info_t __counter_info___NR_##F				\
-	__attribute__((section(".counters"), aligned(1))) = {		\
+	__attribute__((section(".syscalls"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR_" #F,										\
 		.is32 = 0,												\
@@ -47,7 +47,7 @@ extern counter_info_t __stop_counters[];
 
 #define __REGISTER_SYSCALL32(F)									\
 	static counter_info_t __counter_info___NR32_##F				\
-	__attribute__((section(".counters"), aligned(1))) = {		\
+	__attribute__((section(".syscalls"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR32_" #F,									\
 		.is32 = 1,												\
@@ -80,5 +80,6 @@ int set_sct_ro(void);
 
 void hook_calls(void);
 void unhook_calls(void);
+int safe_to_unload(void);
 
 #endif
