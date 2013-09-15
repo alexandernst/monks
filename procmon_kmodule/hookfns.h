@@ -34,10 +34,10 @@ extern counter_info_t __stop_counters[];
 		.rf = &real_sys_##F,									\
 	};
 
-#define __INCR(F)	\
+#define __INCR(F)												\
 	atomic_inc(&__counter_info___NR_##F.counter);
 
-#define __DECR(F)	\
+#define __DECR(F)												\
 	atomic_dec(&__counter_info___NR_##F.counter);
 
 #define __SYSCALL(F)											\
@@ -56,10 +56,10 @@ extern counter_info_t __stop_counters[];
 		.rf = &real_sys32_##F,									\
 	};
 
-#define __INCR32(F)	\
+#define __INCR32(F)												\
 	atomic_inc(&__counter_info___NR32_##F.counter);
 
-#define __DECR32(F)	\
+#define __DECR32(F)												\
 	atomic_dec(&__counter_info___NR32_##F.counter);
 
 #define __SYSCALL32(F)											\
