@@ -9,7 +9,6 @@ procmon-y += 	syshijack.o                    \
 				utils.o                        \
 				hookfns.o                      \
 				control.o                      \
-				control_ro_rw_syscall_table.o  \
 				syscalls/read.o
 
 $(obj)/syshijack.o: $(obj)/unistd_32.h
