@@ -18,11 +18,11 @@ void hook_calls(void){
 		iter = __start_counters;
 		for(; iter < __stop_counters; ++iter){
 			if(iter->is32){
-				DEBUG(KERN_INFO "HOOK_IA32 %s | NR: %d\n", iter->name, iter->__NR_);
+				DEBUG(KERN_INFO "HOOK_IA32 %s\n", iter->name);
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
 			}else{
-				DEBUG(KERN_INFO "HOOK %s | NR: %d\n", iter->name, iter->__NR_);
+				DEBUG(KERN_INFO "HOOK %s\n", iter->name);
 				iter->rf = (void *)sys_call_table[iter->__NR_];
 				sys_call_table[iter->__NR_] = (void *)iter->ff;
 			}
