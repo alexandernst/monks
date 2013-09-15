@@ -10,7 +10,7 @@ typedef struct counter_info {
 	int __NR_;
 	void *ff;
 	void *rf;
-} __attribute__((packed,aligned(64))) counter_info_t;
+} __attribute__((packed)) counter_info_t;
 
 extern counter_info_t __start_counters[];
 extern counter_info_t __stop_counters[];
@@ -24,8 +24,8 @@ extern counter_info_t __stop_counters[];
 \*****************************************************************************************/
 
 #define REGISTER_SYSCALL(F)										\
-	static counter_info_t __counter_info___NR_##F				\
-	__attribute((section(".counters"))) = {						\
+	static counter_info_t __counter_info___NR_##F							\
+	__attribute__((unused, section(".counters"), aligned(1)))  = {						\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR_" #F,										\
 		.is32 = 0,												\
@@ -43,8 +43,8 @@ extern counter_info_t __stop_counters[];
 #ifdef CONFIG_IA32_EMULATION
 
 #define REGISTER_SYSCALL32(F)									\
-	static counter_info_t __counter_info___NR32_##F				\
-	__attribute((section(".counters"))) = {						\
+	static counter_info_t __counter_info___NR32_##F						\
+	__attribute__((unused, section(".counters"), aligned(1))) = {				\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR32_" #F,									\
 		.is32 = 1,												\
