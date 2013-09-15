@@ -16,7 +16,7 @@ extern syscall_info_t __start_syscalls[];
 extern syscall_info_t __stop_syscalls[];
 
 /*****************************************************************************************\
-| HOOK MACROS                                                                             |
+| REGISTER MACROS                                                                         |
 | __NR_#F, real_sys_##F and hooked_sys_##F stand for:                                     |
 | __NR_#F = FUNCTION as defined in include/linux/syscalls.h                               |
 | real_sys_##F = REAL FUNCTION as in the function in which we will save __NR_##F          |
