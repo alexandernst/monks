@@ -24,8 +24,8 @@ extern counter_info_t __stop_counters[];
 \*****************************************************************************************/
 
 #define REGISTER_SYSCALL(F)										\
-	static counter_info_t __counter_info___NR_##F							\
-	__attribute__((unused, section(".counters"), aligned(1)))  = {						\
+	static counter_info_t __counter_info___NR_##F				\
+	__attribute__((section(".counters"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR_" #F,										\
 		.is32 = 0,												\
@@ -40,11 +40,14 @@ extern counter_info_t __stop_counters[];
 #define __DECR(F)	\
 	atomic_dec(&__counter_info___NR_##F.counter);
 
+#define __SYSCALL(F)											\
+	((typeof(real_sys_##F))__counter_info___NR_##F.rf)
+
 #ifdef CONFIG_IA32_EMULATION
 
 #define REGISTER_SYSCALL32(F)									\
-	static counter_info_t __counter_info___NR32_##F						\
-	__attribute__((unused, section(".counters"), aligned(1))) = {				\
+	static counter_info_t __counter_info___NR32_##F				\
+	__attribute__((section(".counters"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR32_" #F,									\
 		.is32 = 1,												\
@@ -58,6 +61,9 @@ extern counter_info_t __stop_counters[];
 
 #define __DECR32(F)	\
 	atomic_dec(&__counter_info___NR32_##F.counter);
+
+#define __SYSCALL32(F)											\
+	((typeof(real_sys32_##F))__counter_info___NR32_##F.rf)
 
 #endif /* CONFIG_IA32_EMULATION */
 
