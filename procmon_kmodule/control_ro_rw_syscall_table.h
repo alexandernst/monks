@@ -3,9 +3,6 @@
 
 #include "syshijack.h"
 
-int make_rw(unsigned long address);
-int make_ro(unsigned long address);
-
 void setback_cr0(unsigned long val);
 unsigned long clear_and_return_cr0(void);
 
