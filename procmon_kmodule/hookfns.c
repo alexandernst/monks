@@ -84,7 +84,7 @@ int set_sct_ro(void){
 
 void hook_calls(void){
 
-	counter_info_t *iter;
+	syscall_info_t *iter;
 
 	if(get_sct() && set_sct_rw()){
 
@@ -117,7 +117,7 @@ void hook_calls(void){
 
 void unhook_calls(void){
 
-	counter_info_t *iter;
+	syscall_info_t *iter;
 
 	if(get_sct() && set_sct_rw()){
 
@@ -142,9 +142,8 @@ void unhook_calls(void){
 
 int safe_to_unload(void){
 	int sw = 1;
-	counter_info_t *iter;
+	syscall_info_t *iter = __start_syscalls;
 
-	iter = __start_syscalls;
 	for(; iter < __stop_syscalls; ++iter){
 		DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
 		if(atomic_read(&iter->counter) > 0){

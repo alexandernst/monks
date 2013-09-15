@@ -3,17 +3,17 @@
 
 #include "syshijack.h"
 
-typedef struct counter_info {
+typedef struct syscall_info {
 	atomic_t counter;
 	char *name;
 	int is32;
 	int __NR_;
 	void *ff;
 	void *rf;
-} __attribute__((packed)) counter_info_t;
+} __attribute__((packed)) syscall_info_t;
 
-extern counter_info_t __start_syscalls[];
-extern counter_info_t __stop_syscalls[];
+extern syscall_info_t __start_syscalls[];
+extern syscall_info_t __stop_syscalls[];
 
 /*****************************************************************************************\
 | HOOK MACROS                                                                             |
@@ -24,7 +24,7 @@ extern counter_info_t __stop_syscalls[];
 \*****************************************************************************************/
 
 #define __REGISTER_SYSCALL(F)									\
-	static counter_info_t __counter_info___NR_##F				\
+	static syscall_info_t __syscall_info___NR_##F				\
 	__attribute__((section(".syscalls"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR_" #F,										\
@@ -35,18 +35,18 @@ extern counter_info_t __stop_syscalls[];
 	};
 
 #define __INCR(F)												\
-	atomic_inc(&__counter_info___NR_##F.counter);
+	atomic_inc(&__syscall_info___NR_##F.counter);
 
 #define __DECR(F)												\
-	atomic_dec(&__counter_info___NR_##F.counter);
+	atomic_dec(&__syscall_info___NR_##F.counter);
 
 #define __SYSCALL(F)											\
-	((typeof(real_sys_##F))__counter_info___NR_##F.rf)
+	((typeof(real_sys_##F))__syscall_info___NR_##F.rf)
 
 #ifdef CONFIG_IA32_EMULATION
 
 #define __REGISTER_SYSCALL32(F)									\
-	static counter_info_t __counter_info___NR32_##F				\
+	static syscall_info_t __syscall_info___NR32_##F				\
 	__attribute__((section(".syscalls"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR32_" #F,									\
@@ -57,13 +57,13 @@ extern counter_info_t __stop_syscalls[];
 	};
 
 #define __INCR32(F)												\
-	atomic_inc(&__counter_info___NR32_##F.counter);
+	atomic_inc(&__syscall_info___NR32_##F.counter);
 
 #define __DECR32(F)												\
-	atomic_dec(&__counter_info___NR32_##F.counter);
+	atomic_dec(&__syscall_info___NR32_##F.counter);
 
 #define __SYSCALL32(F)											\
-	((typeof(real_sys32_##F))__counter_info___NR32_##F.rf)
+	((typeof(real_sys32_##F))__syscall_info___NR32_##F.rf)
 
 #endif /* CONFIG_IA32_EMULATION */
 
