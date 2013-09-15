@@ -10,7 +10,8 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	__INCR(read);
 
-	r = (*real_sys_read)(fd, buf, count);
+	// TODO: macro like ORIGIN_CALL(read, ...) here
+	r = ((typeof(real_sys_read))__counter_info___NR_read.rf)(fd, buf, count);
 
 	if(!is_active()){
 
@@ -63,7 +64,8 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	__INCR32(read);
 
-	r = (*real_sys32_read)(fd, buf, count);
+	// TODO: macro like ORIGIN_CALL(read, ...) here
+	r = ((typeof(real_sys32_read))__counter_info___NR32_read.rf)(fd, buf, count);
 
 	if(!is_active()){
 
