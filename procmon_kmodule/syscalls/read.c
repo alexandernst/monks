@@ -1,7 +1,7 @@
 #include "read.h"
 
-REGISTER_SYSCALL(read);
-REGISTER_SYSCALL32(read);
+__REGISTER_SYSCALL(read);
+__REGISTER_SYSCALL32(read);
 
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){

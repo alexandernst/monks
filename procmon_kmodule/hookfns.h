@@ -23,7 +23,7 @@ extern counter_info_t __stop_counters[];
 | hooked_sys_##F = FAKE FUNCTION as in the function which we'll be using to fake __NR_##F |
 \*****************************************************************************************/
 
-#define REGISTER_SYSCALL(F)										\
+#define __REGISTER_SYSCALL(F)									\
 	static counter_info_t __counter_info___NR_##F				\
 	__attribute__((section(".counters"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
@@ -45,7 +45,7 @@ extern counter_info_t __stop_counters[];
 
 #ifdef CONFIG_IA32_EMULATION
 
-#define REGISTER_SYSCALL32(F)									\
+#define __REGISTER_SYSCALL32(F)									\
 	static counter_info_t __counter_info___NR32_##F				\
 	__attribute__((section(".counters"), aligned(1))) = {		\
 		.counter = ATOMIC_INIT(0),								\
