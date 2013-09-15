@@ -3,8 +3,6 @@
 
 #include "syshijack.h"
 
-static unsigned long orig_cr0;
-
 typedef struct counter_info {
 	atomic_t counter;
 	char *name;
