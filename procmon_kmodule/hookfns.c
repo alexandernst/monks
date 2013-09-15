@@ -10,13 +10,23 @@
 asm(".section .counters, \"aw\""); //set section allocatable and writable
 
 void hook_calls(void){
+
+	counter_info_t *iter;
+
 	if(get_sct() && set_sct_rw()){
 
-/* __NR_read / __NR32_read */
-		HOOK(read);
-#ifdef __NR32_read
-		HOOK_IA32(read);
-#endif
+		iter = __start_counters;
+		for(; iter < __stop_counters; ++iter){
+			if(iter->is32){
+				DEBUG(KERN_INFO "HOOK_IA32 %s | NR: %d\n", iter->name, iter->__NR_);
+				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];	// <--- won't work
+				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
+			}else{
+				DEBUG(KERN_INFO "HOOK %s | NR: %d\n", iter->name, iter->__NR_);
+				iter->rf = (void *)sys_call_table[iter->__NR_];	// <--- won't work
+				sys_call_table[iter->__NR_] = (void *)iter->ff;
+			}
+		}
 
 		set_sct_ro();
 	}
@@ -33,13 +43,21 @@ void hook_calls(void){
 \*****************************************************************************/
 
 void unhook_calls(void){
+
+	counter_info_t *iter;
+
 	if(get_sct() && set_sct_rw()){
 
-/* __NR_read / __NR_read32 */
-		UNHOOK(read);
-#ifdef __NR32_read
-		UNHOOK_IA32(read);
-#endif
+		iter = __start_counters;
+		for(; iter < __stop_counters; ++iter){
+			if(iter->is32){
+				DEBUG(KERN_INFO "UNHOOK_IA32 %s\n", iter->name);
+				ia32_sys_call_table[iter->__NR_] = (void *)iter->rf;	// <--- won't work
+			}else{
+				DEBUG(KERN_INFO "UNHOOK %s\n", iter->name);
+				sys_call_table[iter->__NR_] = (void *)iter->rf;	// <--- won't work
+			}
+		}
 
 		set_sct_ro();
 	}

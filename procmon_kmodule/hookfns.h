@@ -6,7 +6,11 @@
 typedef struct counter_info {
 	atomic_t counter;
 	char *name;
-} __attribute__((packed)) counter_info_t;
+	int is32;
+	int __NR_;
+	void *ff;
+	void *rf;
+} __attribute__((packed,aligned(64))) counter_info_t;
 
 extern counter_info_t __start_counters[];
 extern counter_info_t __stop_counters[];
@@ -19,20 +23,15 @@ extern counter_info_t __stop_counters[];
 | hooked_sys_##F = FAKE FUNCTION as in the function which we'll be using to fake __NR_##F |
 \*****************************************************************************************/
 
-#define HOOK(F)													\
-	DEBUG(KERN_INFO "HOOK __NR_" #F "\n");						\
-	real_sys_##F = (void *)sys_call_table[__NR_##F];			\
-	sys_call_table[__NR_##F] = (void *)hooked_sys_##F;
-
-#define UNHOOK(F)												\
-	DEBUG(KERN_INFO "UNHOOK __NR_" #F "\n");					\
-	sys_call_table[__NR_##F] = (void *)real_sys_##F;
-
 #define REGISTER_SYSCALL(F)										\
 	static counter_info_t __counter_info___NR_##F				\
-	__attribute((unused, section(".counters"))) = {				\
+	__attribute((section(".counters"))) = {						\
 		.counter = ATOMIC_INIT(0),								\
 		.name = "__NR_" #F,										\
+		.is32 = 0,												\
+		.__NR_ = __NR_##F,										\
+		.ff = hooked_sys_##F,									\
+		.rf = &real_sys_##F,									\
 	};
 
 #define __INCR(F)	\
@@ -43,20 +42,15 @@ extern counter_info_t __stop_counters[];
 
 #ifdef CONFIG_IA32_EMULATION
 
-#define HOOK_IA32(F)											\
-	DEBUG(KERN_INFO "HOOK_IA32 __NR32_" #F "\n");				\
-	real_sys32_##F = (void *)ia32_sys_call_table[__NR32_##F];	\
-	ia32_sys_call_table[__NR32_##F] = (void *)hooked_sys32_##F;
-
-#define UNHOOK_IA32(F)											\
-	DEBUG(KERN_INFO "UNHOOK_IA32 __NR32_" #F "\n");				\
-	ia32_sys_call_table[__NR32_##F] = (void *)real_sys32_##F;
-
 #define REGISTER_SYSCALL32(F)									\
 	static counter_info_t __counter_info___NR32_##F				\
-	__attribute((unused, section(".counters"))) = {				\
+	__attribute((section(".counters"))) = {						\
 		.counter = ATOMIC_INIT(0),								\
-		.name = "__NR32_" #F "_32",								\
+		.name = "__NR32_" #F,									\
+		.is32 = 1,												\
+		.__NR_ = __NR32_##F,									\
+		.ff = hooked_sys32_##F,									\
+		.rf = &real_sys32_##F,									\
 	};
 
 #define __INCR32(F)	\
