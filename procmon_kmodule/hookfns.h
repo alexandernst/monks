@@ -12,11 +12,6 @@ typedef struct syscall_info {
 	void *rf;
 } __attribute__((packed)) syscall_info_t;
 
-extern void **sys_call_table;
-#ifdef CONFIG_IA32_EMULATION
-extern void **ia32_sys_call_table;
-#endif
-
 extern syscall_info_t __start_syscalls[];
 extern syscall_info_t __stop_syscalls[];
 
