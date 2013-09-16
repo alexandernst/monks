@@ -96,27 +96,25 @@ void setback_cr0(unsigned long val){
 \*****************************************************************************/
 
 int get_sct(void){
-	int ret = 1;
-
 	sys_call_table = get_sys_call_table();
-	if(sys_call_table == NULL){
+	if(!sys_call_table){
 		DEBUG(KERN_INFO "sys_call_table is NULL\n");
-		ret = 0;
+		return 0;
 	}else{
 		DEBUG(KERN_INFO "get_sct sct: %p\n", sys_call_table);
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
-	if(ia32_sys_call_table == NULL){
+	if(!ia32_sys_call_table){
 		DEBUG(KERN_INFO "ia32_sys_call_table is NULL\n");
-		ret = 0;
+		return 0;
 	}else{
 		DEBUG(KERN_INFO "get_sct ia32_sct: %p\n", ia32_sys_call_table);
 	}
 #endif
 
-	return ret;
+	return 1;
 }
 
 int set_sct_rw(void){
