@@ -12,8 +12,38 @@ typedef struct syscall_info {
 	void *rf;
 } __attribute__((packed)) syscall_info_t;
 
+extern void **sys_call_table;
+#ifdef CONFIG_IA32_EMULATION
+extern void **ia32_sys_call_table;
+#endif
+
 extern syscall_info_t __start_syscalls[];
 extern syscall_info_t __stop_syscalls[];
+
+#ifdef __i386__
+struct idt_descriptor{
+	unsigned short offset_low;
+	unsigned short selector;
+	unsigned char zero;
+	unsigned char type_flags;
+	unsigned short offset_high;
+} __attribute__((packed));
+#elif defined(CONFIG_IA32_EMULATION)
+struct idt_descriptor{
+	unsigned short offset_low;
+	unsigned short selector;
+	unsigned char zero1;
+	unsigned char type_flags;
+	unsigned short offset_middle;
+	unsigned int offset_high;
+	unsigned int zero2;
+} __attribute__((packed));
+#endif
+
+struct idtr{
+	unsigned short limit;
+	void *base;
+} __attribute__((packed));
 
 /*****************************************************************************************\
 | REGISTER MACROS                                                                         |
@@ -70,6 +100,19 @@ extern syscall_info_t __stop_syscalls[];
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+void *get_writable_sct(void *sct_addr);
+#if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
+#ifdef __i386__
+void *get_sys_call_table(void);
+#elif defined(__x86_64__)
+void *get_ia32_sys_call_table(void);
+#endif
+#endif
+
+#ifdef __x86_64__
+void *get_sys_call_table(void);
+#endif
 
 void setback_cr0(unsigned long val);
 unsigned long clear_and_return_cr0(void);
