@@ -6,7 +6,7 @@
 
 static int __init hook_init(void){
 	proc_write_entry = proc_create("procmon", 0666, NULL, &proc_file_fops);
-	if(proc_write_entry == NULL){
+	if(!proc_write_entry){
 		DEBUG(KERN_INFO "Error creating proc entry\n");
 		return -ENOMEM;
 	}
