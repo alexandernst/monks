@@ -90,7 +90,7 @@ struct idtr{
 #define __SYSCALL32(F)											\
 	((typeof(real_sys32_##F))__syscall_info___NR32_##F.rf)
 
-#endif /* CONFIG_IA32_EMULATION */
+#endif
 
 /*****************************************************************************\
 |                                      END                                    |
