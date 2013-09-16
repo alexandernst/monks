@@ -150,7 +150,6 @@ int set_sct_ro(void){
 \*****************************************************************************/
 
 void hook_calls(void){
-
 	syscall_info_t *iter;
 
 	if(get_sct() && set_sct_rw()){
@@ -183,7 +182,6 @@ void hook_calls(void){
 \*****************************************************************************/
 
 void unhook_calls(void){
-
 	syscall_info_t *iter;
 
 	if(get_sct() && set_sct_rw()){
