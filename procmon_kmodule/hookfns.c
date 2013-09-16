@@ -208,15 +208,14 @@ void unhook_calls(void){
 \*****************************************************************************/
 
 int safe_to_unload(void){
-	int sw = 1;
 	syscall_info_t *iter = __start_syscalls;
 
 	for(; iter < __stop_syscalls; ++iter){
 		DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
 		if(atomic_read(&iter->counter) > 0){
-			sw = 0;
+			return 0;
 		}
 	}
 
-	return sw;
+	return 1;
 }
