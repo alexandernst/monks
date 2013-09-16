@@ -1,9 +1,6 @@
 #include "read.h"
 
 __REGISTER_SYSCALL(read);
-#ifdef CONFIG_IA32_EMULATION
-__REGISTER_SYSCALL32(read);
-#endif
 
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
@@ -58,6 +55,8 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 }
 
 #ifdef CONFIG_IA32_EMULATION
+__REGISTER_SYSCALL32(read);
+
 asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 	ssize_t r;
