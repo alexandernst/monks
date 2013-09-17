@@ -6,16 +6,14 @@
 
 !linkerscript.ld
 
+!main.h
 !utils.h
-!control.h
 !hookfns.h
-!syshijack.h
 !unistd_32_hack.h
 
+!main.c
 !utils.c
-!control.c
 !hookfns.c
-!syshijack.c
 
 !/syscalls/
 !syscalls/*

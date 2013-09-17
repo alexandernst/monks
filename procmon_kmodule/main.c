@@ -1,4 +1,4 @@
-#include "syshijack.h"
+#include "main.h"
 
 /*****************************************************************************\
 | /proc/sys state and methods related to the control of procmon               |

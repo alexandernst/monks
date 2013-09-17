@@ -5,9 +5,9 @@ ldflags-y := -T$(M)/linkerscript.ld
 
 obj-m += procmon.o
 
-procmon-y += 	syshijack.o                    \
-				utils.o                        \
-				hookfns.o                      \
+procmon-y += 	main.o			\
+				utils.o			\
+				hookfns.o		\
 				syscalls/read.o
 
 $(obj)/syshijack.o: $(obj)/unistd_32.h

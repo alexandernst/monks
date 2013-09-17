@@ -1,7 +1,7 @@
 #ifndef HOOKFNS_H_INCLUDED
 #define HOOKFNS_H_INCLUDED
 
-#include "syshijack.h"
+#include "main.h"
 
 typedef struct syscall_info {
 	atomic_t counter;

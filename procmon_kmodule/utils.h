@@ -1,7 +1,7 @@
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
-#include "syshijack.h"
+#include "main.h"
 
 /*****************************************************************************\
 | Utils                                                                       |
