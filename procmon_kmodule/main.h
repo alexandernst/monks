@@ -23,7 +23,7 @@
 #endif
 
 #include "utils.h"
-#include "hookfns.h"
+#include "sct_hook.h"
 #include "syscalls/everything.h"
 
 /*****************************************************************************\

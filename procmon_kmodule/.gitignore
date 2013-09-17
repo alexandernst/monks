@@ -8,12 +8,12 @@
 
 !main.h
 !utils.h
-!hookfns.h
+!sct_hook.h
 !unistd_32_hack.h
 
 !main.c
 !utils.c
-!hookfns.c
+!sct_hook.c
 
 !/syscalls/
 !syscalls/*

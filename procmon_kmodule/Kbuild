@@ -7,10 +7,10 @@ obj-m += procmon.o
 
 procmon-y += 	main.o			\
 				utils.o			\
-				hookfns.o		\
+				sct_hook.o		\
 				syscalls/read.o
 
-$(obj)/syshijack.o: $(obj)/unistd_32.h
+$(obj)/main.o: $(obj)/unistd_32.h
 
 $(obj)/unistd_32.h: $(src)/unistd_32_hack.h FORCE
 	@cpp $(c_flags) -E -dM <$< | perl -lne 'print if s/^#define __NR_/#define __NR32_/' >$@
