@@ -173,7 +173,6 @@ void hook_calls(void){
 |                                      END                                    |
 \*****************************************************************************/
 
-
 /*****************************************************************************\
 | This is where we restore the REAL functions, aka, undo what HOOK and        |
 | HOOK_IA32 did.                                                              |
