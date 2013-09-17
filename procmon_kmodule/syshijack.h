@@ -24,7 +24,6 @@
 
 #include "utils.h"
 #include "hookfns.h"
-#include "control.h"
 #include "syscalls/everything.h"
 
 /*****************************************************************************\
@@ -42,5 +41,12 @@
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+void activate(void);
+void deactivate(void);
+int is_active(void);
+
+int register_procmon_sysctl(void);
+void unregister_procmon_sysctl(void);
 
 #endif
