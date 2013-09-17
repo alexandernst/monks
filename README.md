@@ -18,11 +18,11 @@ Once you have all those you just need to run ```make``` inside the ```procmon_km
 Loading the module isn't any different from loading any other module. ```insmod procmon.ko``` for 
 loading it and ```rmmod procmon.ko``` for unloading it.
 
-To start the actual hijack process, once loaded the module, run ```echo 1 > /proc/procmon```.
+To start the actual hijack process, once loaded the module, run ```sysctl procmon.state=1```.
 Once started, you'll probably want to run ```dmesg -w``` (or ```watch -n 0.1 -t 'dmesg | grep -v " grep " | grep -v " tail " | tail -50'``` if your kernel doesn't support ```-w```)
 in another console to see an actual output.
 
-To stop it just run ```echo 0 > /proc/procmon```.
+To stop it just run ```sysctl procmon.state=0```.
 
 Also keep in mind that unloading the module without stopping it previously will *probably* cause
 some bad stuff, maybe even data loss. You have been warned.
