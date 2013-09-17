@@ -5,9 +5,8 @@
 \*****************************************************************************/
 
 static int __init hook_init(void){
-	proc_write_entry = proc_create("procmon", 0666, NULL, &proc_file_fops);
-	if(!proc_write_entry){
-		DEBUG(KERN_INFO "Error creating proc entry\n");
+	if(register_procmon_sysctl() != 0){
+		DEBUG(KERN_INFO "Error creating /proc/sys/procmon/state\n");
 		return -ENOMEM;
 	}
 
@@ -26,7 +25,7 @@ static void __exit hook_exit(void){
 		msleep_interruptible(500);
 	}
 
-	remove_proc_entry("procmon", NULL);
+	unregister_procmon_sysctl();
 }
 
 /*****************************************************************************\

@@ -1,57 +1,57 @@
-#include "syshijack.h"
+#include "control.h"
  
 /*****************************************************************************\
-| /proc vars and methods related to the control of procmon                    |
+| /proc/sys vars and methods related to the control of procmon                |
 \*****************************************************************************/
 
-char proc_data[1] = "0";
-struct proc_dir_entry *proc_write_entry;
+int state = 0, min = 0, max = 1;
+static struct ctl_table_header *procmon_table_header;
 
 void activate(void){
-	memcpy(proc_data, "1", 1);
+	state = 1;
 }
 
 void deactivate(void){
-	memcpy(proc_data, "0", 1);
+	state = 0;
 }
 
 int is_active(void){
-	return strcmp("1", proc_data) == 0;
+	return state;
 }
 
-ssize_t read_proc(struct file *file, char __user *buf, size_t count, loff_t *pos){
-	int ret;
-	if(*pos == 0){
-		memcpy(buf, proc_data, 1);
-		*pos = (loff_t)1;
-		ret = 1;
-	}else{
-		ret = 0;
-	}
-	return ret;
-}
-
-ssize_t write_proc(struct file *file, const char __user *buf, size_t count, loff_t *pos){
-	if(count > 2)
-		return -EINVAL;
-
-	if(copy_from_user(proc_data, buf, 1))
-		return -EFAULT;
-
-	if(strcmp("1", proc_data) == 0){
-		activate();
-	}else if(strcmp("0", proc_data) == 0){
-		deactivate();
-	}
-	
-	return count;
-}
-
-const struct file_operations proc_file_fops = {
-	.owner = THIS_MODULE,
-	.read  = read_proc,
-	.write = write_proc,
+static ctl_table state_table[] = {
+	{
+		.procname	= "state",
+		.data		= &state,
+		.maxlen		= sizeof(int),
+		.mode		= 0666,
+		.proc_handler	= &proc_dointvec_minmax,
+		.extra1		= &min,
+		.extra2		= &max
+	},
+	{ 0 }
 };
+
+static ctl_table procmon_table[] = {
+	{
+		.procname	= "procmon",
+		.mode		= 0555,
+		.child		= state_table
+	},
+	{  0 }
+};
+
+int register_procmon_sysctl(void){
+	procmon_table_header = register_sysctl_table(procmon_table);
+	if(!procmon_table_header){
+		return -ENOMEM;
+	}
+	return 0;
+}
+
+void unregister_procmon_sysctl(void){
+	unregister_sysctl_table(procmon_table_header);
+}
 
 /*****************************************************************************\
 |                                      END                                    |

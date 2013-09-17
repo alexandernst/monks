@@ -12,6 +12,7 @@
 #include <linux/sched.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/sysctl.h>
 #include <linux/fdtable.h>
 #include <linux/version.h>
 #include <linux/vmalloc.h>
