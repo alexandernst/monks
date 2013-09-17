@@ -13,4 +13,4 @@ procmon-y += 	main.o			\
 $(obj)/main.o: $(obj)/unistd_32.h
 
 $(obj)/unistd_32.h: $(src)/unistd_32_hack.h FORCE
-	@cpp $(c_flags) -E -dM <$< | perl -lne 'print if s/^#define __NR_/#define __NR32_/' >$@
+	@cpp $(c_flags) -E -dM <$< | grep -e '^#define __NR_' | sed -e 's/^#define __NR_/#define __NR32_/g' >$@
