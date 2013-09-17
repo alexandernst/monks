@@ -1,4 +1,4 @@
-#include "hookfns.h"
+#include "sct_hook.h"
 
 static unsigned long orig_cr0;
 
