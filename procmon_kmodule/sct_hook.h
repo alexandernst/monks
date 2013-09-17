@@ -1,5 +1,5 @@
-#ifndef HOOKFNS_H_INCLUDED
-#define HOOKFNS_H_INCLUDED
+#ifndef SCT_HOOK_H_INCLUDED
+#define SCT_HOOK_H_INCLUDED
 
 #include "main.h"
 
