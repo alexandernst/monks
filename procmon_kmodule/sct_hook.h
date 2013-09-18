@@ -65,7 +65,7 @@ struct idtr{
 #define __DECR(F)												\
 	atomic_dec(&__syscall_info___NR_##F.counter);
 
-#define __SYSCALL(F)											\
+#define __REAL_SYSCALL(F)											\
 	((typeof(real_sys_##F))__syscall_info___NR_##F.rf)
 
 #ifdef CONFIG_IA32_EMULATION
@@ -87,7 +87,7 @@ struct idtr{
 #define __DECR32(F)												\
 	atomic_dec(&__syscall_info___NR32_##F.counter);
 
-#define __SYSCALL32(F)											\
+#define __REAL_SYSCALL32(F)											\
 	((typeof(real_sys32_##F))__syscall_info___NR32_##F.rf)
 
 #endif

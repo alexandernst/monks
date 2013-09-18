@@ -9,7 +9,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	__INCR(read);
 
-	r = __SYSCALL(read)(fd, buf, count);
+	r = __REAL_SYSCALL(read)(fd, buf, count);
 
 	if(!is_active()){
 
@@ -64,7 +64,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	__INCR32(read);
 
-	r = __SYSCALL32(read)(fd, buf, count);
+	r = __REAL_SYSCALL32(read)(fd, buf, count);
 
 	if(!is_active()){
 
