@@ -1,7 +1,7 @@
 Procmon
 =======
 
-Drone.io current status: [![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest)
+[![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest)
 
 Procmon alternative for Linux
 
