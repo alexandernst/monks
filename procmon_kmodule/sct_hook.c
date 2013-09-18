@@ -76,15 +76,15 @@ void *get_sys_call_table(void){
 unsigned long clear_and_return_cr0(void){
 	unsigned long cr0 = 0;
 	unsigned long ret;
-	asm volatile("movq %%cr0, %%rax" : "=a"(cr0));
+	asm volatile("mov %%cr0, %0" : "=r"(cr0));
 	ret = cr0;
-	cr0 &= 0xfffffffffffeffff;
-	asm volatile("movq %%rax, %%cr0" : : "a"(cr0));
+	cr0 &= ~(1 << 16);
+	asm volatile("mov %0, %%cr0" : : "r"(cr0));
 	return ret;
 }
 
 void setback_cr0(unsigned long val){
-	asm volatile("movq %%rax, %%cr0" : : "a"(val));
+	asm volatile("mov %0, %%cr0" : : "r"(val));
 }
 
 /*****************************************************************************\
