@@ -22,7 +22,7 @@ clean:
 
 _prebuild: unistd_32.h
 
-unistd_32.h: /usr/include/asm/unistd_32.h
-	sed s/__NR_/__NR32_/g /usr/include/asm/unistd_32.h > unistd_32.h
+unistd_32.h:
+	echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep __NR_ | sed s/__NR_/__NR32_/g > unistd_32.h
 
 clean-files	+= unistd_32.h
