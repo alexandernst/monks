@@ -1,6 +1,8 @@
 Procmon
 =======
 
+Travis-CI current status: [![Build Status](https://travis-ci.org/alexandernst/procmon.png)](https://travis-ci.org/alexandernst/procmon)
+
 Procmon alternative for Linux
 
 
