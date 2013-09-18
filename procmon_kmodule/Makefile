@@ -1,16 +1,24 @@
-# -*- Makefile -*-
+NAME		:= procmon
+KDIR		?= /lib/modules/$(shell uname -r)/build
 
-KDIR := /lib/modules/$(shell uname -r)/build
+ccflags-y	:= -g -Wall
+ldflags-y	:= -T$(src)/sections.lds
 
-ECHO := /bin/echo
+obj-m		:= $(NAME).o
+obj-y		:= syscalls/
 
-all modules:
-	@$(ECHO) -ne "#ifndef EVERYTHING_H_INCLUDED\n#define EVERYTHING_H_INCLUDED\n\n" > syscalls/everything.h
-	@ls -1 syscalls | grep -v "everything.h" | grep ".h$$" | awk '{print "#include ""\""$$1"\""}' >> syscalls/everything.h
-	@$(ECHO) -ne "\n#endif\n" >> syscalls/everything.h
-	@make -C ${KDIR} M=$$PWD;
+$(NAME)-y	:= main.o sct_hook.o utils.o \
+		   syscalls/built-in.o
 
-clean modules_install:
-	@make -C ${KDIR} M=$$PWD $@;
-	@rm syscalls/everything.h &>/dev/null || true
-	@rm unistd_32.h &>/dev/null || true
+all: _prebuild
+	make -C $(KDIR) M=$(shell pwd)
+
+clean:
+	make -C $(KDIR) M=$(shell pwd) clean
+
+#
+# TODO: add unistd_32.h autogeneration
+#       if CONFIG_IA32_EMULATION enabled
+#
+
+_prebuild: unistd_32.h

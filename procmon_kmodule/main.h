@@ -24,7 +24,6 @@
 
 #include "utils.h"
 #include "sct_hook.h"
-#include "syscalls/everything.h"
 
 /*****************************************************************************\
 | Define if debugging is enabled or disabled                                  |
