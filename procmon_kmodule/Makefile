@@ -17,8 +17,12 @@ clean:
 	make -C $(KDIR) M=$(shell pwd) clean
 
 #
-# TODO: add unistd_32.h autogeneration
-#       if CONFIG_IA32_EMULATION enabled
+# TODO: check for CONFIG_IA32_EMULATION
 #
 
 _prebuild: unistd_32.h
+
+unistd_32.h: /usr/include/asm/unistd_32.h
+	sed s/__NR_/__NR32_/g /usr/include/asm/unistd_32.h > unistd_32.h
+
+clean-files	+= unistd_32.h
