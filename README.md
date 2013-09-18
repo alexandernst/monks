@@ -1,7 +1,7 @@
 Procmon
 =======
 
-Travis-CI current status: [![Build Status](https://travis-ci.org/alexandernst/procmon.png)](https://travis-ci.org/alexandernst/procmon)
+Drone.io current status: [![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest)
 
 Procmon alternative for Linux
 
