@@ -7,8 +7,9 @@ ldflags-y	:= -T$(src)/sections.lds
 obj-m		:= $(NAME).o
 obj-y		:= syscalls/
 
-$(NAME)-y	:= main.o sct_hook.o utils.o \
-		   syscalls/built-in.o
+$(NAME)-y	:= 	main.o sct_hook.o utils.o \
+		   		syscalls/built-in.o \
+		   		../common/serialize.o
 
 all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)
