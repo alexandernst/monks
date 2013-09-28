@@ -36,7 +36,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 				i->details = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
 			}
 
-			print_info(i);
+			nl_send(i);
 
 			kfree(i->path);
 			kfree(i->details);
@@ -92,7 +92,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 			}
 
 			if(count == 1 && fd == 0)
-				print_info(i);
+				nl_send(i);
 
 			kfree(i->path);
 			kfree(i->details);
