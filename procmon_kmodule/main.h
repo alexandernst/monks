@@ -13,6 +13,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/sysctl.h>
+#include <linux/skbuff.h>
 #include <linux/fdtable.h>
 #include <linux/version.h>
 #include <linux/vmalloc.h>
@@ -40,22 +41,6 @@
 
 #include "utils.h"
 #include "sct_hook.h"
-
-/*****************************************************************************\
-| Define if debugging is enabled or disabled                                  |
-\*****************************************************************************/
-
-#define debug 1
-
-#if debug == 1
-#define DEBUG(...) printk(__VA_ARGS__);
-#else
-#define DEBUG(...)
-#endif
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
 
 void activate(void);
 void deactivate(void);

@@ -44,6 +44,9 @@ static int __init hook_init(void){
 		return -ENOMEM;
 	}
 
+
+	nl_init();
+
 	hook_calls();
 
 	return 0;
@@ -60,6 +63,8 @@ static void __exit hook_exit(void){
 	}
 
 	unregister_sysctl_table(procmon_table_header);
+	
+	nl_halt();
 }
 
 /*****************************************************************************\
