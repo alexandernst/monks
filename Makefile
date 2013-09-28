@@ -1,4 +1,4 @@
-SUBDIRS = procmon_kmodule #procmon
+SUBDIRS = procmon_kmodule procmon
 
 .PHONY: $(SUBDIRS)
 
