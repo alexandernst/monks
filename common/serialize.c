@@ -1,7 +1,7 @@
 #include "serialize.h"
 
 char *serialize_membuffer(membuffer *buffer){
-	char *data = kmalloc(sizeof(size_t) + buffer->len, GFP_KERNEL);
+	char *data = new(sizeof(size_t) + buffer->len);
 
 	memcpy(data, &buffer->len, sizeof(size_t));
 	memcpy(data + sizeof(size_t), buffer->data, buffer->len);
@@ -10,7 +10,7 @@ char *serialize_membuffer(membuffer *buffer){
 }
 
 membuffer *serialize_syscall_info(syscall_info *i){
-	membuffer *buffer = kmalloc(sizeof(membuffer), GFP_KERNEL);
+	membuffer *buffer = new(sizeof(membuffer));
 	buffer->data = NULL;
 	buffer->len = 0;
 
@@ -26,13 +26,13 @@ membuffer *serialize_syscall_info(syscall_info *i){
 
 void add_chunk(membuffer *buffer, void *chunk, size_t size){
 	if(buffer->data == NULL){
-		buffer->data = kmalloc(sizeof(size_t) + size, GFP_KERNEL);
+		buffer->data = new(sizeof(size_t) + size);
 		buffer->len = sizeof(size_t) + size;
 
 		memcpy(buffer->data, &size, sizeof(size_t));
 		memcpy(buffer->data + sizeof(size_t), chunk, size);
 	}else{
-		buffer->data = krealloc(buffer->data, buffer->len + sizeof(size_t) + size, GFP_KERNEL);
+		buffer->data = renew(buffer->data, buffer->len + sizeof(size_t) + size);
 
 		memcpy(buffer->data + buffer->len, &size, sizeof(size_t));
 		memcpy(buffer->data + buffer->len + sizeof(size_t), chunk, size);

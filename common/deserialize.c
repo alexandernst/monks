@@ -2,17 +2,17 @@
 
 membuffer *deserialize_membuffer(char *data){
 	size_t size;
-	membuffer *buffer = malloc(sizeof(membuffer));
+	membuffer *buffer = new(sizeof(membuffer));
 	memcpy(&size, data, sizeof(size_t));
 
-	buffer->data = malloc(size);
+	buffer->data = new(size);
 	memcpy(buffer->data, data + sizeof(size_t), size);
 
 	return buffer;
 }
 
 syscall_info *deserialize_syscall_info(membuffer *buffer){
-	syscall_info *i = malloc(sizeof(syscall_info));
+	syscall_info *i = new(sizeof(syscall_info));
 
 	i->pname = (char *)get_chunk(buffer);
 	i->pid = *(pid_t *)get_chunk(buffer);
