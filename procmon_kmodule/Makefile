@@ -9,7 +9,9 @@ obj-y		:= syscalls/
 
 $(NAME)-y	:= 	main.o sct_hook.o utils.o \
 		   		syscalls/built-in.o \
-		   		../common/serialize.o
+		   		../common/mem_ops.o ../common/serialize.o
+
+new: clean all
 
 all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)

@@ -1,16 +1,21 @@
-CC		=	@gcc
-CFLAGS	=	-g -Wall -w -Wextra -Werror
+CC		=	gcc
+CFLAGS	=	-g -Wall -Wextra -Werror
 CFLAGS	+=	
 
-LDLIBS	=	../common/deserialize.o
+LDLIBS	=	
 LDLIBS	+=	
 
+OBJS	=	../common/mem_ops.o ../common/deserialize.o procmon-user.o
+
 SOURCES	=	procmon-user.c
-DESTS	=	$(patsubst %.c,%,$(SOURCES))
+DESTS	=	procmon-user
 
 new: clean all
 
 clean:
-	@rm -rf *.o */*.o $(DESTS)
+	@rm -rf *.o */*.o ../common/*.o $(DESTS)
 
 all: $(DESTS)
+
+procmon-user: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
