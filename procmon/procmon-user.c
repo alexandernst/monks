@@ -1,9 +1,11 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <unistd.h>
 
+#include "../common/mem_ops.h"
 #include "../common/structures.h"
 #include "../common/deserialize.h"
 
@@ -35,7 +37,7 @@ int main(){
 	dest_addr.nl_pid = 0;
 	dest_addr.nl_groups = 0;
 
-	nlh = (struct nlmsghdr *)malloc(NLMSG_SPACE(MAX_PAYLOAD));
+	nlh = (struct nlmsghdr *)new(NLMSG_SPACE(MAX_PAYLOAD));
 	memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
 	nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
 	nlh->nlmsg_pid = getpid();
@@ -62,8 +64,8 @@ int main(){
 
 		print_info(i);
 
-		free(x);
-		free(i);
+		del(x);
+		del(i);
 	}
 	close(sock_fd);
 }
