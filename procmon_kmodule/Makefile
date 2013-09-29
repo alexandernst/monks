@@ -13,15 +13,11 @@ $(NAME)-y	:= 	main.o sct_hook.o utils.o \
 
 new: clean all
 
-all: _prebuild
-	make -C $(KDIR) M=$(shell pwd)
-
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
 
-#
-# TODO: check for CONFIG_IA32_EMULATION
-#
+all: _prebuild
+	make -C $(KDIR) M=$(shell pwd)
 
 _prebuild: unistd_32.h
 
