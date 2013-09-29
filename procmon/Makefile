@@ -5,10 +5,10 @@ CFLAGS	+=
 LDLIBS	=	
 LDLIBS	+=	
 
-OBJS	=	../common/mem_ops.o ../common/deserialize.o procmon-user.o
+OBJS	=	../common/mem_ops.o ../common/deserialize.o procmon-viewer.o
 
-SOURCES	=	procmon-user.c
-DESTS	=	procmon-user
+SOURCES	=	procmon-viewer.c
+DESTS	=	procmon-viewer
 
 new: clean all
 
@@ -17,5 +17,5 @@ clean:
 
 all: $(DESTS)
 
-procmon-user: $(OBJS)
+procmon-viewer: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
