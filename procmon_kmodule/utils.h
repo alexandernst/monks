@@ -9,8 +9,9 @@
 
 #include <net/sock.h>
 
-#include "../common/structures.h"
+#include "../common/mem_ops.h"
 #include "../common/serialize.h"
+#include "../common/structures.h"
 
 /*****************************************************************************\
 | Utils                                                                       |

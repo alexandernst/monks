@@ -52,15 +52,15 @@ void nl_send(syscall_info *i){
 
 	nlmsg_unicast(nl_sk, skb_out, client_pid);
 
-	kfree(data);
-	kfree(x);
-	kfree(q);
+	del(data);
+	del(x);
+	del(q);
 }
 
 char *path_from_fd(unsigned int fd){
 	char *tmp;
 	char *pathname = "";
-	char *rpathname = kmalloc(1, GFP_KERNEL);
+	char *rpathname = new(1);
 
 	struct file *file;
 	struct path path;
