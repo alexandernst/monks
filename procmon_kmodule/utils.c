@@ -1,19 +1,20 @@
 #include "utils.h"
 
-#define NETLINK_USER 31
+static int netlink_id = MAX_LINKS - 1;
+module_param(netlink_id, int, 0);
+
 int client_pid = 0;
 struct sock *nl_sk = NULL;
 
 void nl_init(void){
-	/* This is for 3.6 kernels and above.*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0)
 	struct netlink_kernel_cfg cfg = {
 		.input = nl_recv,
 	};
-
-	nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
-	/*Bellow kernel 3.6*/
-	//nl_sk = netlink_kernel_create(&init_net, NETLINK_USER, 0, nl_recv, NULL, THIS_MODULE);
-	
+	nl_sk = netlink_kernel_create(&init_net, netlink_id, &cfg);
+#else
+	nl_sk = netlink_kernel_create(&init_net, netlink_id, 0, nl_recv, NULL, THIS_MODULE);
+#endif
 	if(!nl_sk){
 		DEBUG(KERN_INFO "Error creating socket.\n");
 	}
