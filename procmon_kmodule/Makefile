@@ -18,6 +18,7 @@ clean:
 
 all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)
+	@mv $(NAME).ko ../$(NAME).ko
 
 _prebuild: unistd_32.h
 
