@@ -21,9 +21,10 @@ int sock_fd;
 struct msghdr msg;
 
 int main(){
-	sock_fd=socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
-	if(sock_fd<0)
-	return -1;
+	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
+	if(sock_fd < 0){
+		return -1;
+	}
 
 	memset(&src_addr, 0, sizeof(src_addr));
 	src_addr.nl_family = AF_NETLINK;
@@ -52,8 +53,7 @@ int main(){
 	msg.msg_iov = &iov;
 	msg.msg_iovlen = 1;
 
-	sendmsg(sock_fd,&msg,0);
-	printf("Waiting for message from kernel\n");
+	sendmsg(sock_fd, &msg, 0);
 
 	while(1){
 		recvmsg(sock_fd, &msg, 0);
@@ -67,6 +67,7 @@ int main(){
 		del(x);
 		del(i);
 	}
+	
 	close(sock_fd);
 }
 
