@@ -1,9 +1,10 @@
-#include <sys/socket.h>
-#include <linux/netlink.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <linux/netlink.h>
 
 #include "../common/mem_ops.h"
 #include "../common/structures.h"
@@ -12,15 +13,36 @@
 void print_info(syscall_info *i);
 
 #define NETLINK_USER 31
-
 #define MAX_PAYLOAD 1024
-struct sockaddr_nl src_addr, dest_addr;
-struct nlmsghdr *nlh = NULL;
-struct iovec iov;
+
 int sock_fd;
+pid_t mypid;
+pid_t parentpid;
+pid_t parentparentpid;
+struct iovec iov;
 struct msghdr msg;
+struct nlmsghdr *nlh = NULL;
+struct sockaddr_nl src_addr, dest_addr;
 
 int main(){
+
+	mypid = getpid();
+	parentpid = getppid();
+
+	//Ugly... Only for now...
+	pid_t ppid;
+	char procpath[256];
+	FILE *procstat;
+
+	snprintf(procpath, 256, "/proc/%u/stat", parentpid);
+	procstat = fopen(procpath, "r");
+	if(!procstat) {
+		return 0;
+	}
+	fscanf(procstat, "%*d %*s %*c %u", &ppid);
+	fclose(procstat);
+	parentparentpid = ppid;
+
 	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
 	if(sock_fd < 0){
 		return -1;
@@ -28,7 +50,7 @@ int main(){
 
 	memset(&src_addr, 0, sizeof(src_addr));
 	src_addr.nl_family = AF_NETLINK;
-	src_addr.nl_pid = getpid();
+	src_addr.nl_pid = mypid;
 
 	bind(sock_fd, (struct sockaddr*)&src_addr, sizeof(src_addr));
 
@@ -62,18 +84,21 @@ int main(){
 		membuffer *x = deserialize_membuffer(q);
 		syscall_info *i = deserialize_syscall_info(x);
 
-		print_info(i);
+		//Ugly... Only for now...
+		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){
+			print_info(i);
+		}
 
 		del(x);
 		del(i);
 	}
-	
+
 	close(sock_fd);
 }
 
 void print_info(syscall_info *i){
 	printf(
-		"%-15.10s"       /* Process name */
+		"%-15.20s"       /* Process name */
 		"%10u"           /* PID          */
 		" %-15.10s"      /* Operation    */
 		"%-50.45s"       /* Path         */
