@@ -15,25 +15,27 @@ Keep in mind that this is a WIP and you can end up with a totally frozen kernel!
 
 In order to build this module you'll need some basic stuff (make, gcc) and the headers of the kernel 
 you're running on.
-Once you have all those you just need to run ```make``` inside the ```procmon_kmodule``` folder.
+Once you have all those you just need to run ```make``` inside the root folder.
 
 Loading the module isn't any different from loading any other module. ```insmod procmon.ko``` for 
 loading it and ```rmmod procmon.ko``` for unloading it.
 
 To start the actual hijack process, once loaded the module, run ```sysctl procmon.state=1```.
-Once started, you'll probably want to run ```dmesg -w``` (or ```watch -n 0.1 -t 'dmesg | grep -v " grep " | grep -v " tail " | tail -50'``` if your kernel doesn't support ```-w```)
-in another console to see an actual output.
+Once started, you'll probably want to run ```./procmon-viewer``` to see an actual output.
 
-To stop it just run ```sysctl procmon.state=0```.
+To stop it just run hit ```Ctrl + C```. To stop the module run ```sysctl procmon.state=0```.
 
-Also keep in mind that unloading the module without stopping it previously will *probably* cause
-some bad stuff, maybe even data loss. You have been warned.
+Keep in mind that the module will protect your kernel while unloading. That means that if any process
+(both in userland and in the kernel itself) expect to call one of the hijacked syscalls, the module will
+wait those processes to run what they need to run. This may take from 1ms to days. If there's a really long
+delay, try killing/restarting some processes that may have scheduled a call. For example, the module won't
+unload until you press ```Enter``` on all consoles that had any activity while the module was loaded.
 
-The UI part will be based on ```rbcurses```. You'll need Ruby 1.9.3 or newer to play with this part.
+The UI part will be based on ```rbcurses``` (may change). You'll need Ruby 1.9.3 or newer to play with this part.
+Note that this is experimental and has absolutely no support at the moment. Basic instructions:
 First you need to build the Ruby C extension that will allow playing with ```kmod``` from Ruby. Go to the
-```procmon``` and run ```ruby extconf.rb``` and then ```make```. If everything went fine you'll be able to
-go to the main directory and run ```ruby procmon.rb``` (which, for now, will just check if the module is loadad,
-and if it isn't it will load it and unload it).
+```procmon/ui``` and run ```ruby extconf.rb``` and then ```make```. If everything went fine you'll be able to
+copy the binary to the root directory and run ```ruby procmon.rb```. Anyways, at this momento that will cause a few bugs, maybe a crash. It *won't* show anything useful.
 
 Why Procmon
 =======
