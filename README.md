@@ -35,7 +35,8 @@ The UI part will be based on ```rbcurses``` (may change). You'll need Ruby 1.9.3
 Note that this is experimental and has absolutely no support at the moment. Basic instructions:
 First you need to build the Ruby C extension that will allow playing with ```kmod``` from Ruby. Go to the
 ```procmon/ui``` and run ```ruby extconf.rb``` and then ```make```. If everything went fine you'll be able to
-copy the binary to the root directory and run ```ruby procmon.rb```. Anyways, at this momento that will cause a few bugs, maybe a crash. It *won't* show anything useful.
+copy the binary and the rubi script to the root directory and run ```ruby procmon.rb```. 
+Anyways, at this moment that will cause a few bugs, maybe a crash. It *won't* show anything useful.
 
 Why Procmon
 =======
