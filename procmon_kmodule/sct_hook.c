@@ -156,8 +156,10 @@ void hook_calls(void){
 		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
 				DEBUG(KERN_INFO "Hook IA32 %s\n", iter->name);
+#ifdef CONFIG_IA32_EMULATION
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
+#endif
 			}else{
 				DEBUG(KERN_INFO "Hook %s\n", iter->name);
 				iter->rf = (void *)sys_call_table[iter->__NR_];
@@ -186,8 +188,10 @@ void unhook_calls(void){
 		iter = __start_syscalls;
 		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
+#ifdef CONFIG_IA32_EMULATION
 				DEBUG(KERN_INFO "Unhook IA32 %s\n", iter->name);
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->rf;
+#endif
 			}else{
 				DEBUG(KERN_INFO "Unhook %s\n", iter->name);
 				sys_call_table[iter->__NR_] = (void *)iter->rf;
