@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Procmon by alexandernst</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Procmon</h1>
+          <h2>Procmon alternative for Linux</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/alexandernst/procmon/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/alexandernst/procmon/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/alexandernst/procmon" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="procmon" class="anchor" href="#procmon"><span class="octicon octicon-link"></span></a>Procmon</h1>
+
+<p><a href="https://drone.io/github.com/alexandernst/procmon/latest"><img src="https://drone.io/github.com/alexandernst/procmon/status.png" alt="Build Status"></a></p>
+
+<p>Procmon alternative for Linux</p>
+
+<p>This is a kernel module that hijacks sys_calls and printfs messages whenever a sys_call is called.
+In the future, instead of printfs-ing messages, some kind of events will be sent to an UI which will
+be similar to what Procmon (for Windows) offers right now.</p>
+
+<p>Keep in mind that this is a WIP and you can end up with a totally frozen kernel!</p>
+
+<p>In order to build this module you'll need some basic stuff (make, gcc) and the headers of the kernel 
+you're running on.
+Once you have all those you just need to run <code>make</code> inside the root folder.</p>
+
+<p>Loading the module isn't any different from loading any other module. <code>insmod procmon.ko</code> for 
+loading it and <code>rmmod procmon.ko</code> for unloading it.</p>
+
+<p>To start the actual hijack process, once loaded the module, run <code>sysctl procmon.state=1</code>.
+Once started, you'll probably want to run <code>./procmon-viewer</code> to see an actual output.</p>
+
+<p>To stop it just run hit <code>Ctrl + C</code>. To stop the module run <code>sysctl procmon.state=0</code>.</p>
+
+<p>Keep in mind that the module will protect your kernel while unloading. That means that if any process
+(both in userland and in the kernel itself) expect to call one of the hijacked syscalls, the module will
+wait those processes to run what they need to run. This may take from 1ms to days. If there's a really long
+delay, try killing/restarting some processes that may have scheduled a call. For example, the module won't
+unload until you press <code>Enter</code> on all consoles that had any activity while the module was loaded.</p>
+
+<p>The UI part will be based on <code>rbcurses</code> (may change). You'll need Ruby 1.9.3 or newer to play with this part.
+Note that this is experimental and has absolutely no support at the moment. Basic instructions:
+First you need to build the Ruby C extension that will allow playing with <code>kmod</code> from Ruby. Go to the
+<code>procmon/ui</code> and run <code>ruby extconf.rb</code> and then <code>make</code>. If everything went fine you'll be able to
+copy the binary to the root directory and run <code>ruby procmon.rb</code>.
+Anyways, at this moment that will cause a few bugs, maybe a crash. It <em>won't</em> show anything useful.</p>
+
+<p><img src="https://raw.github.com/alexandernst/procmon/screenshots/screenshot1.jpeg" alt="Screenshot"></p>
+
+<h1>
+<a name="why-procmon" class="anchor" href="#why-procmon"><span class="octicon octicon-link"></span></a>Why Procmon</h1>
+
+<p>I'm completely aware of <code>kprobes</code>, <code>perf</code> and all other kernel debug systems/methods. Probably all of them work better than Procmon, but they have one disadvantage: they require you to recompile the kernel or they are not enabled by default in some distros.</p>
+
+<p>Yet another reason: I have fun doing it! I don't seek for this project to be merged into mainline nor being used by every Linux user out there. I'm doing it for myself. Anyways, I'd be glad if it works for you too :)</p>
+
+<p>On the other hand, Procmon will <code>just work</code>.
+What this module does to <code>just work</code> is hijack/replace all (relevant/interesting) syscalls from the syscall table. While this is risky, it will allow you to have a similar tool to Procmon for Windows, without having to recompile the kernel.</p>
+
+<h1>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>Just send me patches, if they are ok I'll give you push access :)</p>
+
+<p>About the editing, note that I'm using <code>TAB</code>s with 4 spaces width, so please keep it that way.</p>
+        </section>
+
+        <footer>
+          Procmon is maintained by <a href="https://github.com/alexandernst">alexandernst</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
