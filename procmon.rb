@@ -2,6 +2,11 @@ require 'open3'
 require './procmon/ui/lkm'
 include LKM
 
+if "#{RUBY_VERSION}".delete('.').to_i < 193 then
+	puts "You need at least Ruby 1.9.3"
+	return
+end
+
 if LKM::check('procmon')
 	puts "Procmon's kernel module doesn't seem to be loaded."
 	LKM::load('./procmon.ko')
