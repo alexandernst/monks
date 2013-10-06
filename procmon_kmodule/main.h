@@ -1,23 +1,8 @@
 #ifndef MAIN_H_INCLUDED
 #define MAIN_H_INCLUDED
 
-#include <asm/page.h>
-#include <asm/unistd.h>
-#include <asm/uaccess.h>
-
-#include <linux/mm.h>
-#include <linux/init.h>
-#include <linux/slab.h>
-#include <linux/delay.h>
-#include <linux/sched.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/sysctl.h>
-#include <linux/skbuff.h>
-#include <linux/fdtable.h>
-#include <linux/version.h>
-#include <linux/vmalloc.h>
-#include <linux/proc_fs.h>
 
 /*****************************************************************************\
 | In case we are on IA32 system we need to get the identifier for both x64    |

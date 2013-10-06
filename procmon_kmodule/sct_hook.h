@@ -1,9 +1,6 @@
 #ifndef SCT_HOOK_H_INCLUDED
 #define SCT_HOOK_H_INCLUDED
 
-#include <linux/kernel.h>
-#include <linux/module.h>
-
 #include "utils.h"
 
 typedef struct syscall_info {
