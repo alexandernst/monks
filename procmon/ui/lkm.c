@@ -126,7 +126,7 @@ static VALUE unload(VALUE self, VALUE kmod_name){
 //0 == ok, 1 == ko
 static VALUE start(VALUE self){
 	int ret = 0;
-	FILE *fp = fopen("/proc/procmon", "w");
+	FILE *fp = fopen("/proc/sys/procmon/state", "w");
 	if(fp == NULL){
 		ret = 1;
 		printf("Error: Can't start hijacking sys calls.\n");
@@ -142,7 +142,7 @@ static VALUE start(VALUE self){
 //0 == ok, 1 == ko
 static VALUE stop(VALUE self){
 	int ret = 0;
-	FILE *fp = fopen("/proc/procmon", "w");
+	FILE *fp = fopen("/proc/sys/procmon/state", "w");
 	if(fp == NULL){
 		ret = 1;
 		printf("Error: Can't start hijacking sys calls.\n");
