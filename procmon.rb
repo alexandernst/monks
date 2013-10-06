@@ -14,7 +14,7 @@ if LKM::check('procmon')
 		stdout.each do |line|
 			i += 1
 			output << line.chomp
-			if i > 500 then
+			if i >= 500 then
 				break
 			end
 		end
