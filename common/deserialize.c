@@ -3,9 +3,21 @@
 membuffer *deserialize_membuffer(char *data){
 	size_t size;
 	membuffer *buffer = new(sizeof(membuffer));
+
+	if(!buffer){
+		return NULL;
+	}
+
 	memcpy(&size, data, sizeof(size_t));
 
+	buffer->len = size;
 	buffer->data = new(size);
+
+	if(!buffer->data){
+		del(buffer);
+		return NULL;
+	}
+
 	memcpy(buffer->data, data + sizeof(size_t), size);
 
 	return buffer;
@@ -13,6 +25,9 @@ membuffer *deserialize_membuffer(char *data){
 
 syscall_info *deserialize_syscall_info(membuffer *buffer){
 	syscall_info *i = new(sizeof(syscall_info));
+	if(!i){
+		return NULL;
+	}
 
 	i->pname = (char *)get_chunk(buffer);
 	i->pid = *(pid_t *)get_chunk(buffer);

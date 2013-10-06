@@ -15,6 +15,6 @@
 
 char *serialize_membuffer(membuffer *buffer);
 membuffer *serialize_syscall_info(syscall_info *i);
-void add_chunk(membuffer *buffer, void *chunk, size_t size);
+int add_chunk(membuffer *buffer, void *chunk, size_t size);
 
 #endif

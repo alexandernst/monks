@@ -82,7 +82,15 @@ int main(){
 
 		char *q = (char *)NLMSG_DATA(nlh);
 		membuffer *x = deserialize_membuffer(q);
+		if(!x){
+			continue;
+		}
+
 		syscall_info *i = deserialize_syscall_info(x);
+		if(!i){
+			del(x);
+			continue;
+		}
 
 		//Ugly... Only for now...
 		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){

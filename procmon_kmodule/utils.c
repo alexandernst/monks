@@ -35,22 +35,35 @@ void nl_send(syscall_info *i){
 	struct nlmsghdr *nlh;
 	struct sk_buff *skb_out;
 	int msg_size;
+	byte *data;
+	char *q;
 
 	membuffer *x = serialize_syscall_info(i);
-	byte *data = x->data;
+	if(!x){
+		return;
+	}
 
-	char *q = serialize_membuffer(x);
+	data = x->data;
 	msg_size = sizeof(size_t) + x->len;
 
 	skb_out = nlmsg_new(msg_size, 0);
-
 	if(!skb_out){
+		del(data);
+		del(x);
 		return;
-	} 
+	}
+
+	q = serialize_membuffer(x);
+	if(!q){
+		del(data);
+		del(x);
+		nlmsg_free(skb_out);
+		return;
+	}
+
 	nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, msg_size, 0);  
 	NETLINK_CB(skb_out).dst_group = 0;
 	memcpy(nlmsg_data(nlh), q, msg_size);
-
 	nlmsg_unicast(nl_sk, skb_out, client_pid);
 
 	del(data);
