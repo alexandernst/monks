@@ -12,6 +12,8 @@
 
 void print_info(syscall_info *i);
 
+int net_init();
+
 #define NETLINK_USER 31
 #define MAX_PAYLOAD 1024
 
@@ -43,6 +45,38 @@ int main(){
 	fclose(procstat);
 	parentparentpid = ppid;
 
+	if(net_init() == -1){
+		return -1;
+	}
+
+	while(1){
+		recvmsg(sock_fd, &msg, 0);
+
+		char *q = (char *)NLMSG_DATA(nlh);
+		membuffer *x = deserialize_membuffer(q);
+		if(!x){
+			continue;
+		}
+
+		syscall_info *i = deserialize_syscall_info(x);
+		if(!i){
+			del(x);
+			continue;
+		}
+
+		//Ugly... Only for now...
+		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){
+			print_info(i);
+		}
+
+		del(x);
+		del(i);
+	}
+
+	close(sock_fd);
+}
+
+int net_init(){
 	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
 	if(sock_fd < 0){
 		return -1;
@@ -77,31 +111,7 @@ int main(){
 
 	sendmsg(sock_fd, &msg, 0);
 
-	while(1){
-		recvmsg(sock_fd, &msg, 0);
-
-		char *q = (char *)NLMSG_DATA(nlh);
-		membuffer *x = deserialize_membuffer(q);
-		if(!x){
-			continue;
-		}
-
-		syscall_info *i = deserialize_syscall_info(x);
-		if(!i){
-			del(x);
-			continue;
-		}
-
-		//Ugly... Only for now...
-		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){
-			print_info(i);
-		}
-
-		del(x);
-		del(i);
-	}
-
-	close(sock_fd);
+	return 0;
 }
 
 void print_info(syscall_info *i){
