@@ -2,6 +2,10 @@
 #define SCT_HOOK_H_INCLUDED
 
 #include "utils.h"
+#include "../udis86/udis86.h"
+
+#define to_x86_ptr(x) (void *)(x)
+#define to_x64_ptr(x) (void *)(0xffffffff00000000 | x)
 
 typedef struct syscall_info {
 	atomic_t counter;
@@ -95,6 +99,8 @@ struct idtr{
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+unsigned int ud_find_insn(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len);
 
 void *get_writable_sct(void *sct_addr);
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)

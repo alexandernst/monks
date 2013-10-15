@@ -11,6 +11,24 @@ void **ia32_sys_call_table = NULL;
 | Functions to get the address of the system call table on each arch          |
 \*****************************************************************************/
 
+unsigned int ud_find_insn(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len){
+	ud_t ud;
+	unsigned int result = 0;
+
+	ud_init(&ud);
+	ud_set_mode(&ud, BITS_PER_LONG);
+	ud_set_vendor(&ud, UD_VENDOR_ANY);
+	ud_set_input_buffer(&ud, entry, limit);
+
+	while(ud_disassemble(&ud)){
+		if(ud.mnemonic == insn_mne && ud_insn_len(&ud) == insn_len){
+			return ud.operand[0].lval.sdword;
+		}
+	}
+
+	return result;
+}
+
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
 #ifdef __i386__
 void *get_sys_call_table(void){
@@ -20,48 +38,38 @@ void *get_ia32_sys_call_table(void){
 	struct idtr idtr;
 	struct idt_descriptor idtd;
 	void *system_call;
-	unsigned char *ptr;
-	int i;
+	unsigned int ptr;
 
 	asm volatile("sidt %0" : "=m" (idtr));
 	memcpy(&idtd, idtr.base + 0x80 * sizeof(idtd), sizeof(idtd));
 
 #ifdef __i386__
-	system_call = (void*)((idtd.offset_high<<16) | idtd.offset_low);
-	for(ptr=system_call, i=0; i<500; i++){
-		if(ptr[0] == 0xff && ptr[1] == 0x14 && ptr[2] == 0x85)
-			return *((void**)(ptr+3));
-		ptr++;
-	}
-#elif defined(__x86_64__)
-	system_call = (void*)(((long)idtd.offset_high<<32) | (idtd.offset_middle<<16) | idtd.offset_low);
-	for(ptr=system_call, i=0; i<500; i++){
-		if(ptr[0] == 0xff && ptr[1] == 0x14 && ptr[2] == 0xc5)
-			return (void*)(0xffffffff00000000 | *((unsigned int*)(ptr+3)));
-		ptr++;
-	}
-#endif
+	system_call = (void *)((idtd.offset_high << 16) | idtd.offset_low);
 
-	return NULL;
+	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	return ptr ? to_x86_ptr(ptr) : NULL;
+
+#elif defined(__x86_64__)
+	system_call = (void *)(((long)idtd.offset_high << 32) | (idtd.offset_middle << 16) | idtd.offset_low);
+	
+	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	return ptr ? to_x64_ptr(ptr) : NULL;
+
+#endif
 }
 #endif
 
 #ifdef __x86_64__
 void *get_sys_call_table(void){
+	int low, high;
 	void *system_call;
-	unsigned char *ptr;
-	int i, low, high;
+	unsigned int ptr;
 
-	asm volatile("rdmsr" : "=a" (low), "=d" (high) : "c" (0xc0000082)); //IA32_LSTAR
-	system_call = (void*)(((long)high<<32) | low);
+	asm volatile("rdmsr" : "=a" (low), "=d" (high) : "c" (0xc0000082));
+	system_call = (void *)(((u64)high << 32) | low);
 
-	for(ptr=system_call, i=0; i<500; i++){
-		if(ptr[0] == 0xff && ptr[1] == 0x14 && ptr[2] == 0xc5)
-			return (void*)(0xffffffff00000000 | *((unsigned int*)(ptr+3)));
-		ptr++;
-	}
-
-	return NULL;
+	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	return ptr ? to_x64_ptr(ptr) : NULL;
 }
 #endif
 
@@ -74,8 +82,7 @@ void *get_sys_call_table(void){
 \*****************************************************************************/
 
 unsigned long clear_and_return_cr0(void){
-	unsigned long cr0 = 0;
-	unsigned long ret;
+	unsigned long ret, cr0 = 0;
 	asm volatile("mov %%cr0, %0" : "=r"(cr0));
 	ret = cr0;
 	cr0 &= ~(1 << 16);
@@ -98,19 +105,19 @@ void setback_cr0(unsigned long val){
 int get_sct(void){
 	sys_call_table = get_sys_call_table();
 	if(!sys_call_table){
-		DEBUG(KERN_INFO "sys_call_table is NULL\n");
+		DEBUG(KERN_INFO "syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		DEBUG(KERN_INFO "get_sct sct: %p\n", sys_call_table);
+		DEBUG(KERN_INFO "Found syscall_table addr at 0x%p\n", sys_call_table);
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(!ia32_sys_call_table){
-		DEBUG(KERN_INFO "ia32_sys_call_table is NULL\n");
+		DEBUG(KERN_INFO "syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		DEBUG(KERN_INFO "get_sct ia32_sct: %p\n", ia32_sys_call_table);
+		DEBUG(KERN_INFO "Found ia32_syscall_table addr at 0x%p\n", ia32_sys_call_table);
 	}
 #endif
 
