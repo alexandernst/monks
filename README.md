@@ -70,9 +70,6 @@ to recompile the kernel.
 Contributing
 =======
 
-Don't forget to run ```git submodule init``` after you clone this repo or you
-will be missing ```udis86```.
-
 Just send me patches, if they are ok I'll give you push access :)
 
 About the editing, note that I'm using ```TAB```s, so please keep it that way.
