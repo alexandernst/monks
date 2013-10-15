@@ -5,17 +5,19 @@ ccflags-y	:= -g -Wall
 ldflags-y	:= -T$(src)/sections.lds
 
 obj-m		:= $(NAME).o
-obj-y		:= syscalls/
+obj-y		:= syscalls/ \
+				../udis86/libudis86/
 
 $(NAME)-y	:= 	main.o sct_hook.o utils.o \
 		   		syscalls/built-in.o \
-		   		../common/mem_ops.o ../common/serialize.o
+		   		../common/mem_ops.o ../common/serialize.o \
+		   		../udis86/libudis86/built-in.o
 
 new: clean all
 
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
-	@rm -rf ../common/*.o
+	@rm -rf ../common/*.o ../udis86/libudis86/*.o
 
 all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)
