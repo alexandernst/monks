@@ -11,7 +11,7 @@ void **ia32_sys_call_table = NULL;
 | Functions to get the address of the system call table on each arch          |
 \*****************************************************************************/
 
-unsigned int ud_find_insn(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len){
+unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len){
 	ud_t ud;
 	unsigned int result = 0;
 
@@ -46,13 +46,13 @@ void *get_ia32_sys_call_table(void){
 #ifdef __i386__
 	system_call = (void *)((idtd.offset_high << 16) | idtd.offset_low);
 
-	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
 	return ptr ? to_x86_ptr(ptr) : NULL;
 
 #elif defined(__x86_64__)
 	system_call = (void *)(((long)idtd.offset_high << 32) | (idtd.offset_middle << 16) | idtd.offset_low);
 	
-	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
 	return ptr ? to_x64_ptr(ptr) : NULL;
 
 #endif
@@ -68,7 +68,7 @@ void *get_sys_call_table(void){
 	asm volatile("rdmsr" : "=a" (low), "=d" (high) : "c" (0xc0000082));
 	system_call = (void *)(((u64)high << 32) | low);
 
-	ptr = ud_find_insn(system_call, 512, UD_Icall, 7);
+	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
 	return ptr ? to_x64_ptr(ptr) : NULL;
 }
 #endif
