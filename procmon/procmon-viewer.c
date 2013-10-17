@@ -26,7 +26,31 @@ struct msghdr msg;
 struct nlmsghdr *nlh = NULL;
 struct sockaddr_nl src_addr, dest_addr;
 
-int main(){
+int main(int argc, char *argv[]){
+
+        int c;
+        char *pvalue = NULL;
+        while ((c = getopt (argc, argv, "p:")) != -1){
+         switch (c)
+           {
+           case 'p':
+             pvalue = optarg;
+             break;
+           case '?':
+             if (optopt == 'p')
+               fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+             return 1;
+           default:
+                printf("Defaulting parm.");
+           }
+        }
+
+        int proc_num=-1;
+
+        if(pvalue){
+                proc_num=atoi(pvalue);
+                printf("Including process %d\n",proc_num);
+        }
 
 	mypid = getpid();
 	parentpid = getppid();
@@ -63,6 +87,9 @@ int main(){
 			del(x);
 			continue;
 		}
+
+		if(proc_num > 0 && i->pid !=proc_num)
+                        continue;
 
 		//Ugly... Only for now...
 		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){
