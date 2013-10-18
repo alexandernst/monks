@@ -20,6 +20,7 @@
 | use them for the ia32 syscall table.                                        |
 \*****************************************************************************/
 
+#include <asm/unistd.h>
 #ifdef CONFIG_IA32_EMULATION
 #include "unistd_32.h"
 #endif
