@@ -1,21 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <linux/netlink.h>
-
-#include "../common/mem_ops.h"
-#include "../common/structures.h"
-#include "../common/deserialize.h"
-
-void print_info(syscall_info *i);
-
-int net_init();
-
-#define NETLINK_USER 31
-#define MAX_PAYLOAD 1024
+#include "procmon-viewer.h"
 
 int sock_fd;
 pid_t mypid;
@@ -30,16 +13,63 @@ int main(int argc, char *argv[]){
 
 	int c;
 	char *pvalue = NULL;
-	while((c = getopt (argc, argv, "p:")) != -1){
+	while((c = getopt(argc, argv, "clusevp:")) != -1){
 		switch(c){
+			case 'c':
+				if(check(PROCMON_MODULE_PATH) == 0){
+					printf("Procmon kernel module is not loaded.\n");
+				}
+				break;
+
+			case 'l':
+				if(load(PROCMON_MODULE_PATH) == 0){
+					printf("Procmon kernel module successfully loaded.\n");
+				}
+				break;
+
+			case 'u':
+				if(unload(PROCMON_MODULE_PATH) == 0){
+					printf("Procmon kernel module successfully unloaded.\n");
+				}
+				break;
+
+			case 's':
+				if(start() == 0){
+					printf("Procmon kernel module successfully started.\n");
+				}
+				break;
+
+			case 'e':
+				if(stop() == 0){
+					printf("Procmon kernel module successfully stopped.\n");
+				}
+				break;
+
 			case 'p':
 				pvalue = optarg;
 				break;
+
+			case 'v':
+				printf("Procmon %g\n", PROCMON_VERSION);
+				break;
+
 			case '?':
 				if(optopt == 'p'){
-					fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+					fprintf(stderr, "Option -%c requires an argument (PID).\n", optopt);
+				}else{
+					printf(
+						"Possible options are:\n\t"
+							"'c' - Check if procmon kernel module is loaded.\n\t"
+							"'l' - Load procmon kernel module.\n\t"
+							"'u' - Unload procmon kernel module.\n\t"
+							"'s' - Start procmon kernel module hijack.\n\t"
+							"'e' - End procmon kernel module hijack.\n\t"
+							"'v' - Show procmon version.\n\t"
+							"'p' <PID> - Exclude PID from returned results. (This option is temporal until UI is working properly)\n"
+					);
 				}
 				return 1;
+
 			default:
 				printf("Defaulting parm.");
 		}

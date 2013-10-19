@@ -1,11 +1,11 @@
 CC		=	gcc
 CFLAGS	=	-g -Wall -Wextra -Werror
-CFLAGS	+=	
+CFLAGS	+=	$(shell pkg-config --cflags libkmod)
 
-LDLIBS	=	
+LDLIBS	=	$(shell pkg-config --libs libkmod)
 LDLIBS	+=	
 
-OBJS	=	../common/mem_ops.o ../common/deserialize.o procmon-viewer.o
+OBJS	=	../common/mem_ops.o ../common/deserialize.o lkm.o procmon-viewer.o
 
 SOURCES	=	procmon-viewer.c
 DESTS	=	../procmon-viewer
@@ -18,4 +18,4 @@ clean:
 all: $(DESTS)
 
 ../procmon-viewer: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
