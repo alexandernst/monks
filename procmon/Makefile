@@ -1,16 +1,12 @@
 CC		=	gcc
 CFLAGS	=	-g -Wall -Wextra -Werror
-CFLAGS	+=	$(shell pkg-config --silence-errors --cflags libkmod)
 
-LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
-LDLIBS	+=	
-
-KMOD	= $(shell pkg-config --exists libkmod && echo "1" || echo "0")
-
+LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod ncurses)
 OBJS	=	../common/mem_ops.o ../common/deserialize.o procmon-viewer.o
-
 SOURCES	=	procmon-viewer.c
 DESTS	=	../procmon-viewer
+
+KMOD	=	$(shell pkg-config --exists libkmod && echo "1" || echo "0")
 
 new: clean all
 
