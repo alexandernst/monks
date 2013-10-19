@@ -1,18 +1,15 @@
 #include "procmon-viewer.h"
 
 int sock_fd;
-pid_t mypid;
-pid_t parentpid;
-pid_t parentparentpid;
 struct iovec iov;
 struct msghdr msg;
 struct nlmsghdr *nlh = NULL;
-struct sockaddr_nl src_addr, dest_addr;
 
-int main(int argc, char *argv[]){
+int main(int argc, char **argv){
 
-	int c;
-	char *pvalue = NULL;
+	int c, pid_filter = -1;
+	pid_t mypid, parentpid, parentparentpid;
+
 	while((c = getopt(argc, argv, "clusevp:")) != -1){
 		switch(c){
 			#ifndef __NO_KMOD__
@@ -20,42 +17,43 @@ int main(int argc, char *argv[]){
 			int ret;
 
 			case 'c':
-				ret = check(PROCMON_MODULE_PATH);
+				ret = check(PROCMON_MODULE_NAME);
 				if(ret == 0){
 					printf("Procmon kernel module is not loaded.\n");
 				}else if(ret == 1){
 					printf("Procmon kernel module is loaded.\n");
 				}
-				break;
+				return 0;
 
 			case 'l':
 				if(load(PROCMON_MODULE_PATH) == 0){
 					printf("Procmon kernel module successfully loaded.\n");
 				}
-				break;
+				return 0;
 
 			case 'u':
-				if(unload(PROCMON_MODULE_PATH) == 0){
+				if(unload(PROCMON_MODULE_NAME) == 0){
 					printf("Procmon kernel module successfully unloaded.\n");
 				}
-				break;
+				return 0;
 
 			case 's':
 				if(start() == 0){
 					printf("Procmon kernel module successfully started.\n");
 				}
-				break;
+				return 0;
 
 			case 'e':
 				if(stop() == 0){
 					printf("Procmon kernel module successfully stopped.\n");
 				}
-				break;
+				return 0;
 
 			#endif
 
 			case 'p':
-				pvalue = optarg;
+				pid_filter = atoi(optarg);
+				printf("Including process %d\n", pid_filter);
 				break;
 
 			case 'v':
@@ -86,31 +84,23 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	int proc_num = -1;
-
-	if(pvalue){
-		proc_num = atoi(pvalue);
-		printf("Including process %d\n", proc_num);
-	}
-
 	mypid = getpid();
 	parentpid = getppid();
 
 	//Ugly... Only for now...
-	pid_t ppid;
 	char procpath[256];
 	FILE *procstat;
 
 	snprintf(procpath, 256, "/proc/%u/stat", parentpid);
 	procstat = fopen(procpath, "r");
-	if(!procstat) {
+	if(!procstat){
 		return 0;
 	}
-	fscanf(procstat, "%*d %*s %*c %u", &ppid);
+	fscanf(procstat, "%*d %*s %*c %u", &parentparentpid);
 	fclose(procstat);
-	parentparentpid = ppid;
 
 	if(net_init() == -1){
+		printf("Error starting NetLink.\n");
 		return -1;
 	}
 
@@ -129,12 +119,13 @@ int main(int argc, char *argv[]){
 			continue;
 		}
 
-		if(proc_num > 0 && i->pid != proc_num){
-			continue;
-		}
-
 		//Ugly... Only for now...
-		if(i->pid != mypid && i->pid != parentpid && i->pid != parentparentpid && strcmp(i->pname, "Xorg") != 0){
+		if(	i->pid != mypid && 
+			i->pid != parentpid && 
+			i->pid != parentparentpid &&
+			i->pid != pid_filter &&
+			strcmp(i->pname, "Xorg") != 0)
+		{
 			print_info(i);
 		}
 
@@ -146,6 +137,8 @@ int main(int argc, char *argv[]){
 }
 
 int net_init(){
+	struct sockaddr_nl src_addr, dest_addr;
+
 	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
 	if(sock_fd < 0){
 		return -1;
@@ -153,7 +146,7 @@ int net_init(){
 
 	memset(&src_addr, 0, sizeof(src_addr));
 	src_addr.nl_family = AF_NETLINK;
-	src_addr.nl_pid = mypid;
+	src_addr.nl_pid = getpid();
 
 	bind(sock_fd, (struct sockaddr *)&src_addr, sizeof(src_addr));
 
