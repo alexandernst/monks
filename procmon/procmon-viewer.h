@@ -6,10 +6,13 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
-#include "lkm.h"
 #include "../common/mem_ops.h"
 #include "../common/structures.h"
 #include "../common/deserialize.h"
+
+#ifndef __NO_KMOD__
+#include "lkm.h"
+#endif
 
 #define PROCMON_VERSION 0.1
 #define PROCMON_MODULE_NAME "procmon"

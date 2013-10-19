@@ -11,10 +11,14 @@ struct sockaddr_nl src_addr, dest_addr;
 
 int main(int argc, char *argv[]){
 
-	int c, ret;
+	int c;
 	char *pvalue = NULL;
 	while((c = getopt(argc, argv, "clusevp:")) != -1){
 		switch(c){
+			#ifndef __NO_KMOD__
+
+			int ret;
+
 			case 'c':
 				ret = check(PROCMON_MODULE_PATH);
 				if(ret == 0){
@@ -48,6 +52,8 @@ int main(int argc, char *argv[]){
 				}
 				break;
 
+			#endif
+
 			case 'p':
 				pvalue = optarg;
 				break;
@@ -62,11 +68,13 @@ int main(int argc, char *argv[]){
 				}else{
 					printf(
 						"Possible options are:\n\t"
+							#ifndef __NO_KMOD__
 							"'c' - Check if procmon kernel module is loaded.\n\t"
 							"'l' - Load procmon kernel module.\n\t"
 							"'u' - Unload procmon kernel module.\n\t"
 							"'s' - Start procmon kernel module hijack.\n\t"
 							"'e' - End procmon kernel module hijack.\n\t"
+							#endif
 							"'v' - Show procmon version.\n\t"
 							"'p' <PID> - Exclude PID from returned results. (This option is temporal until UI is working properly)\n"
 					);
@@ -74,7 +82,7 @@ int main(int argc, char *argv[]){
 				return 1;
 
 			default:
-				printf("Defaulting parm.");
+				break;
 		}
 	}
 
