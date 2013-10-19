@@ -1,8 +1,8 @@
 CC		=	gcc
 CFLAGS	=	-g -Wall -Wextra -Werror
-CFLAGS	+=	$(shell pkg-config --cflags libkmod)
+CFLAGS	+=	$(shell pkg-config --silence-errors --cflags libkmod)
 
-LDLIBS	=	$(shell pkg-config --libs libkmod)
+LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
 LDLIBS	+=	
 
 OBJS	=	../common/mem_ops.o ../common/deserialize.o lkm.o procmon-viewer.o
