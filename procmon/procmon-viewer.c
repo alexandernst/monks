@@ -11,13 +11,16 @@ struct sockaddr_nl src_addr, dest_addr;
 
 int main(int argc, char *argv[]){
 
-	int c;
+	int c, ret;
 	char *pvalue = NULL;
 	while((c = getopt(argc, argv, "clusevp:")) != -1){
 		switch(c){
 			case 'c':
-				if(check(PROCMON_MODULE_PATH) == 0){
+				ret = check(PROCMON_MODULE_PATH);
+				if(ret == 0){
 					printf("Procmon kernel module is not loaded.\n");
+				}else if(ret == 1){
+					printf("Procmon kernel module is loaded.\n");
 				}
 				break;
 
