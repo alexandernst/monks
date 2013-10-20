@@ -17,4 +17,9 @@ typedef struct syscall_intercept_info{
 	char *details;
 } syscall_info;
 
+typedef struct syscall_intercept_info_node {
+	syscall_info *i;
+	struct syscall_intercept_info_node *prev, *next;
+} syscall_intercept_info_node;
+
 #endif

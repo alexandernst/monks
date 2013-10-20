@@ -7,11 +7,12 @@ struct nlmsghdr *nlh = NULL;
 
 int main(int argc, char **argv){
 
-	int c, pid_filter = -1;
+	int ch, pid_filter = -1;
 	pid_t mypid, parentpid, parentparentpid;
+	extern syscall_intercept_info_node *head, *curr;
 
-	while((c = getopt(argc, argv, "clusevp:")) != -1){
-		switch(c){
+	while((ch = getopt(argc, argv, "clusevp:")) != -1){
+		switch(ch){
 			#ifndef __NO_KMOD__
 
 			int ret;
@@ -84,10 +85,25 @@ int main(int argc, char **argv){
 		}
 	}
 
+	if(net_init() == -1){
+		printf("Error starting NetLink.\n");
+		return -1;
+	}
+
+	/*Make SEGFAULTs play nice with NCURSES*/
+	signal(SIGSEGV, do_segfault);
+
+	/*Keep track on the data we have*/
+	head = malloc(sizeof(syscall_intercept_info_node));
+	head->prev = head->next = NULL;
+	head->i = NULL;
+	curr = head;
+
+	/*This is temp, will get remove when UI filters start working*/
 	mypid = getpid();
 	parentpid = getppid();
 
-	//Ugly... Only for now...
+	/*Ugly... Only for now... Get the PID of the parent of our parent*/
 	char procpath[256];
 	FILE *procstat;
 
@@ -99,12 +115,23 @@ int main(int argc, char **argv){
 	fscanf(procstat, "%*d %*s %*c %u", &parentparentpid);
 	fclose(procstat);
 
-	if(net_init() == -1){
-		printf("Error starting NetLink.\n");
-		return -1;
-	}
+	/*Init ncurses window*/
+	initscr();
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
+	curs_set(0);
+	nodelay(stdscr, 1); //non-blocking getch()
 
-	while(1){
+	/*React on resize*/
+	signal(SIGWINCH, do_resize);
+
+	/*Get current positiona and size*/
+	calc_w_size_pos();
+	refresh();
+	create_win_data_data_box();
+
+	while((ch = getch()) != 'q'){
 		recvmsg(sock_fd, &msg, 0);
 
 		char *q = (char *)NLMSG_DATA(nlh);
@@ -114,8 +141,8 @@ int main(int argc, char **argv){
 		}
 
 		syscall_info *i = deserialize_syscall_info(x);
+		del(x);
 		if(!i){
-			del(x);
 			continue;
 		}
 
@@ -126,14 +153,29 @@ int main(int argc, char **argv){
 			i->pid != pid_filter &&
 			strcmp(i->pname, "Xorg") != 0)
 		{
-			print_info(i);
+			add_data(i);
 		}
 
-		del(x);
-		del(i);
+		if(ch == KEY_UP && curr->prev != NULL){
+			curr = curr->prev;
+		}else if(ch == KEY_DOWN && curr->next != NULL){
+			curr = curr->next;
+		}
+
+		draw_data(curr);
+
+		//del(i);
 	}
 
 	close(sock_fd);
+
+	endwin();
+	return 0;
+}
+
+void do_segfault(){
+	endwin();
+	abort();
 }
 
 int get_netlink_id(void)
@@ -190,20 +232,3 @@ int net_init(){
 	return 0;
 }
 
-void print_info(syscall_info *i){
-	printf(
-		"%-15.20s"       /* Process name */
-		"%10u"           /* PID          */
-		" %-15.10s"      /* Operation    */
-		"%-50.45s"       /* Path         */
-		"%-10.10s"       /* Result       */
-		" %-200.200s\n", /* Details      */
-
-		i->pname,
-		i->pid,
-		i->operation,
-		i->path,
-		i->result,
-		i->details
-	);
-}
