@@ -1,7 +1,8 @@
 CC		=	gcc
 CFLAGS	=	-g -Wall -Wextra -Werror
 
-LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod ncurses)
+LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
+LDLIBS	+=	$(shell pkg-config --silence-errors --libs ncurses)
 OBJS	=	../common/mem_ops.o ../common/deserialize.o ui.o procmon-viewer.o
 SOURCES	=	procmon-viewer.c
 DESTS	=	../procmon-viewer
