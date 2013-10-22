@@ -132,15 +132,23 @@ int main(int argc, char **argv){
 	create_win_data_data_box();
 
 	while((ch = getch()) != 'q'){
-		recvmsg(sock_fd, &msg, 0);
-
-		char *q = (char *)NLMSG_DATA(nlh);
-		membuffer *x = deserialize_membuffer(q);
-		if(!x){
+		if(recvmsg(sock_fd, &msg, MSG_WAITALL) <= 0){
 			continue;
 		}
 
+		membuffer *x = new(sizeof(membuffer));
+		if(!x){
+			continue;
+		}
+		x->len = nlh->nlmsg_len - NLMSG_HDRLEN;
+		x->data = new(x->len);
+		if(!x->data){
+			continue;
+		}
+		memcpy(x->data, NLMSG_DATA(nlh), x->len);
+
 		syscall_info *i = deserialize_syscall_info(x);
+		del(x->data);
 		del(x);
 		if(!i){
 			continue;
@@ -154,6 +162,15 @@ int main(int argc, char **argv){
 			strcmp(i->pname, "Xorg") != 0)
 		{
 			add_data(i);
+		}else{
+			//TODO: this whole thing is wrong. We should store everything and filter
+			//it when we're showing the data.
+			del(i->pname);
+			del(i->operation);
+			del(i->path);
+			del(i->result);
+			del(i->details);
+			del(i);
 		}
 
 		if(ch == KEY_UP && curr->prev != NULL){
@@ -163,11 +180,25 @@ int main(int argc, char **argv){
 		}
 
 		draw_data(curr);
-
-		//del(i);
 	}
 
 	close(sock_fd);
+
+	syscall_intercept_info_node *in = head, *tmp;
+	while(!in->next){
+		//TODO ~20 lines up == same thing. Make a function or something to free the entire i struct
+		del(in->i->pname);
+		del(in->i->operation);
+		del(in->i->path);
+		del(in->i->result);
+		del(in->i->details);
+		del(in->i);
+
+		tmp = in;
+		in = in->next;
+
+		del(tmp);
+	}
 
 	endwin();
 	return 0;
