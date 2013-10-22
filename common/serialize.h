@@ -13,7 +13,6 @@
 #include "mem_ops.h"
 #include "structures.h"
 
-char *serialize_membuffer(membuffer *buffer);
 membuffer *serialize_syscall_info(syscall_info *i);
 int add_chunk(membuffer *buffer, void *chunk, size_t size);
 

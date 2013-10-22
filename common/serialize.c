@@ -1,17 +1,5 @@
 #include "serialize.h"
 
-char *serialize_membuffer(membuffer *buffer){
-	char *data = new(sizeof(size_t) + buffer->len);
-	if(!data){
-		return NULL;
-	}
-
-	memcpy(data, &buffer->len, sizeof(size_t));
-	memcpy(data + sizeof(size_t), buffer->data, buffer->len);
-
-	return data;
-}
-
 membuffer *serialize_syscall_info(syscall_info *i){
 	membuffer *buffer = new(sizeof(membuffer));
 	buffer->data = NULL;
