@@ -1,12 +1,11 @@
 #include "utils.h"
 
-static int netlink_id = MAX_LINKS - 1;
-module_param(netlink_id, int, 0);
-
 int client_pid = 0;
 struct sock *nl_sk = NULL;
 
-void nl_init(void){
+static struct sock * nl_init_sock(int netlink_id)
+{
+	struct sock * nl_sk;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0)
 	struct netlink_kernel_cfg cfg = {
 		.input = nl_recv,
@@ -15,9 +14,21 @@ void nl_init(void){
 #else
 	nl_sk = netlink_kernel_create(&init_net, netlink_id, 0, nl_recv, NULL, THIS_MODULE);
 #endif
-	if(!nl_sk){
-		DEBUG(KERN_INFO "Error creating socket.\n");
+	return nl_sk;
+}
+
+void nl_init(void){
+	int nl_id = MAX_LINKS - 1;
+
+	while (nl_id >= 0) {
+		if ((nl_sk = nl_init_sock(nl_id))) {
+			DEBUG(KERN_INFO "Acquired NETLINK socket (%d)\n", nl_id);
+			return;
+		}
+		nl_id--;
 	}
+
+	DEBUG(KERN_INFO "Error creating socket.\n");
 }
 
 void nl_halt(void){
