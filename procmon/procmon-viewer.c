@@ -136,10 +136,24 @@ int main(int argc, char **argv){
 	close(sock_fd);
 }
 
+int get_netlink_id(void)
+{
+	FILE * file;
+	int nl_id = MAX_LINKS - 1;
+
+	file = fopen("/proc/sys/procmon/netlink", "r");
+	if (file) {
+		fscanf(file, "%d", &nl_id);
+		fclose(file);
+	}
+
+	return nl_id;
+}
+
 int net_init(){
 	struct sockaddr_nl src_addr, dest_addr;
 
-	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
+	sock_fd = socket(PF_NETLINK, SOCK_RAW, get_netlink_id());
 	if(sock_fd < 0){
 		return -1;
 	}

@@ -18,7 +18,6 @@
 #define PROCMON_MODULE_NAME "procmon"
 #define PROCMON_MODULE_PATH "./procmon.ko"
 
-#define NETLINK_USER 31
 #define MAX_PAYLOAD 1024
 
 int net_init();
