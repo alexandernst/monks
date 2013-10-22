@@ -1,6 +1,8 @@
 #include "utils.h"
 
 int client_pid = 0;
+
+int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
 
 static struct sock * nl_init_sock(int netlink_id)
@@ -18,8 +20,6 @@ static struct sock * nl_init_sock(int netlink_id)
 }
 
 void nl_init(void){
-	int nl_id = MAX_LINKS - 1;
-
 	while (nl_id >= 0) {
 		if ((nl_sk = nl_init_sock(nl_id))) {
 			DEBUG(KERN_INFO "Acquired NETLINK socket (%d)\n", nl_id);

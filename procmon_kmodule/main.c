@@ -14,6 +14,11 @@ static ctl_table state_table[] = {
 		.data = &state, .maxlen	= sizeof(int),
 		.extra1 = &min, .extra2 = &max
 	},
+	{
+		.procname = "netlink", .mode = 0444,
+		.proc_handler = &proc_dointvec,
+		.data = &nl_id, .maxlen = sizeof(int),
+	},
 	{ 0 }
 };
 
