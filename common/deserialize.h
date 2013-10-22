@@ -14,7 +14,6 @@
 #include "mem_ops.h"
 #include "structures.h"
 
-membuffer *deserialize_membuffer(char *data);
 syscall_info *deserialize_syscall_info(membuffer *buffer);
 void *get_chunk(membuffer *buffer);
 

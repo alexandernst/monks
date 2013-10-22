@@ -1,36 +1,19 @@
 #include "deserialize.h"
 
-membuffer *deserialize_membuffer(char *data){
-	size_t size;
-	membuffer *buffer = new(sizeof(membuffer));
-
-	if(!buffer){
-		return NULL;
-	}
-
-	memcpy(&size, data, sizeof(size_t));
-
-	buffer->len = size;
-	buffer->data = new(size);
-
-	if(!buffer->data){
-		del(buffer);
-		return NULL;
-	}
-
-	memcpy(buffer->data, data + sizeof(size_t), size);
-
-	return buffer;
-}
-
 syscall_info *deserialize_syscall_info(membuffer *buffer){
 	syscall_info *i = new(sizeof(syscall_info));
 	if(!i){
 		return NULL;
 	}
 
+	void *tmp;
+
 	i->pname = (char *)get_chunk(buffer);
-	i->pid = *(pid_t *)get_chunk(buffer);
+
+	tmp = get_chunk(buffer);
+	i->pid = *(pid_t *)tmp;
+	del(tmp);
+
 	i->operation = (char *)get_chunk(buffer);
 	i->path = (char *)get_chunk(buffer);
 	i->result = (char *)get_chunk(buffer);
@@ -40,13 +23,24 @@ syscall_info *deserialize_syscall_info(membuffer *buffer){
 }
 
 void *get_chunk(membuffer *buffer){
-	void *chk;
 	size_t size;
+	void *chunk;
+	membuffer *tmp;
 
-	size = *(size_t*)buffer->data;
-	buffer->data += sizeof(size_t);
-	chk = buffer->data;
-	buffer->data += size;
-	buffer->len -= size + sizeof(size_t);
-	return chk;
+	memcpy(&size, buffer->data, sizeof(size_t));
+	chunk = new(size);
+	memcpy(chunk, buffer->data + sizeof(size_t), size);
+
+	tmp = new(sizeof(membuffer));
+	tmp->len = buffer->len - sizeof(size_t) - size;
+	tmp->data = new(tmp->len);
+
+	memcpy(tmp->data, buffer->data + sizeof(size_t) + size, tmp->len);
+
+	del(buffer->data);
+	buffer->data = tmp->data;
+	buffer->len = tmp->len;
+	del(tmp);
+
+	return chunk;
 }
