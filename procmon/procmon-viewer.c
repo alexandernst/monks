@@ -1,12 +1,12 @@
 #include "procmon-viewer.h"
 
-int sock_fd;
 struct iovec iov;
 struct msghdr msg;
 struct nlmsghdr *nlh = NULL;
 
 int main(int argc, char **argv){
 
+	int sock_fd;
 	int ch, pid_filter = -1;
 	pid_t mypid, parentpid, parentparentpid;
 	extern syscall_intercept_info_node *head, *curr;
@@ -85,7 +85,8 @@ int main(int argc, char **argv){
 		}
 	}
 
-	if(net_init() == -1){
+	sock_fd = net_init();
+	if(sock_fd == -1){
 		printf("Error starting NetLink.\n");
 		return -1;
 	}
@@ -224,6 +225,7 @@ int get_netlink_id(void)
 }
 
 int net_init(){
+	int sock_fd;
 	struct sockaddr_nl src_addr, dest_addr;
 
 	sock_fd = socket(PF_NETLINK, SOCK_RAW, get_netlink_id());
@@ -260,6 +262,6 @@ int net_init(){
 
 	sendmsg(sock_fd, &msg, 0);
 
-	return 0;
+	return sock_fd;
 }
 
