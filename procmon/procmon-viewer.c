@@ -4,6 +4,7 @@ extern struct iovec iov;
 extern struct msghdr msg;
 extern struct nlmsghdr *nlh;
 
+unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr;
 
 int main(int argc, char **argv){
@@ -172,6 +173,15 @@ void add_data(syscall_info *i){
 		in->i = i;
 		curr = in;
 	}else{
+
+		if(total_nodes >= MEM_LIMIT){
+			syscall_intercept_info_node *tmp = head;
+			head = head->next;
+			free_info(tmp->i);
+			del(tmp);
+			total_nodes--;
+		}
+
 		in = calloc(sizeof(syscall_intercept_info_node), 1);
 		in->prev = curr;
 		in->i = i;
@@ -179,6 +189,8 @@ void add_data(syscall_info *i){
 		curr = in;
 		curr->next = NULL;
 	}
+
+	total_nodes++;
 }
 
 void free_info(syscall_info *i){

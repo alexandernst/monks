@@ -19,6 +19,8 @@
 #define PROCMON_MODULE_NAME "procmon"
 #define PROCMON_MODULE_PATH "./procmon.ko"
 
+#define MEM_LIMIT 3000
+
 void do_segfault();
 void add_data(syscall_info *i);
 void free_info(syscall_info *i);
