@@ -4,6 +4,8 @@ extern struct iovec iov;
 extern struct msghdr msg;
 extern struct nlmsghdr *nlh;
 
+syscall_intercept_info_node *head, *curr;
+
 int main(int argc, char **argv){
 
 	int sock_fd;
@@ -158,6 +160,25 @@ int main(int argc, char **argv){
 void do_segfault(){
 	endwin();
 	abort();
+}
+
+void add_data(syscall_info *i){
+	syscall_intercept_info_node *in;
+
+	if(head->i == NULL){
+		in = head;
+		in->prev = NULL;
+		in->next = NULL;
+		in->i = i;
+		curr = in;
+	}else{
+		in = calloc(sizeof(syscall_intercept_info_node), 1);
+		in->prev = curr;
+		in->i = i;
+		curr->next = in;
+		curr = in;
+		curr->next = NULL;
+	}
 }
 
 void free_info(syscall_info *i){

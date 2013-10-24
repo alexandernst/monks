@@ -1,7 +1,8 @@
 #include "ui.h"
 
+extern syscall_intercept_info_node *head, *curr;
+
 WINDOW *win_data_box, *win_data;
-syscall_intercept_info_node *head, *curr;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
 int win_data_box_startx, win_data_box_starty, win_data_box_width, win_data_box_height;
 
@@ -105,26 +106,6 @@ void calc_w_size_pos(){
 
 	win_data_starty = win_data_box_starty + 1;
 	win_data_startx = win_data_box_startx + 1;
-}
-
-void add_data(syscall_info *i) {
-	syscall_intercept_info_node *in;
-
-	if(head->i == NULL){
-		in = head;
-		in->prev = NULL;
-		in->next = NULL;
-		in->i = i;
-		curr = in;
-	}else{
-		in = calloc(sizeof(syscall_intercept_info_node), 1);
-		in->prev = curr;
-		in->i = i;
-		curr->next = in;
-		curr = in;
-		curr->next = NULL;
-	}
-
 }
 
 void draw_data(syscall_intercept_info_node *in) {
