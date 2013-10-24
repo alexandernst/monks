@@ -20,3 +20,4 @@
 #define PROCMON_MODULE_PATH "./procmon.ko"
 
 void do_segfault();
+void free_info(syscall_info *i);

@@ -7,8 +7,7 @@ extern struct nlmsghdr *nlh;
 int main(int argc, char **argv){
 
 	int sock_fd;
-	int ch, pid_filter = -1;
-	pid_t mypid, parentpid, parentparentpid;
+	int ch;
 	extern syscall_intercept_info_node *head, *curr;
 
 	while((ch = getopt(argc, argv, "clusevp:")) != -1){
@@ -52,32 +51,22 @@ int main(int argc, char **argv){
 
 			#endif
 
-			case 'p':
-				pid_filter = atoi(optarg);
-				printf("Including process %d\n", pid_filter);
-				break;
-
 			case 'v':
 				printf("Procmon %g\n", PROCMON_VERSION);
 				break;
 
 			case '?':
-				if(optopt == 'p'){
-					fprintf(stderr, "Option -%c requires an argument (PID).\n", optopt);
-				}else{
-					printf(
-						"Possible options are:\n\t"
-							#ifndef __NO_KMOD__
-							"'c' - Check if procmon kernel module is loaded.\n\t"
-							"'l' - Load procmon kernel module.\n\t"
-							"'u' - Unload procmon kernel module.\n\t"
-							"'s' - Start procmon kernel module hijack.\n\t"
-							"'e' - End procmon kernel module hijack.\n\t"
-							#endif
-							"'v' - Show procmon version.\n\t"
-							"'p' <PID> - Exclude PID from returned results. (This option is temporal until UI is working properly)\n"
-					);
-				}
+				printf(
+					"Possible options are:\n\t"
+						#ifndef __NO_KMOD__
+						"'c' - Check if procmon kernel module is loaded.\n\t"
+						"'l' - Load procmon kernel module.\n\t"
+						"'u' - Unload procmon kernel module.\n\t"
+						"'s' - Start procmon kernel module hijack.\n\t"
+						"'e' - End procmon kernel module hijack.\n\t"
+						#endif
+						"'v' - Show procmon version.\n"
+				);
 				return 1;
 
 			default:
@@ -99,22 +88,6 @@ int main(int argc, char **argv){
 	head->prev = head->next = NULL;
 	head->i = NULL;
 	curr = head;
-
-	/*This is temp, will get remove when UI filters start working*/
-	mypid = getpid();
-	parentpid = getppid();
-
-	/*Ugly... Only for now... Get the PID of the parent of our parent*/
-	char procpath[256];
-	FILE *procstat;
-
-	snprintf(procpath, 256, "/proc/%u/stat", parentpid);
-	procstat = fopen(procpath, "r");
-	if(!procstat){
-		return 0;
-	}
-	fscanf(procstat, "%*d %*s %*c %u", &parentparentpid);
-	fclose(procstat);
 
 	/*Init ncurses window*/
 	initscr();
@@ -155,24 +128,7 @@ int main(int argc, char **argv){
 			continue;
 		}
 
-		//Ugly... Only for now...
-		if(	i->pid != mypid && 
-			i->pid != parentpid && 
-			i->pid != parentparentpid &&
-			i->pid != pid_filter &&
-			strcmp(i->pname, "Xorg") != 0)
-		{
-			add_data(i);
-		}else{
-			//TODO: this whole thing is wrong. We should store everything and filter
-			//it when we're showing the data.
-			del(i->pname);
-			del(i->operation);
-			del(i->path);
-			del(i->result);
-			del(i->details);
-			del(i);
-		}
+		add_data(i);
 
 		if(ch == KEY_UP && curr->prev != NULL){
 			curr = curr->prev;
@@ -187,13 +143,7 @@ int main(int argc, char **argv){
 
 	syscall_intercept_info_node *in = head, *tmp;
 	while(!in->next){
-		//TODO ~20 lines up == same thing. Make a function or something to free the entire i struct
-		del(in->i->pname);
-		del(in->i->operation);
-		del(in->i->path);
-		del(in->i->result);
-		del(in->i->details);
-		del(in->i);
+		free_info(in->i);
 
 		tmp = in;
 		in = in->next;
@@ -208,4 +158,13 @@ int main(int argc, char **argv){
 void do_segfault(){
 	endwin();
 	abort();
+}
+
+void free_info(syscall_info *i){
+	del(i->pname);
+	del(i->operation);
+	del(i->path);
+	del(i->result);
+	del(i->details);
+	del(i);
 }

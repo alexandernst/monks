@@ -129,8 +129,21 @@ void add_data(syscall_info *i) {
 
 void draw_data(syscall_intercept_info_node *in) {
 	int i;
+
+	/*This is temp, will get remove when UI filters start working*/
+	pid_t mypid, parentpid;
+	mypid = getpid();
+	parentpid = getppid();
+
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
-		if(in->i != NULL){
+		if(	in->i != NULL && //Will be there in->i == NULL ever?
+
+			//Ugly... Only for now...
+			in->i->pid != mypid && 
+			in->i->pid != parentpid && 
+			strcmp(in->i->pname, "Xorg") != 0 &&
+			strcmp(in->i->pname, "konsole") != 0
+		){
 			char *s_info = get_str_info(in->i);
 			wclrtoeol(win_data);
 			mvwaddstr(win_data, i, 0, s_info);
