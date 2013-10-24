@@ -1,6 +1,6 @@
 #include "ui.h"
 
-extern syscall_intercept_info_node *head, *curr;
+extern syscall_intercept_info_node *head, *curr, *tail;
 
 WINDOW *win_data_box, *win_data;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
@@ -117,8 +117,7 @@ void draw_data(syscall_intercept_info_node *in) {
 	parentpid = getppid();
 
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
-		if(	in->i != NULL && //Will be there in->i == NULL ever?
-
+		if(
 			//Ugly... Only for now...
 			in->i->pid != mypid && 
 			in->i->pid != parentpid && 
@@ -130,7 +129,7 @@ void draw_data(syscall_intercept_info_node *in) {
 			mvwaddstr(win_data, i, 0, s_info);
 			del(s_info);
 		}else{
-			i++; //Do we really need this?
+			i++; //Do not leave empty lines!
 		}
 	}
 

@@ -5,7 +5,7 @@ extern struct msghdr msg;
 extern struct nlmsghdr *nlh;
 
 unsigned long int total_nodes = 0;
-syscall_intercept_info_node *head, *curr;
+syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv){
 	head = malloc(sizeof(syscall_intercept_info_node));
 	head->prev = head->next = NULL;
 	head->i = NULL;
-	curr = head;
+	tail = curr = head;
 
 	/*Init ncurses window*/
 	initscr();
@@ -109,7 +109,7 @@ int main(int argc, char **argv){
 	create_win_data_data_box();
 
 	while((ch = getch()) != 'q'){
-		if(recvmsg(sock_fd, &msg, MSG_WAITALL) <= 0){
+		if(recvmsg(sock_fd, &msg, 0) <= 0){
 			continue;
 		}
 
@@ -168,10 +168,7 @@ void add_data(syscall_info *i){
 
 	if(head->i == NULL){
 		in = head;
-		in->prev = NULL;
-		in->next = NULL;
 		in->i = i;
-		curr = in;
 	}else{
 
 		if(total_nodes >= MEM_LIMIT){
@@ -183,11 +180,11 @@ void add_data(syscall_info *i){
 		}
 
 		in = calloc(sizeof(syscall_intercept_info_node), 1);
-		in->prev = curr;
+		in->prev = tail;
 		in->i = i;
-		curr->next = in;
-		curr = in;
-		curr->next = NULL;
+		tail->next = in;
+		tail = in;
+		tail->next = NULL;
 	}
 
 	total_nodes++;
