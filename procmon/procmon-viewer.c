@@ -188,6 +188,11 @@ void add_data(syscall_info *i){
 	}
 
 	total_nodes++;
+
+	//Auto-scroll!
+	if(curr == tail->prev){
+		curr = tail;
+	}
 }
 
 void free_info(syscall_info *i){
