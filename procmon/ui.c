@@ -124,7 +124,7 @@ void draw_data(syscall_intercept_info_node *in) {
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
 		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
-			if(s_info != NULL){
+			if(s_info){
 				wclrtoeol(win_data);
 				mvwaddstr(win_data, i, 0, s_info);
 				del(s_info);
