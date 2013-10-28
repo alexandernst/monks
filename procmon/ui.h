@@ -21,6 +21,7 @@ void destroy_win(WINDOW *local_win);
 void do_resize();
 void calc_w_size_pos();
 
-void draw_data(syscall_intercept_info_node *l); 
+void draw_data(syscall_intercept_info_node *l);
+int filter_i(syscall_info *i);
 
 #endif

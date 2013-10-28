@@ -7,8 +7,13 @@ int win_data_startx, win_data_starty, win_data_width, win_data_height;
 int win_data_box_startx, win_data_box_starty, win_data_box_width, win_data_box_height;
 
 char *get_str_info(syscall_info *i){
-	char *tmp = new(win_data_width);
-	snprintf(tmp,
+	int err;
+	char *tmp = new(win_data_width + 1);
+	if(!tmp){
+		return NULL;
+	}
+
+	err = snprintf(tmp,
 		win_data_width,
 		"%-15.20s"       /* Process name */
 		"%10u"           /* PID          */
@@ -24,6 +29,11 @@ char *get_str_info(syscall_info *i){
 		i->result,
 		i->details
 	);
+
+	if(err < 0){
+		del(tmp);
+		return NULL;
+	}
 
 	rstrip(tmp);
 	return tmp;
@@ -111,27 +121,38 @@ void calc_w_size_pos(){
 void draw_data(syscall_intercept_info_node *in) {
 	int i;
 
-	/*This is temp, will get remove when UI filters start working*/
-	pid_t mypid, parentpid;
-	mypid = getpid();
-	parentpid = getppid();
-
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
-		if(
-			//Ugly... Only for now...
-			in->i->pid != mypid && 
-			in->i->pid != parentpid && 
-			strcmp(in->i->pname, "Xorg") != 0 &&
-			strcmp(in->i->pname, "konsole") != 0
-		){
+		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
-			wclrtoeol(win_data);
-			mvwaddstr(win_data, i, 0, s_info);
-			del(s_info);
+			if(s_info != NULL){
+				wclrtoeol(win_data);
+				mvwaddstr(win_data, i, 0, s_info);
+				del(s_info);
+			}else{
+				i++;
+			}
 		}else{
 			i++; //Do not leave empty lines!
 		}
 	}
 
 	wrefresh(win_data);
+}
+
+int filter_i(syscall_info *i){
+	/*This is temp, will get remove when UI filters start working*/
+	pid_t mypid, parentpid;
+	mypid = getpid();
+	parentpid = getppid();
+
+	if(
+		i->pid != mypid && 
+		i->pid != parentpid && 
+		strcmp(i->pname, "Xorg") != 0 &&
+		strcmp(i->pname, "konsole") != 0
+	){
+		return 0;
+	}else{
+		return 1;
+	}
 }
