@@ -9,8 +9,8 @@ syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
 
-	int sock_fd;
-	int ch;
+	int ch, sock_fd, stdin_fd, efd;
+	struct epoll_event event, events[2];
 	extern syscall_intercept_info_node *head, *curr;
 
 	while((ch = getopt(argc, argv, "clusevp:")) != -1){
@@ -77,17 +77,47 @@ int main(int argc, char **argv){
 		}
 	}
 
+	/*Get NetLink file descriptor*/
 	sock_fd = net_init();
 	if(sock_fd == -1){
 		printf("Error starting NetLink.\n");
 		return -1;
 	}
+	//fcntl(sock_fd, F_SETFL, fcntl(sock_fd, F_GETFL, 0) | O_NONBLOCK); //Do we need this?
+
+	/*Get STDIN file descriptor*/
+	stdin_fd = fcntl(STDIN_FILENO,  F_DUPFD, 0);
 
 	/*Make SEGFAULTs play nice with NCURSES*/
 	signal(SIGSEGV, do_segfault);
 
+	/*Create event loop*/
+	efd = epoll_create1(0);
+	if(efd == -1){
+		printf("Error creating epoll\n");
+		return -1;
+	}
+
+	event.data.fd = sock_fd;
+	event.events = EPOLLIN;
+	if(epoll_ctl(efd, EPOLL_CTL_ADD, sock_fd, &event) == -1){
+		printf("Error adding socket fd to epoll\n");
+		return -1;
+	}
+
+	event.data.fd = stdin_fd;
+	event.events = EPOLLIN;
+	if(epoll_ctl(efd, EPOLL_CTL_ADD, stdin_fd, &event) == -1){
+		printf("Error adding stdin fd to epoll\n");
+		return -1;
+	}
+
 	/*Keep track on the data we have*/
-	head = malloc(sizeof(syscall_intercept_info_node));
+	head = new(sizeof(syscall_intercept_info_node));
+	if(!head){
+		printf("Error allocating memory for data list\n");
+		return -1;
+	}
 	head->prev = head->next = NULL;
 	head->i = NULL;
 	tail = curr = head;
@@ -108,42 +138,26 @@ int main(int argc, char **argv){
 	refresh();
 	create_win_data_data_box();
 
-	while((ch = getch()) != 'q'){
-		if(recvmsg(sock_fd, &msg, 0) <= 0){
-			continue;
+	/*Start even loop*/
+	while(1){
+		int n, i;
+		n = epoll_wait(efd, events, MAXEVENTS, -1);
+		for(i = 0; i < n; i++){
+			if(events[i].events & EPOLLIN){
+				if(events[i].data.fd == sock_fd){
+					read_from_socket(sock_fd);
+				}else if(events[i].data.fd == stdin_fd){
+					read_from_kb();
+				}
+			}else if(events[i].events & (EPOLLHUP | EPOLLERR)){
+				continue;
+			}
 		}
-
-		membuffer *x = new(sizeof(membuffer));
-		if(!x){
-			continue;
-		}
-		x->len = nlh->nlmsg_len - NLMSG_HDRLEN;
-		x->data = new(x->len);
-		if(!x->data){
-			continue;
-		}
-		memcpy(x->data, NLMSG_DATA(nlh), x->len);
-
-		syscall_info *i = deserialize_syscall_info(x);
-		del(x->data);
-		del(x);
-		if(!i){
-			continue;
-		}
-
-		add_data(i);
-
-		if(ch == KEY_UP && curr->prev != NULL){
-			curr = curr->prev;
-		}else if(ch == KEY_DOWN && curr->next != NULL){
-			curr = curr->next;
-		}
-
-		draw_data(curr);
 	}
 
 	close(sock_fd);
 
+	/*Free all the memory we allocated for the data*/
 	syscall_intercept_info_node *in = head, *tmp;
 	while(!in->next){
 		free_info(in->i);
@@ -154,6 +168,7 @@ int main(int argc, char **argv){
 		del(tmp);
 	}
 
+	/*Exit*/
 	endwin();
 	return 0;
 }
@@ -161,6 +176,61 @@ int main(int argc, char **argv){
 void do_segfault(){
 	endwin();
 	abort();
+}
+
+void read_from_kb(void){
+	int ch = getch();
+
+	//We need to assign curr the next *visible* element
+	//aka, the one that will pass the filter options
+	if(ch == KEY_UP && curr->prev != NULL){
+		curr = curr->prev;
+		while(!filter_i(curr->i)){
+			curr = curr->prev;
+			if(curr == head){
+				break;
+			}
+		}
+	}else if(ch == KEY_DOWN && curr->next != NULL){
+		curr = curr->next;
+		while(!filter_i(curr->i)){
+			curr = curr->next;
+			if(curr == tail){
+				break;
+			}
+		}
+	}
+
+	draw_data(curr);	
+}
+
+void read_from_socket(int sock_fd){
+	recvmsg(sock_fd, &msg, 0);
+
+	membuffer *x = new(sizeof(membuffer));
+	if(!x){
+		return;
+	}
+	x->len = nlh->nlmsg_len - NLMSG_HDRLEN;
+	x->data = new(x->len);
+	if(!x->data){
+		return;
+	}
+	memcpy(x->data, NLMSG_DATA(nlh), x->len);
+
+	syscall_info *i = deserialize_syscall_info(x);
+	del(x->data);
+	del(x);
+	if(!i){
+		return;
+	}
+
+	add_data(i);
+
+	//Don't draw if there's nothing new to draw
+	if(curr == tail){
+		draw_data(curr);
+	}
 }
 
 void add_data(syscall_info *i){

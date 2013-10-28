@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/epoll.h>
 
 #include "../common/mem_ops.h"
 #include "../common/structures.h"
@@ -19,8 +20,11 @@
 #define PROCMON_MODULE_NAME "procmon"
 #define PROCMON_MODULE_PATH "./procmon.ko"
 
-#define MEM_LIMIT 3000
+#define MAXEVENTS 2
+#define MEM_LIMIT 30000
 
 void do_segfault();
+void read_from_kb(void);
+void read_from_socket(int sock_fd);
 void add_data(syscall_info *i);
 void free_info(syscall_info *i);
