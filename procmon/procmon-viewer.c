@@ -140,18 +140,25 @@ int main(int argc, char **argv){
 
 	/*Start even loop*/
 	while(1){
-		int n, i;
+		int n, i, quit = 0;
 		n = epoll_wait(efd, events, MAXEVENTS, -1);
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
 				if(events[i].data.fd == sock_fd){
 					read_from_socket(sock_fd);
 				}else if(events[i].data.fd == stdin_fd){
-					read_from_kb();
+					if(read_from_kb() < 0){
+						quit = 1;
+						break;
+					}
 				}
 			}else if(events[i].events & (EPOLLHUP | EPOLLERR)){
 				continue;
 			}
+		}
+		
+		if(quit){
+			break;
 		}
 	}
 
@@ -178,7 +185,7 @@ void do_segfault(){
 	abort();
 }
 
-void read_from_kb(void){
+int read_from_kb(void){
 	int ch = getch();
 
 	//We need to assign curr the next *visible* element
@@ -199,9 +206,12 @@ void read_from_kb(void){
 				break;
 			}
 		}
+	}else if(ch == 'q'){
+		return -1;
 	}
 
-	draw_data(curr);	
+	draw_data(curr);
+	return 0;
 }
 
 void read_from_socket(int sock_fd){

@@ -25,7 +25,7 @@
 #define MEM_LIMIT 30000
 
 void do_segfault();
-void read_from_kb(void);
+int read_from_kb(void);
 void read_from_socket(int sock_fd);
 void add_data(syscall_info *i);
 void free_info(syscall_info *i);
