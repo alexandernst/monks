@@ -10,7 +10,7 @@ syscall_intercept_info_node *head, *curr, *tail;
 int main(int argc, char **argv){
 
 	int ch, sock_fd, stdin_fd, efd;
-	struct epoll_event event, events[2];
+	struct epoll_event event = { .events = 0 }, events[2] = { { .events = 0 }, { .events = 0 } };
 	extern syscall_intercept_info_node *head, *curr;
 
 	while((ch = getopt(argc, argv, "clusevp:")) != -1){
