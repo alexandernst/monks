@@ -1,20 +1,15 @@
 #include "utils.h"
 
-int client_pid = 0;
-
 int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
 
-static struct sock * nl_init_sock(int netlink_id)
+static struct sock *nl_init_sock(int netlink_id)
 {
 	struct sock * nl_sk;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0)
-	struct netlink_kernel_cfg cfg = {
-		.input = nl_recv,
-	};
-	nl_sk = netlink_kernel_create(&init_net, netlink_id, &cfg);
+	nl_sk = netlink_kernel_create(&init_net, netlink_id, NULL);
 #else
-	nl_sk = netlink_kernel_create(&init_net, netlink_id, 0, nl_recv, NULL, THIS_MODULE);
+	nl_sk = netlink_kernel_create(&init_net, netlink_id, 0, NULL, NULL, THIS_MODULE);
 #endif
 	return nl_sk;
 }
@@ -35,18 +30,19 @@ void nl_halt(void){
 	netlink_kernel_release(nl_sk);
 }
 
-void nl_recv(struct sk_buff *skb){
-	struct nlmsghdr *nlh;
-
-	nlh = (struct nlmsghdr*)skb->data;
-	client_pid = nlh->nlmsg_pid;
-}
-
 void nl_send(syscall_info *i){
+	int _client_pid;
+	membuffer *x;
 	struct nlmsghdr *nlh;
 	struct sk_buff *skb_out;
 
-	membuffer *x = serialize_syscall_info(i);
+	/*If there isn't any client listening, don't try sending anything*/
+	_client_pid = get_client_pid();
+	if(_client_pid < 0){
+		return;
+	}
+
+	x = serialize_syscall_info(i);
 	if(!x) return;
 
 	skb_out = nlmsg_new(x->len, 0);
@@ -55,7 +51,7 @@ void nl_send(syscall_info *i){
 	nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, x->len, 0);  
 	NETLINK_CB(skb_out).dst_group = 0;
 	memcpy(nlmsg_data(nlh), x->data, x->len);
-	nlmsg_unicast(nl_sk, skb_out, client_pid);
+	nlmsg_unicast(nl_sk, skb_out, _client_pid);
 
 end:
 	del(x->data);

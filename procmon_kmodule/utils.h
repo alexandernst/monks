@@ -25,12 +25,12 @@
 
 void nl_init(void);
 void nl_halt(void);
-void nl_recv(struct sk_buff *skb);
 void nl_send(syscall_info *i);
 
 char *path_from_fd(unsigned int fd);
 
 extern int nl_id;
+extern int get_client_pid(void);
 
 /*****************************************************************************\
 |                                      END                                    |

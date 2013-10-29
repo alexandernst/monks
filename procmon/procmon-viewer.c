@@ -8,7 +8,7 @@ unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
-
+	FILE *file;
 	int ch, sock_fd, stdin_fd, efd;
 	struct epoll_event 
 	event = { 
@@ -94,6 +94,13 @@ int main(int argc, char **argv){
 
 	/*Get STDIN file descriptor*/
 	stdin_fd = fcntl(STDIN_FILENO,  F_DUPFD, 0);
+
+	/*Set our client PID in Procmon*/
+	file = fopen("/proc/sys/procmon/client_pid", "w");
+	if(file){
+		fprintf(file, "%d", getpid());
+		fclose(file);
+	}
 
 	/*Make SEGFAULTs play nice with NCURSES*/
 	signal(SIGSEGV, do_segfault);

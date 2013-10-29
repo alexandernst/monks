@@ -4,7 +4,7 @@
 | /proc/sys state and methods related to the control of procmon               |
 \*****************************************************************************/
 
-int state = 0, min = 0, max = 1;
+int state = 0, min = 0, max = 1, client_pid = -1;
 static struct ctl_table_header *procmon_table_header;
 
 static ctl_table state_table[] = {
@@ -17,7 +17,12 @@ static ctl_table state_table[] = {
 	{
 		.procname = "netlink", .mode = 0444,
 		.proc_handler = &proc_dointvec,
-		.data = &nl_id, .maxlen = sizeof(int),
+		.data = &nl_id, .maxlen = sizeof(int)
+	},
+	{
+		.procname = "client_pid", .mode = 0666,
+		.proc_handler = &proc_dointvec,
+		.data = &client_pid, .maxlen = sizeof(pid_t)
 	},
 	{ 0 }
 };
@@ -33,6 +38,7 @@ static ctl_table procmon_table[] = {
 void activate(void){ state = 1; }
 void deactivate(void){ state = 0; }
 int is_active(void){ return state; }
+int get_client_pid(void){ return client_pid; }
 
 /*****************************************************************************\
 |                                      END                                    |
