@@ -42,3 +42,27 @@ int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
 
 	return sock_fd;
 }
+
+syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh, struct msghdr msg){
+	recvmsg(sock_fd, &msg, 0);
+
+	membuffer *x = new(sizeof(membuffer));
+	if(!x){
+		return NULL;
+	}
+	x->len = nlh->nlmsg_len - NLMSG_HDRLEN;
+	x->data = new(x->len);
+	if(!x->data){
+		return NULL;
+	}
+	memcpy(x->data, NLMSG_DATA(nlh), x->len);
+
+	syscall_info *i = deserialize_syscall_info(x);
+	del(x->data);
+	del(x);
+	if(!i){
+		return NULL;
+	}
+
+	return i;
+}

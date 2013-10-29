@@ -163,7 +163,13 @@ int main(int argc, char **argv){
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
 				if(events[i].data.fd == sock_fd){
-					read_from_socket(sock_fd, nlh, msg);
+					/*Read from NetLink and add data*/
+					add_data( read_from_socket(sock_fd, nlh, msg) );
+
+					//Don't draw if there's nothing new to draw
+					if(curr == tail){
+						draw_data(curr);
+					}
 				}else if(events[i].data.fd == stdin_fd){
 					if(read_from_kb() < 0){
 						quit = 1;
@@ -232,37 +238,12 @@ int read_from_kb(void){
 	return 0;
 }
 
-void read_from_socket(int sock_fd, struct nlmsghdr *nlh, struct msghdr msg){
-	recvmsg(sock_fd, &msg, 0);
+void add_data(syscall_info *i){
+	syscall_intercept_info_node *in;
 
-	membuffer *x = new(sizeof(membuffer));
-	if(!x){
-		return;
-	}
-	x->len = nlh->nlmsg_len - NLMSG_HDRLEN;
-	x->data = new(x->len);
-	if(!x->data){
-		return;
-	}
-	memcpy(x->data, NLMSG_DATA(nlh), x->len);
-
-	syscall_info *i = deserialize_syscall_info(x);
-	del(x->data);
-	del(x);
 	if(!i){
 		return;
 	}
-
-	add_data(i);
-
-	//Don't draw if there's nothing new to draw
-	if(curr == tail){
-		draw_data(curr);
-	}
-}
-
-void add_data(syscall_info *i){
-	syscall_intercept_info_node *in;
 
 	if(head->i == NULL){
 		in = head;
