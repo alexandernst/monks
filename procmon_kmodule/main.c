@@ -49,7 +49,6 @@ static int __init hook_init(void){
 		return -ENOMEM;
 	}
 
-
 	nl_init();
 
 	hook_calls();
