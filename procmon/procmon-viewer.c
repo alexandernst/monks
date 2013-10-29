@@ -1,7 +1,6 @@
 #include "procmon-viewer.h"
 
 //extern struct iovec iov;
-extern struct msghdr msg;
 
 unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr, *tail;
@@ -18,6 +17,7 @@ int main(int argc, char **argv){
 		{ .events = 0 }
 	};
 
+	struct msghdr msg;
 	struct nlmsghdr *nlh = NULL;
 
 	extern syscall_intercept_info_node *head, *curr;
@@ -86,8 +86,8 @@ int main(int argc, char **argv){
 		}
 	}
 
-	/*Get NetLink file descriptor*/
-	sock_fd = net_init(&nlh);
+	/*Initialize NetLink msg headers and get socket file descriptor*/
+	sock_fd = net_init(&nlh, &msg);
 	if(sock_fd == -1){
 		printf("Error starting NetLink.\n");
 		return -1;
@@ -161,7 +161,7 @@ int main(int argc, char **argv){
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
 				if(events[i].data.fd == sock_fd){
-					read_from_socket(sock_fd, nlh);
+					read_from_socket(sock_fd, nlh, msg);
 				}else if(events[i].data.fd == stdin_fd){
 					if(read_from_kb() < 0){
 						quit = 1;
@@ -230,7 +230,7 @@ int read_from_kb(void){
 	return 0;
 }
 
-void read_from_socket(int sock_fd, struct nlmsghdr *nlh){
+void read_from_socket(int sock_fd, struct nlmsghdr *nlh, struct msghdr msg){
 	recvmsg(sock_fd, &msg, 0);
 
 	membuffer *x = new(sizeof(membuffer));
