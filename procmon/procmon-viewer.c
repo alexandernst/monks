@@ -239,7 +239,7 @@ void add_data(syscall_info *i){
 
 	total_nodes++;
 
-	//Auto-scroll!
+	//Auto-scroll on next draw!
 	if(curr == tail->prev){
 		curr = tail;
 	}
