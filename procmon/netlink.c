@@ -1,8 +1,5 @@
 #include "netlink.h"
 
-struct iovec iov;
-//struct msghdr msg;
-
 int get_netlink_id(void){
 	FILE *file;
 	int netlink_id;
@@ -16,7 +13,7 @@ int get_netlink_id(void){
 	return netlink_id;
 }
 
-int net_init(struct nlmsghdr **nlh, struct msghdr *msg){
+int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
 	int sock_fd, ret;
 	struct sockaddr_nl src_addr;
 
@@ -37,10 +34,10 @@ int net_init(struct nlmsghdr **nlh, struct msghdr *msg){
 	memset(*nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
 	(*nlh)->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
 
-	iov.iov_base = (void *)*nlh;
-	iov.iov_len = (*nlh)->nlmsg_len;
+	iov->iov_base = (void *)*nlh;
+	iov->iov_len = (*nlh)->nlmsg_len;
 
-	msg->msg_iov = &iov;
+	msg->msg_iov = iov;
 	msg->msg_iovlen = 1;
 
 	return sock_fd;

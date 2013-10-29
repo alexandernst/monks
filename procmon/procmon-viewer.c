@@ -1,13 +1,15 @@
 #include "procmon-viewer.h"
 
-//extern struct iovec iov;
-
 unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
+	/*Random vars*/
+	int ch;
 	FILE *file;
-	int ch, sock_fd, stdin_fd, efd;
+
+	/*Event loop related vars*/
+	int sock_fd, stdin_fd, efd;
 	struct epoll_event 
 	event = { 
 		.events = 0 
@@ -17,10 +19,10 @@ int main(int argc, char **argv){
 		{ .events = 0 }
 	};
 
+	/*NetLink related vars*/
+	struct iovec iov;
 	struct msghdr msg;
 	struct nlmsghdr *nlh = NULL;
-
-	extern syscall_intercept_info_node *head, *curr;
 
 	while((ch = getopt(argc, argv, "clusevp:")) != -1){
 		switch(ch){
@@ -87,7 +89,7 @@ int main(int argc, char **argv){
 	}
 
 	/*Initialize NetLink msg headers and get socket file descriptor*/
-	sock_fd = net_init(&nlh, &msg);
+	sock_fd = net_init(&nlh, &msg, &iov);
 	if(sock_fd == -1){
 		printf("Error starting NetLink.\n");
 		return -1;

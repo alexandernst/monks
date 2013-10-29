@@ -1,6 +1,6 @@
 #include "ui.h"
 
-extern syscall_intercept_info_node *head, *curr, *tail;
+extern syscall_intercept_info_node *head, *curr;
 
 WINDOW *win_data_box, *win_data;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
