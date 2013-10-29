@@ -209,35 +209,6 @@ void do_segfault(){
 	abort();
 }
 
-int read_from_kb(void){
-	int ch = getch();
-
-	//We need to assign curr the next *visible* element
-	//aka, the one that will pass the filter options
-	if(ch == KEY_UP && curr->prev){
-		curr = curr->prev;
-		while(!filter_i(curr->i)){
-			curr = curr->prev;
-			if(curr == head){
-				break;
-			}
-		}
-	}else if(ch == KEY_DOWN && curr->next){
-		curr = curr->next;
-		while(!filter_i(curr->i)){
-			curr = curr->next;
-			if(curr == tail){
-				break;
-			}
-		}
-	}else if(ch == 'q'){
-		return -1;
-	}
-
-	draw_data(curr);
-	return 0;
-}
-
 void add_data(syscall_info *i){
 	syscall_intercept_info_node *in;
 

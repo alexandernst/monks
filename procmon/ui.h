@@ -23,5 +23,6 @@ void calc_w_size_pos();
 
 void draw_data(syscall_intercept_info_node *l);
 int filter_i(syscall_info *i);
+int read_from_kb(void);
 
 #endif
