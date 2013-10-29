@@ -191,7 +191,7 @@ int main(int argc, char **argv){
 	/*Free all the memory we allocated for the data*/
 	syscall_intercept_info_node *in = head, *tmp;
 	while(!in->next){
-		free_info(in->i);
+		free_data(in->i);
 
 		tmp = in;
 		in = in->next;
@@ -253,7 +253,7 @@ void add_data(syscall_info *i){
 		if(total_nodes >= MEM_LIMIT){
 			syscall_intercept_info_node *tmp = head;
 			head = head->next;
-			free_info(tmp->i);
+			free_data(tmp->i);
 			del(tmp);
 			total_nodes--;
 		}
@@ -274,7 +274,7 @@ void add_data(syscall_info *i){
 	}
 }
 
-void free_info(syscall_info *i){
+void free_data(syscall_info *i){
 	del(i->pname);
 	del(i->operation);
 	del(i->path);
