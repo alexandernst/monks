@@ -6,28 +6,26 @@ Procmon
 Procmon alternative for Linux - [Main webpage](http://alexandernst.github.io/procmon "Procmon's Homepage")
 
 
-This is a kernel module that hijacks sys_calls and printfs messages whenever a 
-sys_call is called. In the future, instead of printfs-ing messages, some kind 
-of events will be sent to an UI which will be similar to what Procmon (for 
-Windows) offers right now.
+This is a kernel module that hijacks sys_calls and sends information about which
+process called which syscall, what arguments did it call it with, what was the
+return value, etc, and sends that information to a nice ncurses interface.
 
 Keep in mind that this is a WIP and you can end up with a totally frozen 
 kernel!
 
 In order to build this module you'll need some basic stuff (make, gcc) and the 
 headers of the kernel you're running on. Once you have all those you just need
-to run ```make``` inside the root folder.
+to run ```make``` inside the root folder of the project.
 
 Loading the module isn't any different from loading any other module. 
 ```insmod procmon.ko``` for loading it and ```rmmod procmon.ko``` for 
 unloading it.
 
 To start the actual hijack process, once loaded the module, run 
-```sysctl procmon.state=1```. Once started, you'll probably want to run 
+```sysctl procmon.state=1```, then you'll probably want to run 
 ```./procmon-viewer``` to see an actual output.
 
-To stop it just run hit ```Ctrl + C```. To stop the module run 
-```sysctl procmon.state=0```.
+To stop it just run hit ```Q```. To stop the module run ```sysctl procmon.state=0```.
 
 If your distro has ```libkmod```, you can use procmon's viewer command line
 switches instead to do all those actions (load/unload, start/stop).
@@ -35,7 +33,7 @@ switches instead to do all those actions (load/unload, start/stop).
 Keep in mind that the module will protect your kernel while unloading. That 
 means that if any process (both in userland and in the kernel itself) expect 
 to call one of the hijacked syscalls, the module will wait those processes to 
-run what they need to run. This may take from 1ms to days. If there's a really 
+call what they need to call. This may take from 1ms to days. If there's a really 
 long delay, try killing/restarting some processes that may have scheduled a 
 call. For example, the module won't unload until you press ```Enter``` on all 
 consoles that had any activity while the module was loaded.
