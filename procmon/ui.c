@@ -124,8 +124,13 @@ void draw_data(syscall_intercept_info_node *in) {
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
 		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
+			
+			//Clear line before drawing on it
+			wmove(win_data, i, 0);
+			wclrtoeol(win_data);
+
+			//Draw or skip data node but keep cursor on the same line
 			if(s_info){
-				wclrtoeol(win_data);
 				mvwaddstr(win_data, i, 0, s_info);
 				del(s_info);
 			}else{
