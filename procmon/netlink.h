@@ -16,6 +16,6 @@
 #define MAX_PAYLOAD 1024
 
 int get_netlink_id(void);
-int net_init(void);
+int net_init(struct nlmsghdr **nlh);
 
 #endif

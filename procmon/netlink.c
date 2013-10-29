@@ -2,7 +2,6 @@
 
 struct iovec iov;
 struct msghdr msg;
-struct nlmsghdr *nlh;
 
 int get_netlink_id(void){
 	FILE *file;
@@ -17,7 +16,7 @@ int get_netlink_id(void){
 	return netlink_id;
 }
 
-int net_init(void){
+int net_init(struct nlmsghdr **nlh){
 	int sock_fd, ret;
 	struct sockaddr_nl src_addr;
 
@@ -34,12 +33,12 @@ int net_init(void){
 		return -1;
 	}
 
-	nlh = (struct nlmsghdr *)new(NLMSG_SPACE(MAX_PAYLOAD));
-	memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
-	nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
+	*nlh = (struct nlmsghdr *)new(NLMSG_SPACE(MAX_PAYLOAD));
+	memset(*nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
+	(*nlh)->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
 
-	iov.iov_base = (void *)nlh;
-	iov.iov_len = nlh->nlmsg_len;
+	iov.iov_base = (void *)*nlh;
+	iov.iov_len = (*nlh)->nlmsg_len;
 
 	msg.msg_iov = &iov;
 	msg.msg_iovlen = 1;

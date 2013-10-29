@@ -26,6 +26,6 @@
 
 void do_segfault();
 int read_from_kb(void);
-void read_from_socket(int sock_fd);
+void read_from_socket(int sock_fd, struct nlmsghdr *nlh);
 void add_data(syscall_info *i);
 void free_info(syscall_info *i);
