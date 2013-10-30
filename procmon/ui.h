@@ -14,6 +14,7 @@ char *get_str_info(syscall_info *i);
 void rstrip(char *string);
 void lstrip(char *string);
 
+void init_ncurses(void);
 void create_win_data_data_box();
 WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);

@@ -63,6 +63,15 @@ void lstrip(char *string){
 	}
 }
 
+void init_ncurses(void){
+	initscr();
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
+	curs_set(0);
+	nodelay(stdscr, 1); //non-blocking getch()
+}
+
 void create_win_data_data_box(){
 	if(!win_data_box){
 		destroy_win(win_data_box);
@@ -124,7 +133,7 @@ void draw_data(syscall_intercept_info_node *in) {
 	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
 		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
-			
+
 			//Clear line before drawing on it
 			wmove(win_data, i, 0);
 			wclrtoeol(win_data);

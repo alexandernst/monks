@@ -141,12 +141,7 @@ int main(int argc, char **argv){
 	tail = curr = head;
 
 	/*Init ncurses window*/
-	initscr();
-	noecho();
-	cbreak();
-	keypad(stdscr, TRUE);
-	curs_set(0);
-	nodelay(stdscr, 1); //non-blocking getch()
+	init_ncurses();
 
 	/*React on resize*/
 	signal(SIGWINCH, do_resize);
