@@ -205,7 +205,7 @@ void do_segfault(){
 }
 
 void add_data(syscall_info *i){
-	syscall_intercept_info_node *in;
+	syscall_intercept_info_node *in, *tmp;
 
 	if(!i){
 		return;
@@ -217,7 +217,7 @@ void add_data(syscall_info *i){
 	}else{
 
 		if(total_nodes >= MEM_LIMIT){
-			syscall_intercept_info_node *tmp = head;
+			tmp = head;
 			head = head->next;
 			free_data(tmp->i);
 			del(tmp);
