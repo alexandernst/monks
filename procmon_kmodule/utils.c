@@ -2,9 +2,9 @@
 
 int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
+extern unsigned int sent_msgs;
 
-static struct sock *nl_init_sock(int netlink_id)
-{
+static struct sock *nl_init_sock(int netlink_id){
 	struct sock * nl_sk;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0)
 	nl_sk = netlink_kernel_create(&init_net, netlink_id, NULL);
@@ -52,6 +52,8 @@ void nl_send(syscall_info *i){
 	NETLINK_CB(skb_out).dst_group = 0;
 	memcpy(nlmsg_data(nlh), x->data, x->len);
 	nlmsg_unicast(nl_sk, skb_out, _client_pid);
+
+	sent_msgs++;
 
 end:
 	del(x->data);

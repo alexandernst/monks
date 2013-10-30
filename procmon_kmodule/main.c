@@ -4,6 +4,7 @@
 | /proc/sys state and methods related to the control of procmon               |
 \*****************************************************************************/
 
+unsigned int sent_msgs = 0;
 int state = 0, min = 0, max = 1, client_pid = -1;
 static struct ctl_table_header *procmon_table_header;
 
@@ -23,6 +24,11 @@ static ctl_table state_table[] = {
 		.procname = "client_pid", .mode = 0666,
 		.proc_handler = &proc_dointvec,
 		.data = &client_pid, .maxlen = sizeof(pid_t)
+	},
+	{
+		.procname = "sent_msgs", .mode = 0666,
+		.proc_handler = &proc_dointvec,
+		.data = &sent_msgs, .maxlen = sizeof(unsigned int)
 	},
 	{ 0 }
 };
