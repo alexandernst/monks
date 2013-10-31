@@ -65,6 +65,8 @@ static int __init hook_init(void){
 
 	hook_calls();
 
+	procmon_info("Successfull loaded\n");
+
 	return 0;
 }
 
@@ -81,6 +83,8 @@ static void __exit hook_exit(void){
 	unregister_sysctl_table(procmon_table_header);
 	
 	nl_halt();
+
+	procmon_info("Successfull unloaded\n");
 }
 
 /*****************************************************************************\
