@@ -19,8 +19,6 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	}else{
 
-		deactivate();
-
 		i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 		if(i){
 			i->pname = current->comm;
@@ -44,8 +42,6 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 		}else{
 			//something bad happened, can't show results
 		}
-
-		activate();
 
 		__DECR(read);
 
@@ -74,8 +70,6 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	}else{
 
-		deactivate();
-
 		i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
 		if(i){
 			i->pname = current->comm;
@@ -100,8 +94,6 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 		}else{
 			//something bad happened, can't show results
 		}
-
-		activate();
 
 		__DECR32(read);
 
