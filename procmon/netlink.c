@@ -17,13 +17,14 @@ int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
 	int sock_fd, ret;
 	struct sockaddr_nl src_addr;
 
-	sock_fd = socket(PF_NETLINK, SOCK_RAW, get_netlink_id());
+	sock_fd = socket(AF_NETLINK, SOCK_DGRAM, get_netlink_id());
 	if(sock_fd < 0){
 		return -1;
 	}
 
 	memset(&src_addr, 0, sizeof(src_addr));
 	src_addr.nl_family = AF_NETLINK;
+	src_addr.nl_pid = getpid();
 
 	ret = bind(sock_fd, (struct sockaddr *)&src_addr, sizeof(src_addr));
 	if(ret != 0){
@@ -43,8 +44,12 @@ int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
 	return sock_fd;
 }
 
-syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh, struct msghdr msg){
-	recvmsg(sock_fd, &msg, 0);
+syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh){
+	struct iovec iov = { nlh, NLMSG_SPACE(MAX_PAYLOAD) };
+	struct msghdr msg = { NULL, 0, &iov, 1, NULL, 0, 0 };
+
+	if (recvmsg(sock_fd, &msg, MSG_DONTWAIT) <= 0)
+		return NULL;
 
 	membuffer *x = new(sizeof(membuffer));
 	if(!x){

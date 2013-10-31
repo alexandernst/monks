@@ -159,8 +159,10 @@ int main(int argc, char **argv){
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
 				if(events[i].data.fd == sock_fd){
-					/*Read from NetLink and add data*/
-					add_data( read_from_socket(sock_fd, nlh, msg) );
+					syscall_info * info;
+					while ((info = read_from_socket(sock_fd, nlh)) != NULL) {
+						add_data(info);
+					}
 
 					//Don't draw if there's nothing new to draw
 					if(curr == tail){

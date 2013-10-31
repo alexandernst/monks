@@ -19,6 +19,6 @@
 
 int get_netlink_id(void);
 int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov);
-syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh, struct msghdr msg);
+syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh);
 
 #endif
