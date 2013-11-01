@@ -22,7 +22,6 @@ int main(int argc, char **argv){
 
 	/*NetLink related vars*/
 	struct iovec iov;
-	struct msghdr msg;
 	struct nlmsghdr *nlh = NULL;
 
 	while((ch = getopt(argc, argv, "clusevp:")) != -1){
@@ -90,7 +89,7 @@ int main(int argc, char **argv){
 	}
 
 	/*Initialize NetLink msg headers and get socket file descriptor*/
-	sock_fd = net_init(&nlh, &msg, &iov);
+	sock_fd = net_init(&nlh, &iov);
 	if(sock_fd == -1){
 		printf("Error starting NetLink.\n");
 		return -1;

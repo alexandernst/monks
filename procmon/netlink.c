@@ -13,7 +13,7 @@ int get_netlink_id(void){
 	return netlink_id;
 }
 
-int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
+int net_init(struct nlmsghdr **nlh, struct iovec *iov){
 	int sock_fd, ret;
 	struct sockaddr_nl src_addr;
 
@@ -37,9 +37,6 @@ int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov){
 
 	iov->iov_base = (void *)*nlh;
 	iov->iov_len = (*nlh)->nlmsg_len;
-
-	msg->msg_iov = iov;
-	msg->msg_iovlen = 1;
 
 	return sock_fd;
 }

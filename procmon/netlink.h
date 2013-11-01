@@ -18,7 +18,7 @@
 #define MAX_PAYLOAD 1024
 
 int get_netlink_id(void);
-int net_init(struct nlmsghdr **nlh, struct msghdr *msg, struct iovec *iov);
+int net_init(struct nlmsghdr **nlh, struct iovec *iov);
 syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh);
 
 #endif
