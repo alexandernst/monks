@@ -57,7 +57,7 @@ int get_client_pid(void){ return client_pid; }
 static int __init hook_init(void){
 	procmon_table_header = register_sysctl_table(procmon_table);
 	if(!procmon_table_header){
-		DEBUG(KERN_INFO "Error creating /proc/sys/procmon/state\n");
+		procmon_error("Error creating /proc/sys/procmon/state\n");
 		return -ENOMEM;
 	}
 

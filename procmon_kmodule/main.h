@@ -25,7 +25,6 @@
 #include "unistd_32.h"
 #endif
 
-#include "utils.h"
 #include "sct_hook.h"
 
 void activate(void);
