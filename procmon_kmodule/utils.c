@@ -23,7 +23,7 @@ static int nl_send_skb(struct sk_buff * skb)
 
 	/* TODO: make client_pid global and keep it uptodate */
 
-	if (is_active() && client > 0) {
+	if (procmon_state && client > 0) {
 		nlmsg_unicast(nl_sk, skb, client);
 	} else {
 		if (printk_ratelimit()) {

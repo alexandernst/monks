@@ -11,7 +11,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	r = __REAL_SYSCALL(read)(fd, buf, count);
 
-	if(!is_active()){
+	if(!procmon_state){
 
 		__DECR(read);
 
@@ -62,7 +62,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	r = __REAL_SYSCALL32(read)(fd, buf, count);
 
-	if(!is_active()){
+	if(!procmon_state){
 
 		__DECR32(read);
 

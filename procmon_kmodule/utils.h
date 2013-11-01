@@ -26,6 +26,7 @@ void nl_send(syscall_info *i);
 char *path_from_fd(unsigned int fd);
 
 extern int nl_id;
+extern int procmon_state;
 extern int get_client_pid(void);
 
 /*****************************************************************************\

@@ -28,9 +28,6 @@
 #include "msgs.h"
 #include "sct_hook.h"
 
-void activate(void);
-void deactivate(void);
-int is_active(void);
 int get_client_pid(void);
 
 int register_procmon_sysctl(void);

@@ -4,14 +4,14 @@
 | /proc/sys state and methods related to the control of procmon               |
 \*****************************************************************************/
 
-int state = 0, min = 0, max = 1, client_pid = -1;
+int procmon_state = 0, min = 0, max = 1, client_pid = -1;
 static struct ctl_table_header *procmon_table_header;
 
 static ctl_table state_table[] = {
 	{
 		.procname = "state", .mode = 0666,
 		.proc_handler = &proc_dointvec_minmax,
-		.data = &state, .maxlen	= sizeof(int),
+		.data = &procmon_state, .maxlen	= sizeof(int),
 		.extra1 = &min, .extra2 = &max
 	},
 	{
@@ -35,9 +35,6 @@ static ctl_table procmon_table[] = {
 	{ 0 }
 };
 
-void activate(void){ state = 1; }
-void deactivate(void){ state = 0; }
-int is_active(void){ return state; }
 int get_client_pid(void){ return client_pid; }
 
 /*****************************************************************************\
@@ -65,9 +62,7 @@ static int __init hook_init(void){
 }
 
 static void __exit hook_exit(void){
-	if(is_active()){ //just in case user did not deactivate
-		deactivate();
-	}
+	procmon_state = 0;
 	unhook_calls();
 
 	while(!safe_to_unload()){
