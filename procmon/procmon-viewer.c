@@ -1,6 +1,5 @@
 #include "procmon-viewer.h"
 
-unsigned int procmon_nodes = 0;
 unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr, *tail;
 
@@ -198,14 +197,6 @@ int main(int argc, char **argv){
 
 	/*Exit*/
 	endwin();
-
-	file = fopen("/proc/sys/procmon/sent_msgs", "rw");
-	if(file){
-		fscanf(file, "%u", &procmon_nodes);
-		fprintf(file, "%u", 0); //Restart counter
-		fclose(file);
-	}
-	printf("Received messages: %lu (Should be +/-%u)\n", total_nodes, procmon_nodes);
 
 	return 0;
 }

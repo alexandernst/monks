@@ -2,7 +2,6 @@
 
 int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
-extern unsigned int sent_msgs;
 
 /* kernel thread id */
 static struct task_struct * nl_thread = NULL;
@@ -51,7 +50,6 @@ static int nl_kernel_thread(void * arg)
 
 		while ((skb = skb_dequeue(&nl_queue)) != NULL) {
 			nl_send_skb(skb);
-			sent_msgs++;
 		}
 
 		if (signal_pending(current))
