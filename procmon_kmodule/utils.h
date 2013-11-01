@@ -9,8 +9,8 @@
 #include <linux/fdtable.h>
 #include <linux/netlink.h>
 
-#include "./main.h"
-#include "./msgs.h"
+#include "main.h"
+#include "msgs.h"
 #include "../common/mem_ops.h"
 #include "../common/serialize.h"
 #include "../common/structures.h"
