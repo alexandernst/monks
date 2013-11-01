@@ -9,6 +9,8 @@
 #include <linux/fdtable.h>
 #include <linux/netlink.h>
 
+#include "main.h"
+#include "msgs.h"
 #include "../common/mem_ops.h"
 #include "../common/serialize.h"
 #include "../common/structures.h"
@@ -16,14 +18,6 @@
 /*****************************************************************************\
 | Utils                                                                       |
 \*****************************************************************************/
-
-#define debug 1
-
-#if debug == 1
-#define DEBUG(...) printk(__VA_ARGS__);
-#else
-#define DEBUG(...)
-#endif
 
 void nl_init(void);
 void nl_halt(void);

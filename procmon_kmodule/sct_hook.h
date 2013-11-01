@@ -1,6 +1,7 @@
 #ifndef SCT_HOOK_H_INCLUDED
 #define SCT_HOOK_H_INCLUDED
 
+#include "msgs.h"
 #include "utils.h"
 #include "../udis86/udis86.h"
 

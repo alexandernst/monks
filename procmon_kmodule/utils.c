@@ -1,4 +1,4 @@
-#include "main.h"
+#include "utils.h"
 
 int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
@@ -89,7 +89,7 @@ void nl_init(void){
 
 	while (nl_id >= 0) {
 		if ((nl_sk = nl_init_sock(nl_id))) {
-			DEBUG(KERN_INFO "Acquired NETLINK socket (%d)\n", nl_id);
+			procmon_info("Acquired NETLINK socket (%d)\n", nl_id);
 			return;
 		}
 		nl_id--;
@@ -97,7 +97,7 @@ void nl_init(void){
 
 	kthread_stop(nl_thread), nl_thread = NULL;
 
-	DEBUG(KERN_INFO "Error creating socket.\n");
+	procmon_info("Error creating socket.\n");
 }
 
 void nl_halt(void){

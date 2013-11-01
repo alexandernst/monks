@@ -105,19 +105,19 @@ void setback_cr0(unsigned long val){
 int get_sct(void){
 	sys_call_table = get_sys_call_table();
 	if(!sys_call_table){
-		DEBUG(KERN_INFO "syscall_table is NULL, quitting...\n");
+		procmon_info("syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		DEBUG(KERN_INFO "Found syscall_table addr at 0x%p\n", sys_call_table);
+		procmon_info("Found syscall_table addr at 0x%p\n", sys_call_table);
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(!ia32_sys_call_table){
-		DEBUG(KERN_INFO "syscall_table is NULL, quitting...\n");
+		procmon_info("syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		DEBUG(KERN_INFO "Found ia32_syscall_table addr at 0x%p\n", ia32_sys_call_table);
+		procmon_info("Found ia32_syscall_table addr at 0x%p\n", ia32_sys_call_table);
 	}
 #endif
 
@@ -162,13 +162,13 @@ void hook_calls(void){
 		iter = __start_syscalls;
 		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
-				DEBUG(KERN_INFO "Hook IA32 %s\n", iter->name);
+				procmon_info("Hook IA32 %s\n", iter->name);
 #ifdef CONFIG_IA32_EMULATION
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
 #endif
 			}else{
-				DEBUG(KERN_INFO "Hook %s\n", iter->name);
+				procmon_info("Hook %s\n", iter->name);
 				iter->rf = (void *)sys_call_table[iter->__NR_];
 				sys_call_table[iter->__NR_] = (void *)iter->ff;
 			}
@@ -196,11 +196,11 @@ void unhook_calls(void){
 		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-				DEBUG(KERN_INFO "Unhook IA32 %s\n", iter->name);
+				procmon_info("Unhook IA32 %s\n", iter->name);
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->rf;
 #endif
 			}else{
-				DEBUG(KERN_INFO "Unhook %s\n", iter->name);
+				procmon_info("Unhook %s\n", iter->name);
 				sys_call_table[iter->__NR_] = (void *)iter->rf;
 			}
 		}
@@ -217,7 +217,7 @@ int safe_to_unload(void){
 	syscall_info_t *iter = __start_syscalls;
 
 	for(; iter < __stop_syscalls; ++iter){
-		DEBUG(KERN_INFO "Unloading syscall %s\n", iter->name);
+		procmon_info("Unloading syscall %s\n", iter->name);
 		if(atomic_read(&iter->counter) > 0){
 			return 0;
 		}
