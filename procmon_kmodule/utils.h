@@ -3,6 +3,8 @@
 
 #include <net/sock.h>
 
+#include <linux/kernel.h>
+#include <linux/kthread.h>
 #include <linux/version.h>
 #include <linux/fdtable.h>
 #include <linux/netlink.h>

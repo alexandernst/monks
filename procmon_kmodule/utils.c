@@ -1,6 +1,3 @@
-#include <linux/kernel.h>
-#include <linux/kthread.h>
-
 #include "main.h"
 
 int nl_id = MAX_LINKS - 1;
