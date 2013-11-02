@@ -22,8 +22,9 @@
 #include "unistd_32.h"
 #endif
 
+#include <linux/preempt.h>
+
 #include "msgs.h"
-#include "utils.h"
 #include "../udis86/udis86.h"
 
 #define to_x86_ptr(x) (void *)(x)

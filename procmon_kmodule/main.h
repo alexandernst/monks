@@ -5,6 +5,7 @@
 #include <linux/module.h>
 
 #include "msgs.h"
+#include "utils.h"
 #include "sct_hook.h"
 
 int get_client_pid(void);
