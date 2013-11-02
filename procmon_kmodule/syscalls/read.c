@@ -19,7 +19,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	}else{
 
-		i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+		i = new(sizeof(syscall_info));
 		if(i){
 			i->pname = current->comm;
 			i->pid = current->pid;
@@ -36,9 +36,9 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 			nl_send(i);
 
-			kfree(i->path);
-			kfree(i->details);
-			kfree(i);
+			del(i->path);
+			del(i->details);
+			del(i);
 		}else{
 			//something bad happened, can't show results
 		}
@@ -70,7 +70,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	}else{
 
-		i = kmalloc(sizeof(syscall_info), GFP_KERNEL);
+		i = new(sizeof(syscall_info));
 		if(i){
 			i->pname = current->comm;
 			i->pid = current->pid;
@@ -88,9 +88,9 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 			if(count == 1 && fd == 0)
 				nl_send(i);
 
-			kfree(i->path);
-			kfree(i->details);
-			kfree(i);
+			del(i->path);
+			del(i->details);
+			del(i);
 		}else{
 			//something bad happened, can't show results
 		}
