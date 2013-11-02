@@ -65,13 +65,11 @@ static int nl_kernel_thread(void *arg){
 }
 
 static struct sock *nl_init_sock(int netlink_id){
-	struct sock *nl_sk;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,6,0)
-	nl_sk = netlink_kernel_create(&init_net, netlink_id, NULL);
+	return netlink_kernel_create(&init_net, netlink_id, NULL);
 #else
-	nl_sk = netlink_kernel_create(&init_net, netlink_id, 0, NULL, NULL, THIS_MODULE);
+	return netlink_kernel_create(&init_net, netlink_id, 0, NULL, NULL, THIS_MODULE);
 #endif
-	return nl_sk;
 }
 
 void nl_init(void){
