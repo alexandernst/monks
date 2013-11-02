@@ -2,12 +2,9 @@
 #define UTILS_H_INCLUDED
 
 #include <net/sock.h>
-
-#include <linux/kernel.h>
 #include <linux/kthread.h>
 #include <linux/version.h>
 #include <linux/fdtable.h>
-#include <linux/netlink.h>
 
 #include "msgs.h"
 #include "../common/mem_ops.h"
