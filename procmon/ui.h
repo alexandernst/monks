@@ -1,5 +1,5 @@
-#ifndef UI_H
-#define UI_H
+#ifndef UI_H_INCLUDED
+#define UI_H_INCLUDED
 
 #include <ctype.h>
 #include <string.h>

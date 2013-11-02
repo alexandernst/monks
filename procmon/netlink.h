@@ -1,5 +1,5 @@
-#ifndef NETLINK_H
-#define NETLINK_H
+#ifndef NETLINK_H_INCLUDED
+#define NETLINK_H_INCLUDED
 
 #include <stdio.h>
 #include <stdlib.h>
