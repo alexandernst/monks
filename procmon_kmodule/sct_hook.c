@@ -162,8 +162,8 @@ void hook_calls(void){
 		iter = __start_syscalls;
 		for(; iter < __stop_syscalls; ++iter){
 			if(iter->is32){
-				procmon_info("Hook IA32 %s\n", iter->name);
 #ifdef CONFIG_IA32_EMULATION
+				procmon_info("Hook IA32 %s\n", iter->name);
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
 #endif
