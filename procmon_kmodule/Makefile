@@ -18,6 +18,7 @@ new: clean all
 clean:
 	make -C $(KDIR) M=$(shell pwd) clean
 	@rm -rf ../common/*.o ../udis86/libudis86/*.o
+	@rm -rf ../$(NAME).ko
 
 all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)
