@@ -4,7 +4,7 @@
 | /proc/sys state and methods related to the control of procmon               |
 \*****************************************************************************/
 
-int procmon_state = 0, min = 0, max = 1, client_pid = -1;
+int procmon_state = 0, client_pid = -1;
 static struct ctl_table_header *procmon_table_header;
 
 static ctl_table state_table[] = {
@@ -12,7 +12,7 @@ static ctl_table state_table[] = {
 		.procname = "state", .mode = 0666,
 		.proc_handler = &proc_dointvec_minmax,
 		.data = &procmon_state, .maxlen	= sizeof(int),
-		.extra1 = &min, .extra2 = &max
+		.extra1 = "\x00\x00\x00\x00" /*0*/, .extra2 = "\x01\x00\x00\x00" /*1*/
 	},
 	{
 		.procname = "netlink", .mode = 0444,
