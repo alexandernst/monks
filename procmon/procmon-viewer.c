@@ -92,7 +92,6 @@ int main(int argc, char **argv){
 		printf("Error starting NetLink.\n");
 		return -1;
 	}
-	//fcntl(sock_fd, F_SETFL, fcntl(sock_fd, F_GETFL, 0) | O_NONBLOCK); //Do we need this?
 
 	/*Get STDIN file descriptor*/
 	stdin_fd = fcntl(STDIN_FILENO,  F_DUPFD, 0);
