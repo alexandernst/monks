@@ -14,13 +14,12 @@
 | Utils                                                                       |
 \*****************************************************************************/
 
-void nl_init(void);
+int nl_init(void);
 void nl_halt(void);
 void nl_send(syscall_info *i);
 
 char *path_from_fd(unsigned int fd);
 
-extern int nl_id;
 extern int procmon_state;
 extern int get_client_pid(void);
 

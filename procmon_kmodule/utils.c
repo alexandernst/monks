@@ -1,6 +1,5 @@
 #include "utils.h"
 
-int nl_id = MAX_LINKS - 1;
 struct sock *nl_sk = NULL;
 
 /* kernel thread id */
@@ -72,26 +71,26 @@ static struct sock *nl_init_sock(int netlink_id){
 #endif
 }
 
-void nl_init(void){
+int nl_init(void){
+	int nl_id = MAX_LINKS - 1;
+
 	skb_queue_head_init(&nl_queue);
 
 	nl_thread = kthread_run(nl_kernel_thread, NULL, "kpmnld");
-	if (IS_ERR_OR_NULL(nl_thread)) {
-		procmon_error("Can't create netlink thread\n");
-		return;
+	if(IS_ERR_OR_NULL(nl_thread)){
+		return -2;
 	}
 
 	while(nl_id >= 0){
 		if((nl_sk = nl_init_sock(nl_id))){
-			procmon_info("Acquired NETLINK socket (%d)\n", nl_id);
-			return;
+			return nl_id;
 		}
 		nl_id--;
 	}
 
 	kthread_stop(nl_thread), nl_thread = NULL;
 
-	procmon_info("Error creating socket.\n");
+	return -1;
 }
 
 void nl_halt(void){

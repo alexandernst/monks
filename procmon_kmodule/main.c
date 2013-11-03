@@ -17,7 +17,7 @@ static ctl_table state_table[] = {
 	{
 		.procname = "netlink", .mode = 0444,
 		.proc_handler = &proc_dointvec,
-		.data = &nl_id, .maxlen = sizeof(int)
+		.data = "\xFF\xFF\xFF\xFF" /*-1, assign after nl_init()*/, .maxlen = sizeof(int)
 	},
 	{
 		.procname = "client_pid", .mode = 0666,
@@ -46,23 +46,40 @@ int get_client_pid(void){ return client_pid; }
 \*****************************************************************************/
 
 static int __init hook_init(void){
+	static int netlink_id;
+	
+	procmon_info("================\n");
+	procmon_info("Starting procmon\n");
+
+	netlink_id = nl_init();
+	if(netlink_id == -2){
+		procmon_error("Can't create netlink thread\n");
+	}else if(netlink_id == -1){
+		procmon_info("Error creating socket.\n");
+	}else{
+		procmon_info("Acquired NETLINK socket (%d)\n", netlink_id);
+	}
+
+	procmon_table[0].child[1].data = &netlink_id;
+
 	procmon_table_header = register_sysctl_table(procmon_table);
 	if(!procmon_table_header){
-		procmon_error("Error creating /proc/sys/procmon/state\n");
+		procmon_error("Error creating fs control interface in /proc/sys/procmon/\n");
 		return -ENOMEM;
 	}
 
-	nl_init();
-
 	hook_calls();
 
-	procmon_info("Successfull loaded\n");
+	procmon_info("Successfully loaded\n");
 
 	return 0;
 }
 
 static void __exit hook_exit(void){
 	procmon_state = 0;
+
+	procmon_info("Stopping procmon\n");
+
 	unhook_calls();
 
 	while(!safe_to_unload()){
@@ -73,7 +90,8 @@ static void __exit hook_exit(void){
 	
 	nl_halt();
 
-	procmon_info("Successfull unloaded\n");
+	procmon_info("Successfully unloaded\n");
+	procmon_info("================\n");
 }
 
 /*****************************************************************************\
