@@ -162,6 +162,7 @@ int filter_i(syscall_info *i){
 	if(
 		i->pid != mypid && 
 		i->pid != parentpid && 
+		strcmp(i->pname, "X") != 0 &&
 		strcmp(i->pname, "Xorg") != 0 &&
 		strcmp(i->pname, "konsole") != 0
 	){
