@@ -4,7 +4,7 @@ syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
 	/*Random vars*/
-	int ch;
+	int ch, running;
 	syscall_intercept_info_node *in, *tmp;
 
 	/*Event loop related vars*/
@@ -143,8 +143,9 @@ int main(int argc, char **argv){
 	create_win_data_data_box();
 
 	/*Start even loop*/
-	while(1){
-		int n, i, quit = 0;
+	running = 1;
+	while(running){
+		int n, i;
 		n = epoll_wait(efd, events, MAXEVENTS, -1);
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
@@ -160,17 +161,15 @@ int main(int argc, char **argv){
 					}
 				}else if(events[i].data.fd == stdin_fd){
 					if(read_from_kb() < 0){
-						quit = 1;
+						running = 0;
 						break;
+					}else{
+						draw_data(curr);
 					}
 				}
 			}else if(events[i].events & (EPOLLHUP | EPOLLERR)){
 				continue;
 			}
-		}
-
-		if(quit){
-			break;
 		}
 	}
 

@@ -197,6 +197,5 @@ int read_from_kb(void){
 		return -1;
 	}
 
-	draw_data(curr);
 	return 0;
 }
