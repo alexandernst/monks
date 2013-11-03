@@ -1,21 +1,26 @@
-Procmon
+[![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest) Procmon alternative for Linux - [Main webpage](http://alexandernst.github.io/procmon "Procmon's Homepage")
+
+What is Procmon
 =======
 
-[![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest)
+This is a kernel module that hijacks sys calls and sends information about which
+processes called which sys call, with what arguments did they called them with, 
+what was the return value, etc, and sends that information to a nice ncurses 
+interface.
 
-Procmon alternative for Linux - [Main webpage](http://alexandernst.github.io/procmon "Procmon's Homepage")
+Said in another way, Procmon is like ```strace```, but tracing all and every single
+process from any user, at any level.
 
-
-This is a kernel module that hijacks sys_calls and sends information about which
-process called which syscall, what arguments did it call it with, what was the
-return value, etc, and sends that information to a nice ncurses interface.
+Setting Procmon
+=======
 
 Keep in mind that this is a WIP and you can end up with a totally frozen 
-kernel!
+kernel! Do *NOT* run this in production machines. I'm *NOT* responsible
+for any data loss or damage in any way.
 
-In order to build this module you'll need some basic stuff (make, gcc) and the 
-headers of the kernel you're running on. Once you have all those you just need
-to run ```make``` inside the root folder of the project.
+In order to build this module you'll need some basic stuff (make, gcc), the 
+headers of the kernel you're running on and ncurses library. Once you have all
+those you just need to run ```make``` inside the root folder of the project.
 
 Loading the module isn't any different from loading any other module. 
 ```insmod procmon.ko``` for loading it and ```rmmod procmon.ko``` for 
@@ -31,15 +36,15 @@ If your distro has ```libkmod```, you can use procmon's viewer command line
 switches instead to do all those actions (load/unload, start/stop).
 
 Keep in mind that the module will protect your kernel while unloading. That 
-means that if any process (both in userland and in the kernel itself) expect 
+means that if any process (both in userland and in the kernel itself) expected 
 to call one of the hijacked syscalls, the module will wait those processes to 
 call what they need to call. This may take from 1ms to days. If there's a really 
 long delay, try killing/restarting some processes that may have scheduled a 
 call. For example, the module won't unload until you press ```Enter``` on all 
 consoles that had any activity while the module was loaded.
 
-The UI part will be based on ```ncurses```. Anyways, right now there is almost
-no functional code, just a basic viewer.
+The UI is based on ```ncurses```. Anyways, right now there is almost no functional
+code, just a basic viewer.
 
 ![Screenshot](https://raw.github.com/alexandernst/procmon/screenshots/screenshot1.jpeg)
 
