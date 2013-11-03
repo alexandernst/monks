@@ -5,7 +5,7 @@
 #include <linux/module.h>
 
 #include "msgs.h"
-#include "utils.h"
+#include "netlink.h"
 #include "sct_hook.h"
 
 int register_procmon_sysctl(void);
