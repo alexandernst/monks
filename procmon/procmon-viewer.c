@@ -1,6 +1,5 @@
 #include "procmon-viewer.h"
 
-unsigned long int total_nodes = 0;
 syscall_intercept_info_node *head, *curr, *tail;
 
 int main(int argc, char **argv){
@@ -204,6 +203,7 @@ void do_segfault(){
 }
 
 void add_data(syscall_info *i){
+	static unsigned long int total_nodes = 0;
 	syscall_intercept_info_node *in, *tmp;
 
 	if(!i){
