@@ -6,7 +6,6 @@ syscall_intercept_info_node *head, *curr, *tail;
 int main(int argc, char **argv){
 	/*Random vars*/
 	int ch;
-	FILE *file;
 
 	/*Event loop related vars*/
 	int sock_fd, stdin_fd, efd;
@@ -99,11 +98,7 @@ int main(int argc, char **argv){
 	stdin_fd = fcntl(STDIN_FILENO,  F_DUPFD, 0);
 
 	/*Set our client PID in Procmon*/
-	file = fopen("/proc/sys/procmon/client_pid", "w");
-	if(file){
-		fprintf(file, "%d", getpid());
-		fclose(file);
-	}
+	set_client_pid(getpid());
 
 	/*Make SEGFAULTs play nice with NCURSES*/
 	signal(SIGSEGV, do_segfault);
@@ -195,8 +190,11 @@ int main(int argc, char **argv){
 		del(tmp);
 	}
 
-	/*Exit*/
+	/*End NCURSES mode*/
 	endwin();
+
+	/*Let the procmon module that we're not listening anymore*/
+	set_client_pid(-1);
 
 	return 0;
 }

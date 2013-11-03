@@ -15,6 +15,7 @@
 #endif
 
 #include "ui.h"
+#include "utils.h"
 #include "netlink.h"
 
 #define PROCMON_VERSION 0.1
