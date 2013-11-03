@@ -72,7 +72,7 @@ static struct sock *nl_init_sock(int netlink_id){
 }
 
 int nl_init(void){
-	int nl_id = MAX_LINKS - 1;
+	int netlink_id = MAX_LINKS - 1;
 
 	skb_queue_head_init(&nl_queue);
 
@@ -81,11 +81,11 @@ int nl_init(void){
 		return -2;
 	}
 
-	while(nl_id >= 0){
-		if((nl_sk = nl_init_sock(nl_id))){
-			return nl_id;
+	while(netlink_id >= 0){
+		if((nl_sk = nl_init_sock(netlink_id))){
+			return netlink_id;
 		}
-		nl_id--;
+		netlink_id--;
 	}
 
 	kthread_stop(nl_thread), nl_thread = NULL;
