@@ -176,7 +176,7 @@ int read_from_kb(void){
 	int ch = getch();
 
 	//We need to assign curr the next *visible* element
-	//aka, the one that will pass the filter options
+	//(the one that will pass the filter options)
 	if(ch == KEY_UP && curr->prev){
 		curr = curr->prev;
 		while(filter_i(curr->i)){
