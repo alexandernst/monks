@@ -29,13 +29,26 @@ int net_init(struct nlmsghdr **nlh, struct iovec *iov){
 }
 
 syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh){
-	struct iovec iov = { nlh, NLMSG_SPACE(MAX_PAYLOAD) };
-	struct msghdr msg = { NULL, 0, &iov, 1, NULL, 0, 0 };
+	membuffer *x;
+	syscall_info *i;
+	struct iovec iov;
+	struct msghdr msg;
+
+	iov.iov_base = nlh;
+	iov.iov_len = NLMSG_SPACE(MAX_PAYLOAD);
+
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+	msg.msg_iov = &iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = NULL;
+	msg.msg_controllen = 0;
+	msg.msg_flags = 0;
 
 	if (recvmsg(sock_fd, &msg, MSG_DONTWAIT) <= 0)
 		return NULL;
 
-	membuffer *x = new(sizeof(membuffer));
+	x = new(sizeof(membuffer));
 	if(!x){
 		return NULL;
 	}
@@ -46,7 +59,7 @@ syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh){
 	}
 	memcpy(x->data, NLMSG_DATA(nlh), x->len);
 
-	syscall_info *i = deserialize_syscall_info(x);
+	i = deserialize_syscall_info(x);
 	del(x->data);
 	del(x);
 	if(!i){

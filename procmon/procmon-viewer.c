@@ -5,17 +5,11 @@ syscall_intercept_info_node *head, *curr, *tail;
 int main(int argc, char **argv){
 	/*Random vars*/
 	int ch;
+	syscall_intercept_info_node *in, *tmp;
 
 	/*Event loop related vars*/
 	int sock_fd, stdin_fd, efd;
-	struct epoll_event 
-	event = { 
-		.events = 0 
-	}, 
-	events[2] = { 
-		{ .events = 0 },
-		{ .events = 0 }
-	};
+	struct epoll_event event, events[2];
 
 	/*NetLink related vars*/
 	struct iovec iov;
@@ -108,6 +102,11 @@ int main(int argc, char **argv){
 		return -1;
 	}
 
+	/*Init and fill event structs*/
+	event.events = 0;
+	events[0].events = 0;
+	events[1].events = 0;
+
 	event.data.fd = sock_fd;
 	event.events = EPOLLIN;
 	if(epoll_ctl(efd, EPOLL_CTL_ADD, sock_fd, &event) == -1){
@@ -155,7 +154,7 @@ int main(int argc, char **argv){
 						add_data(info);
 					}
 
-					//Don't draw if there's nothing new to draw
+					/*Don't draw if there's nothing new to draw*/
 					if(curr == tail){
 						draw_data(curr);
 					}
@@ -178,7 +177,7 @@ int main(int argc, char **argv){
 	close(sock_fd);
 
 	/*Free all the memory we allocated for the data*/
-	syscall_intercept_info_node *in = head, *tmp;
+	in = head;
 	while(!in->next){
 		free_data(in->i);
 
@@ -233,7 +232,7 @@ void add_data(syscall_info *i){
 
 	total_nodes++;
 
-	//Auto-scroll on next draw!
+	/*Auto-scroll on next draw!*/
 	if(curr == tail->prev){
 		curr = tail;
 	}

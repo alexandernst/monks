@@ -2,6 +2,7 @@
 #define UI_H_INCLUDED
 
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>

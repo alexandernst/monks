@@ -1,6 +1,11 @@
 #ifndef STRUCTURES_H_INCLUDED
 #define STRUCTURES_H_INCLUDED
 
+#ifndef __KERNEL__
+#include <unistd.h>
+#include <sys/types.h>
+#endif
+
 typedef unsigned char byte;
 
 typedef struct membuffer{

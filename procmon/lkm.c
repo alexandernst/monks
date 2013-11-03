@@ -1,13 +1,14 @@
 #include "lkm.h"
 
 int check(char *kmod_name){
-	printf("Checking if %s is loaded...\n", kmod_name);
-
 	int ret = 0, err;
 	struct kmod_ctx *ctx;
 	struct kmod_module *mod;
 	struct kmod_list *list, *itr;
 	const char *null_config = NULL;
+
+	printf("Checking if %s is loaded...\n", kmod_name);
+
 	ctx = kmod_new(NULL, &null_config);
 	if(ctx == NULL){
 		ret = -1;
@@ -35,12 +36,12 @@ int check(char *kmod_name){
 }
 
 int load(char *kmod_path){
-	printf("Loading %s kernel module...\n", kmod_path);
-
 	int ret = 0, err;
 	struct kmod_ctx *ctx;
 	struct kmod_module *mod;
 	const char *null_config = NULL;
+
+	printf("Loading %s kernel module...\n", kmod_path);
 
 	ctx = kmod_new(NULL, &null_config);
 	if(ctx == NULL){
@@ -67,12 +68,12 @@ int load(char *kmod_path){
 }
 
 int unload(char *kmod_name){
-	printf("Unloading %s kernel module...\n", kmod_name);
-
 	int ret = 0, err;
 	struct kmod_ctx *ctx;
 	struct kmod_module *mod;
 	const char *null_config = NULL;
+
+	printf("Unloading %s kernel module...\n", kmod_name);
 
 	ctx = kmod_new(NULL, &null_config);
 	if(ctx == NULL){
@@ -98,10 +99,11 @@ int unload(char *kmod_name){
 	return ret;
 }
 
-//0 == ok, 1 == ko
+/*0 == ok, 1 == ko*/
 int start(){
 	int ret = 0;
 	FILE *fp = fopen("/proc/sys/procmon/state", "w");
+
 	if(fp == NULL){
 		ret = 1;
 		printf("Error: Can't start hijacking sys calls.\n");
@@ -114,10 +116,11 @@ int start(){
 	return ret;
 }
 
-//0 == ok, 1 == ko
+/*0 == ok, 1 == ko*/
 int stop(){
 	int ret = 0;
 	FILE *fp = fopen("/proc/sys/procmon/state", "w");
+
 	if(fp == NULL){
 		ret = 1;
 		printf("Error: Can't start hijacking sys calls.\n");

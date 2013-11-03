@@ -69,7 +69,7 @@ void init_ncurses(void){
 	cbreak();
 	keypad(stdscr, TRUE);
 	curs_set(0);
-	nodelay(stdscr, 1); //non-blocking getch()
+	nodelay(stdscr, 1); /*non-blocking getch()*/
 }
 
 void create_win_data_data_box(){
@@ -114,8 +114,8 @@ void do_resize(){
 }
 
 void calc_w_size_pos(){
-	win_data_box_height = LINES - 2; //Leave 2 LINES top/bottom margin
-	win_data_box_width = COLS - 4; //Leave 4 LINES left/right margin 
+	win_data_box_height = LINES - 2; /*Leave 2 LINES top/bottom margin*/
+	win_data_box_width = COLS - 4; /*/Leave 4 LINES left/right margin */
 
 	win_data_height = win_data_box_height - 2;
 	win_data_width = win_data_box_width - 2;
@@ -134,11 +134,11 @@ void draw_data(syscall_intercept_info_node *in) {
 		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
 
-			//Clear line before drawing on it
+			/*Clear line before drawing on it*/
 			wmove(win_data, i, 0);
 			wclrtoeol(win_data);
 
-			//Draw or skip data node but keep cursor on the same line
+			/*Draw or skip data node but keep cursor on the same line*/
 			if(s_info){
 				mvwaddstr(win_data, i, 0, s_info);
 				del(s_info);
@@ -146,7 +146,7 @@ void draw_data(syscall_intercept_info_node *in) {
 				i++;
 			}
 		}else{
-			i++; //Do not leave empty lines!
+			i++; /*Do not leave empty lines!*/
 		}
 	}
 
@@ -175,8 +175,8 @@ int filter_i(syscall_info *i){
 int read_from_kb(void){
 	int ch = getch();
 
-	//We need to assign curr the next *visible* element
-	//(the one that will pass the filter options)
+	/*We need to assign curr the next *visible* element
+	(the one that will pass the filter options)*/
 	if(ch == KEY_UP && curr->prev){
 		curr = curr->prev;
 		while(filter_i(curr->i)){

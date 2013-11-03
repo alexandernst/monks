@@ -1,12 +1,12 @@
 #include "deserialize.h"
 
 syscall_info *deserialize_syscall_info(membuffer *buffer){
+	void *tmp;
 	syscall_info *i = new(sizeof(syscall_info));
+	
 	if(!i){
 		return NULL;
 	}
-
-	void *tmp;
 
 	i->pname = (char *)get_chunk(buffer);
 
