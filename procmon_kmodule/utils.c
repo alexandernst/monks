@@ -16,12 +16,9 @@ static int nl_show_skb(struct sk_buff *skb){
 }
 
 static int nl_send_skb(struct sk_buff *skb){
-	int client = get_client_pid();
-
-	/* TODO: make client_pid global and keep it uptodate */
-
-	if(procmon_state && client > 0){
-		nlmsg_unicast(nl_sk, skb, client);
+	//TODO: Check from time to time that client_pid still exists, if not, set to -1
+	if(procmon_state && client_pid > 0){
+		nlmsg_unicast(nl_sk, skb, client_pid);
 	}else{
 		if(printk_ratelimit()){
 			nl_show_skb(skb);

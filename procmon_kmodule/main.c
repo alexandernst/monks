@@ -35,8 +35,6 @@ static ctl_table procmon_table[] = {
 	{ 0 }
 };
 
-int get_client_pid(void){ return client_pid; }
-
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
@@ -47,7 +45,7 @@ int get_client_pid(void){ return client_pid; }
 
 static int __init hook_init(void){
 	static int netlink_id;
-	
+
 	procmon_info("================\n");
 	procmon_info("Starting procmon\n");
 
