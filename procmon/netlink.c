@@ -1,18 +1,5 @@
 #include "netlink.h"
 
-int get_netlink_id(void){
-	FILE *file;
-	int netlink_id;
-
-	file = fopen("/proc/sys/procmon/netlink", "r");
-	if(file){
-		fscanf(file, "%d", &netlink_id);
-		fclose(file);
-	}
-
-	return netlink_id;
-}
-
 int net_init(struct nlmsghdr **nlh, struct iovec *iov){
 	int sock_fd, ret;
 	struct sockaddr_nl src_addr;

@@ -4,5 +4,6 @@
 #include <stdio.h>
 
 void set_client_pid(int pid);
+int get_netlink_id(void);
 
 #endif
