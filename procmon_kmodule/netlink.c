@@ -45,9 +45,6 @@ static int nl_kernel_thread(void *arg){
 			nl_send_skb(skb);
 		}
 
-		if(signal_pending(current))
-			break;
-
 		current->state = TASK_INTERRUPTIBLE;
 
 		schedule();
