@@ -4,7 +4,7 @@ What is Procmon
 =======
 
 Procmon is a kernel module that hijacks sys calls and sends information about which
-processes called which sys call, with what arguments did they called them with, 
+processes called which sys calls, with what arguments did they call them with, 
 what was the return value, etc, and sends that information to a nice ncurses 
 interface.
 
