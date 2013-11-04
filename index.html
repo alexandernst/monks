@@ -1,79 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>Procmon by alexandernst</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <title>Procmon by alexandernst</title>
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Procmon</h1>
+        <p class="header">Procmon alternative for Linux</p>
 
-        <header>
-          <h1>Procmon</h1>
-          <h2>Procmon alternative for Linux</h2>
-        </header>
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/alexandernst/procmon/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/alexandernst/procmon/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/alexandernst/procmon">View On GitHub</a></li>
+        </ul>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/alexandernst/procmon/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/alexandernst/procmon/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/alexandernst/procmon" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/alexandernst">alexandernst</a></p>
 
-        <hr>
 
-        <section id="main_content">
-          <h1>
-<a name="procmon" class="anchor" href="#procmon"><span class="octicon octicon-link"></span></a>Procmon</h1>
+      </header>
+      <section>
+        <p><a href="https://drone.io/github.com/alexandernst/procmon/latest"><img src="https://drone.io/github.com/alexandernst/procmon/status.png" alt="Build Status"></a> Procmon alternative for Linux - <a href="http://alexandernst.github.io/procmon" title="Procmon's Homepage">Main webpage</a></p>
 
-<p><a href="https://drone.io/github.com/alexandernst/procmon/latest"><img src="https://drone.io/github.com/alexandernst/procmon/status.png" alt="Build Status"></a></p>
+<h1>
+<a name="what-is-procmon" class="anchor" href="#what-is-procmon"><span class="octicon octicon-link"></span></a>What is Procmon</h1>
 
-<p>Procmon alternative for Linux - <a href="http://alexandernst.github.io/procmon" title="Procmon's Homepage">Main webpage</a></p>
+<p>Procmon is a kernel module that hijacks sys calls and sends information about which
+processes called which sys calls, with what arguments did they call them with, 
+what was the return value, etc, and sends that information to a nice ncurses 
+interface.</p>
 
-<p>This is a kernel module that hijacks sys_calls and printfs messages whenever a 
-sys_call is called. In the future, instead of printfs-ing messages, some kind 
-of events will be sent to an UI which will be similar to what Procmon (for 
-Windows) offers right now.</p>
+<p>Said in another way, Procmon is like <code>strace</code>, but tracing all and every single
+process from any user, at any level.</p>
+
+<p>That's how it works:</p>
+
+<p><img src="https://raw.github.com/alexandernst/procmon/screenshots/procmon.gif" alt="How it works"></p>
+
+<h1>
+<a name="setting-procmon" class="anchor" href="#setting-procmon"><span class="octicon octicon-link"></span></a>Setting Procmon</h1>
 
 <p>Keep in mind that this is a WIP and you can end up with a totally frozen 
-kernel!</p>
+kernel! Do <em>NOT</em> run this in production machines. I'm <em>NOT</em> responsible
+for any data loss or damage in any way.</p>
 
-<p>In order to build this module you'll need some basic stuff (make, gcc) and the 
-headers of the kernel you're running on. Once you have all those you just need
-to run <code>make</code> inside the root folder.</p>
+<p>In order to build this module you'll need some basic stuff (make, gcc), the 
+headers of the kernel you're running on and ncurses library. Once you have all
+those you just need to run <code>make</code> inside the root folder of the project.</p>
 
 <p>Loading the module isn't any different from loading any other module. 
 <code>insmod procmon.ko</code> for loading it and <code>rmmod procmon.ko</code> for 
 unloading it.</p>
 
 <p>To start the actual hijack process, once loaded the module, run 
-<code>sysctl procmon.state=1</code>. Once started, you'll probably want to run 
+<code>sysctl procmon.state=1</code>, then you'll probably want to run 
 <code>./procmon-viewer</code> to see an actual output.</p>
 
-<p>To stop it just run hit <code>Ctrl + C</code>. To stop the module run 
-<code>sysctl procmon.state=0</code>.</p>
+<p>To stop it just run hit <code>Q</code>. To stop the module run <code>sysctl procmon.state=0</code>.</p>
 
 <p>If your distro has <code>libkmod</code>, you can use procmon's viewer command line
 switches instead to do all those actions (load/unload, start/stop).</p>
 
 <p>Keep in mind that the module will protect your kernel while unloading. That 
-means that if any process (both in userland and in the kernel itself) expect 
+means that if any process (both in userland and in the kernel itself) expected 
 to call one of the hijacked syscalls, the module will wait those processes to 
-run what they need to run. This may take from 1ms to days. If there's a really 
+call what they need to call. This may take from 1ms to days. If there's a really 
 long delay, try killing/restarting some processes that may have scheduled a 
 call. For example, the module won't unload until you press <code>Enter</code> on all 
 consoles that had any activity while the module was loaded.</p>
 
-<p>The UI part will be based on <code>ncurses</code>. Anyways, right now there is almost
-no functional code, just a basic viewer.</p>
+<p>The UI is based on <code>ncurses</code>. Anyways, right now there is almost no functional
+code, just a basic viewer.</p>
 
 <p><img src="https://raw.github.com/alexandernst/procmon/screenshots/screenshot1.jpeg" alt="Screenshot"></p>
 
@@ -108,14 +115,13 @@ to recompile the kernel.</p>
 <p>The license is WTFPL (Do What The Fuck You Want To Public License), but keep
 in mind it's good for both sides if you use this project, fix/add things and
 push them back.</p>
-        </section>
-
-        <footer>
-          Procmon is maintained by <a href="https://github.com/alexandernst">alexandernst</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-                  <script type="text/javascript">
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -126,7 +132,5 @@ push them back.</p>
             } catch(err) {}
           </script>
 
-      </div>
-    </div>
   </body>
 </html>
