@@ -11,6 +11,10 @@ interface.
 Said in another way, Procmon is like ```strace```, but tracing all and every single
 process from any user, at any level.
 
+That's how it works:
+
+![How it works](https://raw.github.com/alexandernst/procmon/screenshots/procmon.gif)
+
 Setting Procmon
 =======
 
