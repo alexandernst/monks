@@ -130,7 +130,7 @@ void calc_w_size_pos(){
 void draw_data(syscall_intercept_info_node *in) {
 	int i;
 
-	for(i = win_data_height; i >= 0 && in != NULL; i--, in = in->prev){
+	for(i = win_data_height; i >= 0 && in != NULL && in != head; i--, in = in->prev){
 		if(!filter_i(in->i)){
 			char *s_info = get_str_info(in->i);
 
