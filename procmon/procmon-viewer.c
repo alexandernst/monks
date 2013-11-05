@@ -186,6 +186,8 @@ int main(int argc, char **argv){
 
 		del(tmp);
 	}
+	/*Free everything else we might have allocated*/
+	del(nlh);
 
 	/*End NCURSES mode*/
 	endwin();
