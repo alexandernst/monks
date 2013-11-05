@@ -1,5 +1,5 @@
 CC		=	gcc
-CFLAGS	=	-g -Wall -Wextra -Werror -std=gnu89 -pedantic
+CFLAGS	=	-g -Wall -Wextra -Werror -std=gnu89
 
 LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
 LDLIBS	+=	$(shell pkg-config --silence-errors --libs ncurses)

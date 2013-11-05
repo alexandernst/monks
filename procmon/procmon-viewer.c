@@ -9,7 +9,13 @@ int main(int argc, char **argv){
 
 	/*Event loop related vars*/
 	int sock_fd, stdin_fd, efd;
-	struct epoll_event event, events[2];
+	struct epoll_event event = {
+		.events = 0
+	},
+	events[2] = {
+		{ .events = 0 },
+		{ .events = 0 }
+	};
 
 	/*NetLink related vars*/
 	struct iovec iov;
@@ -101,11 +107,6 @@ int main(int argc, char **argv){
 		printf("Error creating epoll\n");
 		return -1;
 	}
-
-	/*Init and fill event structs*/
-	event.events = 0;
-	events[0].events = 0;
-	events[1].events = 0;
 
 	event.data.fd = sock_fd;
 	event.events = EPOLLIN;
