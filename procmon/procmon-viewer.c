@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 	struct iovec iov;
 	struct nlmsghdr *nlh = NULL;
 
-	while((ch = getopt(argc, argv, "clusevp:")) != -1){
+	while((ch = getopt(argc, argv, "clusev")) != -1){
 		switch(ch){
 			#ifndef __NO_KMOD__
 
