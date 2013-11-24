@@ -8,7 +8,4 @@
 #include "netlink.h"
 #include "sct_hook.h"
 
-int register_procmon_sysctl(void);
-void unregister_procmon_sysctl(void);
-
 #endif
