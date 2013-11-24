@@ -5,6 +5,7 @@
 #include <linux/module.h>
 
 #include "msgs.h"
+#include "control.h"
 #include "netlink.h"
 #include "sct_hook.h"
 
