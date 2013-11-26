@@ -20,7 +20,7 @@ void create_win_data_data_box();
 WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);
 
-void do_resize();
+void schedule_resize();
 void calc_w_size_pos();
 
 void draw_data(syscall_intercept_info_node *l);

@@ -1,5 +1,6 @@
 #include "ui.h"
 
+static int scheduled_resize = 0;
 extern syscall_intercept_info_node *head, *curr, *tail;
 
 WINDOW *win_data_box, *win_data;
@@ -102,15 +103,8 @@ void destroy_win(WINDOW *local_win) {
 	delwin(local_win);
 }
 
-void do_resize(){
-	endwin();
-	refresh();
-	clear();
-
-	calc_w_size_pos();
-	create_win_data_data_box();
-
-	draw_data(curr);
+void schedule_resize(){
+	scheduled_resize = 1;
 }
 
 void calc_w_size_pos(){
@@ -129,6 +123,17 @@ void calc_w_size_pos(){
 
 void draw_data(syscall_intercept_info_node *in) {
 	int i;
+
+	if(scheduled_resize){
+		endwin();
+		refresh();
+		clear();
+
+		calc_w_size_pos();
+		create_win_data_data_box();
+
+		scheduled_resize = 0;
+	}
 
 	for(i = win_data_height; i >= 0 && in != NULL && in != head; i--, in = in->prev){
 		if(!filter_i(in->i)){

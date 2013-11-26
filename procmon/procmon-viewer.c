@@ -136,7 +136,7 @@ int main(int argc, char **argv){
 	init_ncurses();
 
 	/*React on resize*/
-	signal(SIGWINCH, do_resize);
+	signal(SIGWINCH, schedule_resize);
 
 	/*Get current positiona and size*/
 	calc_w_size_pos();
