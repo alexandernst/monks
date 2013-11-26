@@ -1,7 +1,7 @@
 NAME		:= procmon
 KDIR		?= /lib/modules/$(shell uname -r)/build
 
-ccflags-y	:= -g -Wall
+ccflags-y	:= -g -Wall -nostdinc
 ldflags-y	:= -T$(src)/sections.lds
 
 obj-m		:= $(NAME).o
