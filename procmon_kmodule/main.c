@@ -23,12 +23,12 @@ static int __init hook_init(void){
 
 	set_procmon_control_netlink_id(&netlink_id);
 
+	hook_calls();
+
 	if(!register_procmon_controls()){
 		procmon_error("Error creating fs control interface in /proc/sys/procmon/\n");
 		return -ENOMEM;
 	}
-
-	hook_calls();
 
 	procmon_info("Successfully loaded\n");
 
@@ -40,13 +40,13 @@ static void __exit hook_exit(void){
 
 	procmon_info("Stopping procmon\n");
 
+	unregister_procmon_controls();
+
 	unhook_calls();
 
 	while(!safe_to_unload()){
 		msleep_interruptible(500);
 	}
-
-	unregister_procmon_controls();
 	
 	nl_halt();
 
