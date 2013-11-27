@@ -1,8 +1,8 @@
 #include "deserialize.h"
 
-syscall_info *deserialize_syscall_info(membuffer *buffer){
+syscall_intercept_info *deserialize_syscall_info(membuffer *buffer){
 	void *tmp;
-	syscall_info *i = new(sizeof(syscall_info));
+	syscall_intercept_info *i = new(sizeof(struct syscall_intercept_info));
 	
 	if(!i){
 		return NULL;

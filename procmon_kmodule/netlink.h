@@ -6,6 +6,7 @@
 #include <linux/version.h>
 
 #include "msgs.h"
+#include "sct_hook.h"
 #include "../common/mem_ops.h"
 #include "../common/serialize.h"
 
@@ -13,6 +14,6 @@ extern int procmon_state, client_pid;
 
 int nl_init(void);
 void nl_halt(void);
-void nl_send(syscall_info *i);
+void nl_send(syscall_intercept_info *i);
 
 #endif

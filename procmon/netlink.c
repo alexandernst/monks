@@ -28,9 +28,9 @@ int net_init(struct nlmsghdr **nlh, struct iovec *iov){
 	return sock_fd;
 }
 
-syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh){
+syscall_intercept_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh){
 	membuffer *x;
-	syscall_info *i;
+	syscall_intercept_info *i;
 	struct iovec iov;
 	struct msghdr msg;
 

@@ -20,10 +20,10 @@ typedef struct syscall_intercept_info{
 	char *path;
 	char *result;
 	char *details;
-} syscall_info;
+} syscall_intercept_info;
 
 typedef struct syscall_intercept_info_node {
-	syscall_info *i;
+	syscall_intercept_info *i;
 	struct syscall_intercept_info_node *prev, *next;
 } syscall_intercept_info_node;
 

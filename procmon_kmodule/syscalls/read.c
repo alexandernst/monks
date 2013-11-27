@@ -5,7 +5,7 @@ __REGISTER_SYSCALL(read);
 asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 	ssize_t r;
-	syscall_info *i;
+	syscall_intercept_info *i;
 
 	__INCR(read);
 
@@ -19,7 +19,7 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 
 	}else{
 
-		i = new(sizeof(syscall_info));
+		i = new(sizeof(struct syscall_intercept_info));
 		if(i){
 			i->pname = current->comm;
 			i->pid = current->pid;
@@ -56,7 +56,7 @@ __REGISTER_SYSCALL32(read);
 asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 	ssize_t r;
-	syscall_info *i;
+	syscall_intercept_info *i;
 
 	__INCR32(read);
 
@@ -70,7 +70,7 @@ asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t c
 
 	}else{
 
-		i = new(sizeof(syscall_info));
+		i = new(sizeof(struct syscall_intercept_info));
 		if(i){
 			i->pname = current->comm;
 			i->pid = current->pid;

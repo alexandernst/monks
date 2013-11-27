@@ -11,7 +11,7 @@
 #include "../common/mem_ops.h"
 #include "../common/structures.h"
 
-char *get_str_info(syscall_info *i);
+char *get_str_info(syscall_intercept_info *i);
 void rstrip(char *string);
 void lstrip(char *string);
 
@@ -24,7 +24,7 @@ void schedule_resize();
 void calc_w_size_pos();
 
 void draw_data(syscall_intercept_info_node *l);
-int filter_i(syscall_info *i);
+int filter_i(syscall_intercept_info *i);
 int read_from_kb(void);
 
 #endif

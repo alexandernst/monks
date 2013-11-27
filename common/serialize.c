@@ -1,6 +1,6 @@
 #include "serialize.h"
 
-membuffer *serialize_syscall_info(syscall_info *i){
+membuffer *serialize_syscall_info(syscall_intercept_info *i){
 	membuffer *buffer = new(sizeof(membuffer));
 	buffer->data = NULL;
 	buffer->len = 0;

@@ -26,5 +26,5 @@
 #define MEM_LIMIT 30000
 
 void do_segfault();
-void add_data(syscall_info *i);
-void free_data(syscall_info *i);
+void add_data(syscall_intercept_info *i);
+void free_data(syscall_intercept_info *i);

@@ -14,6 +14,6 @@
 #define MAX_PAYLOAD 1024
 
 int net_init(struct nlmsghdr **nlh, struct iovec *iov);
-syscall_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh);
+syscall_intercept_info *read_from_socket(int sock_fd, struct nlmsghdr *nlh);
 
 #endif

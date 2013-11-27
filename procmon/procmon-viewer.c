@@ -5,6 +5,7 @@ syscall_intercept_info_node *head, *curr, *tail;
 int main(int argc, char **argv){
 	/*Random vars*/
 	int ch, running;
+	syscall_intercept_info *info;
 	syscall_intercept_info_node *in, *tmp;
 
 	/*Event loop related vars*/
@@ -151,7 +152,6 @@ int main(int argc, char **argv){
 		for(i = 0; i < n; i++){
 			if(events[i].events & EPOLLIN){
 				if(events[i].data.fd == sock_fd){
-					syscall_info * info;
 					while ((info = read_from_socket(sock_fd, nlh)) != NULL) {
 						add_data(info);
 					}
@@ -203,7 +203,7 @@ void do_segfault(){
 	abort();
 }
 
-void add_data(syscall_info *i){
+void add_data(syscall_intercept_info *i){
 	static unsigned long int total_nodes = 0;
 	syscall_intercept_info_node *in, *tmp;
 
@@ -240,7 +240,7 @@ void add_data(syscall_info *i){
 	}
 }
 
-void free_data(syscall_info *i){
+void free_data(syscall_intercept_info *i){
 	del(i->pname);
 	del(i->operation);
 	del(i->path);

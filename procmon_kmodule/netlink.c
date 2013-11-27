@@ -93,7 +93,7 @@ void nl_halt(void){
 	kthread_stop(nl_thread), nl_thread = NULL;
 }
 
-void nl_send(syscall_info *i){
+void nl_send(syscall_intercept_info *i){
 	membuffer *x;
 	struct nlmsghdr *nlh;
 	struct sk_buff *skb_out;

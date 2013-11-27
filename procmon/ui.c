@@ -7,7 +7,7 @@ WINDOW *win_data_box, *win_data;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
 int win_data_box_startx, win_data_box_starty, win_data_box_width, win_data_box_height;
 
-char *get_str_info(syscall_info *i){
+char *get_str_info(syscall_intercept_info *i){
 	int err;
 	char *tmp = new(win_data_width + 1);
 	if(!tmp){
@@ -158,7 +158,7 @@ void draw_data(syscall_intercept_info_node *in) {
 	wrefresh(win_data);
 }
 
-int filter_i(syscall_info *i){
+int filter_i(syscall_intercept_info *i){
 	/*This is temp, will get remove when UI filters start working*/
 	pid_t mypid, parentpid;
 	mypid = getpid();

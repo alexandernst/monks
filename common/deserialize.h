@@ -14,7 +14,7 @@
 #include "mem_ops.h"
 #include "structures.h"
 
-syscall_info *deserialize_syscall_info(membuffer *buffer);
+syscall_intercept_info *deserialize_syscall_info(membuffer *buffer);
 void *get_chunk(membuffer *buffer);
 
 #endif
