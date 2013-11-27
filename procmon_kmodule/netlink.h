@@ -6,7 +6,6 @@
 #include <linux/version.h>
 
 #include "msgs.h"
-#include "sct_hook.h"
 #include "../common/mem_ops.h"
 #include "../common/serialize.h"
 
