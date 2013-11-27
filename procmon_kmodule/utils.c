@@ -1,13 +1,10 @@
 #include "utils.h"
 
 char *path_from_fd(unsigned int fd){
-	char *tmp;
-	char *pathname = "";
-	char *rpathname = new(1);
-
 	struct file *file;
 	struct path path;
 	struct files_struct *files = current->files;
+	char *tmp, *pathname = "", *rpathname = new(1);
 
 	spin_lock(&files->file_lock);
 	file = fcheck_files(files, fd);
