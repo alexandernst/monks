@@ -8,6 +8,7 @@
 #else
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #endif
 
 void *new(size_t sz);
