@@ -77,7 +77,7 @@ struct idtr{
 | hooked_sys_##F = FAKE FUNCTION as in the function which we'll be using to fake __NR_##F |
 |                                                                                         |
 | NOTE: The __REGISTER_SYSCALL/32 macros are called at compile time and the values are    |
-| strored in a ELF section called 'syscalls'.                                             |
+| stored in a ELF section called 'syscalls'.                                              |
 | That section is iterated at run time, once when hooking and once when unhooking. That   |
 | is how we know the details about every single syscall at run time, and that is how we   |
 | get the necessary information to patch the syscall table.                               | 
