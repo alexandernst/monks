@@ -9,22 +9,10 @@ static DECLARE_WAIT_QUEUE_HEAD(nl_wait);
 /* kernel thread data queue */
 static struct sk_buff_head nl_queue;
 
-static int nl_show_skb(struct sk_buff *skb){
-	procmon_info("TODO: show the skb\n");
-
-	return 0;
-}
-
 static int nl_send_skb(struct sk_buff *skb){
-	//TODO: Check from time to time that client_pid still exists, if not, set to -1
 	if(procmon_state && client_pid > 0){
 		nlmsg_unicast(nl_sk, skb, client_pid);
 	}else{
-		if(printk_ratelimit()){
-			nl_show_skb(skb);
-		}else{
-			procmon_warning("printk limit exceeded\n");
-		}
 		kfree_skb(skb);
 	}
 
