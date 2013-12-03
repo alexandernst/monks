@@ -27,12 +27,13 @@
 #include "msgs.h"
 #include "control.h"
 #include "../udis86/udis86.h"
+#include "../common/mem_ops.h"
 
 #define to_x86_ptr(x) (void *)(x)
 #define to_x64_ptr(x) (void *)(0xffffffff00000000 | x)
 
 typedef struct syscall_info_t {
-	atomic_t counter;
+	atomic_t *counter;
 	char *name;
 	int is32;
 	int state;
@@ -86,7 +87,7 @@ struct idtr{
 #define __REGISTER_SYSCALL(F)									\
 	static syscall_info_t __syscall_info___NR_##F				\
 	__attribute__((section(".syscalls"), aligned(1))) = {		\
-		.counter = ATOMIC_INIT(0),								\
+		.counter = NULL,										\
 		.name = "__NR_" #F,										\
 		.is32 = 0,												\
 		.state = 1,												\
@@ -95,11 +96,17 @@ struct idtr{
 		.rf = &real_sys_##F,									\
 	};
 
+#define __INIT_SYSCALL(F)										\
+	if(!__syscall_info___NR_##F.counter){						\
+		__syscall_info___NR_##F.counter = new(sizeof(atomic_t));\
+		atomic_set(__syscall_info___NR_##F.counter, 0);			\
+	}
+
 #define __INCR(F)												\
-	atomic_inc(&__syscall_info___NR_##F.counter);
+	atomic_inc(__syscall_info___NR_##F.counter);
 
 #define __DECR(F)												\
-	atomic_dec(&__syscall_info___NR_##F.counter);
+	atomic_dec(__syscall_info___NR_##F.counter);
 
 #define __STATE(F)												\
 	__syscall_info___NR_##F.state
@@ -112,7 +119,7 @@ struct idtr{
 #define __REGISTER_SYSCALL32(F)									\
 	static syscall_info_t __syscall_info___NR32_##F				\
 	__attribute__((section(".syscalls"), aligned(1))) = {		\
-		.counter = ATOMIC_INIT(0),								\
+		.counter = NULL,										\
 		.name = "__NR32_" #F,									\
 		.is32 = 1,												\
 		.state = 1,												\
@@ -121,11 +128,17 @@ struct idtr{
 		.rf = &real_sys32_##F,									\
 	};
 
+#define __INIT_SYSCALL32(F)										\
+	if(!__syscall_info___NR32_##F.counter){						\
+		__syscall_info___NR32_##F.counter = new(sizeof(atomic_t));\
+		atomic_set(__syscall_info___NR32_##F.counter, 0);		\
+	}
+
 #define __INCR32(F)												\
-	atomic_inc(&__syscall_info___NR32_##F.counter);
+	atomic_inc(__syscall_info___NR32_##F.counter);
 
 #define __DECR32(F)												\
-	atomic_dec(&__syscall_info___NR32_##F.counter);
+	atomic_dec(__syscall_info___NR32_##F.counter);
 
 #define __STATE32(F)											\
 	__syscall_info___NR32_##F.state

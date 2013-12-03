@@ -220,8 +220,10 @@ int safe_to_unload(void){
 
 	for(; iter < __stop_syscalls; ++iter){
 		procmon_info("Unloading syscall %s\n", iter->name);
-		if(atomic_read(&iter->counter) > 0){
+		if(iter->counter && atomic_read(iter->counter) > 0){
 			return 0;
+		}else if(iter->counter && atomic_read(iter->counter) == 0){
+			del(iter->counter);
 		}
 	}
 

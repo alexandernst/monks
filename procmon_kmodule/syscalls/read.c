@@ -7,6 +7,8 @@ asmlinkage ssize_t hooked_sys_read(unsigned int fd, char __user *buf, size_t cou
 	ssize_t r;
 	syscall_intercept_info *i;
 
+	__INIT_SYSCALL(read);
+
 	__INCR(read);
 
 	r = __REAL_SYSCALL(read)(fd, buf, count);
@@ -57,6 +59,8 @@ asmlinkage ssize_t (*real_sys32_read)(unsigned int fd, char __user *buf, size_t 
 asmlinkage ssize_t hooked_sys32_read(unsigned int fd, char __user *buf, size_t count){
 	ssize_t r;
 	syscall_intercept_info *i;
+
+	__INIT_SYSCALL32(read);
 
 	__INCR32(read);
 
