@@ -16,6 +16,14 @@ void *renew(void *ptr, size_t sz){
 #endif
 }
 
+void *duplicate(void *ptr){
+#ifdef __KERNEL__
+	return kstrdup(ptr, GFP_KERNEL);
+#else
+	return strdup(ptr);
+#endif	
+}
+
 void del(void *ptr){
 #ifdef __KERNEL__
 	kfree(ptr);

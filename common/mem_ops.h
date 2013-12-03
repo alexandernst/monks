@@ -13,6 +13,7 @@
 
 void *new(size_t sz);
 void *renew(void *ptr, size_t sz);
+void *duplicate(void *ptr);
 void del(void *ptr);
 
 #endif
