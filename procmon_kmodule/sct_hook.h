@@ -96,12 +96,6 @@ struct idtr{
 		.rf = &real_sys_##F,									\
 	};
 
-#define __INIT_SYSCALL(F)										\
-	if(!__syscall_info___NR_##F.counter){						\
-		__syscall_info___NR_##F.counter = new(sizeof(atomic_t));\
-		atomic_set(__syscall_info___NR_##F.counter, 0);			\
-	}
-
 #define __INCR(F)												\
 	atomic_inc(__syscall_info___NR_##F.counter);
 
@@ -127,12 +121,6 @@ struct idtr{
 		.ff = hooked_sys32_##F,									\
 		.rf = &real_sys32_##F,									\
 	};
-
-#define __INIT_SYSCALL32(F)										\
-	if(!__syscall_info___NR32_##F.counter){						\
-		__syscall_info___NR32_##F.counter = new(sizeof(atomic_t));\
-		atomic_set(__syscall_info___NR32_##F.counter, 0);		\
-	}
 
 #define __INCR32(F)												\
 	atomic_inc(__syscall_info___NR32_##F.counter);

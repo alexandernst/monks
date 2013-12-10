@@ -166,14 +166,16 @@ void hook_calls(void){
 				procmon_info("Hook IA32 %s\n", iter->name);
 				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
 				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
-				add_syscalls_state_table_entry(iter->name, &iter->state);
 #endif
 			}else{
 				procmon_info("Hook %s\n", iter->name);
 				iter->rf = (void *)sys_call_table[iter->__NR_];
 				sys_call_table[iter->__NR_] = (void *)iter->ff;
-				add_syscalls_state_table_entry(iter->name, &iter->state);
 			}
+
+			add_syscalls_state_table_entry(iter->name, &iter->state);
+			iter->counter = new(sizeof(atomic_t));
+			atomic_set(iter->counter, 0);
 		}
 
 		set_sct_ro();
