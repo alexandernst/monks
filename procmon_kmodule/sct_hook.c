@@ -1,7 +1,5 @@
 #include "sct_hook.h"
 
-static unsigned long orig_cr0;
-
 void **sys_call_table = NULL;
 static void **sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
@@ -74,27 +72,6 @@ void *get_sys_call_table(void){
 	return ptr ? to_x64_ptr(ptr) : NULL;
 }
 #endif
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-/*****************************************************************************\
-| Methods to get/set the system call table to RW or RO                        |
-\*****************************************************************************/
-
-unsigned long clear_and_return_cr0(void){
-	unsigned long ret, cr0 = 0;
-	asm volatile("mov %%cr0, %0" : "=r"(cr0));
-	ret = cr0;
-	cr0 &= ~(1 << 16);
-	asm volatile("mov %0, %%cr0" : : "r"(cr0));
-	return ret;
-}
-
-void setback_cr0(unsigned long val){
-	asm volatile("mov %0, %%cr0" : : "r"(val));
-}
 
 /*****************************************************************************\
 |                                      END                                    |
