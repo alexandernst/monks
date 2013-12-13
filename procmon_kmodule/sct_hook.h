@@ -23,8 +23,10 @@
 #endif
 
 #include <linux/preempt.h>
+#include <linux/stop_machine.h>
 
 #include "msgs.h"
+#include "utils.h"
 #include "control.h"
 #include "../udis86/udis86.h"
 #include "../common/mem_ops.h"
