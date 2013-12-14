@@ -1,10 +1,10 @@
 #include "sct_hook.h"
 
-static unsigned long orig_cr0;
-
 void **sys_call_table = NULL;
+static void **sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
 void **ia32_sys_call_table = NULL;
+static void **ia32_sct_map = NULL;
 #endif
 
 /*****************************************************************************\
@@ -78,27 +78,6 @@ void *get_sys_call_table(void){
 \*****************************************************************************/
 
 /*****************************************************************************\
-| Methods to get/set the system call table to RW or RO                        |
-\*****************************************************************************/
-
-unsigned long clear_and_return_cr0(void){
-	unsigned long ret, cr0 = 0;
-	asm volatile("mov %%cr0, %0" : "=r"(cr0));
-	ret = cr0;
-	cr0 &= ~(1 << 16);
-	asm volatile("mov %0, %%cr0" : : "r"(cr0));
-	return ret;
-}
-
-void setback_cr0(unsigned long val){
-	asm volatile("mov %0, %%cr0" : : "r"(val));
-}
-
-/*****************************************************************************\
-|                                      END                                    |
-\*****************************************************************************/
-
-/*****************************************************************************\
 | Method to get the system call table                                         |
 \*****************************************************************************/
 
@@ -124,29 +103,11 @@ int get_sct(void){
 	return 1;
 }
 
-int set_sct_rw(void){
-	// NOTE: On SMP systems, there is a scheduling race that must be dealt with.
-	// http://vulnfactory.org/blog/2011/08/12/wp-safe-or-not/
-	preempt_disable();
-	barrier();
-
-	orig_cr0 = clear_and_return_cr0();
-
-	return 1;
-}
-
-int set_sct_ro(void){
-	setback_cr0(orig_cr0);
-
-	barrier();
-	preempt_enable_no_resched();
-
-	return 1;
-}
-
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
+
+#define __NR_syscall_max	512	/* TODO: find out real value */
 
 /*****************************************************************************\
 | This is where the magic happens. We iterate over the .syscalls ELF section  |
@@ -154,32 +115,58 @@ int set_sct_ro(void){
 | Once we have that information, we hook all the available syscalls           |
 \*****************************************************************************/
 
-void hook_calls(void){
+static int do_hook_calls(void * arg)
+{
 	syscall_info_t *iter;
 
-	if(get_sct() && set_sct_rw()){
-
-		iter = __start_syscalls;
-		for(; iter < __stop_syscalls; ++iter){
-			if(iter->is32){
+	for (iter = __start_syscalls; iter < __stop_syscalls; iter++) {
+		if (iter->is32) {
 #ifdef CONFIG_IA32_EMULATION
-				procmon_info("Hook IA32 %s\n", iter->name);
-				iter->rf = (void *)ia32_sys_call_table[iter->__NR_];
-				ia32_sys_call_table[iter->__NR_] = (void *)iter->ff;
+			procmon_info("Hook IA32 %s\n", iter->name);
+			iter->rf = (void *)ia32_sct_map[iter->__NR_];
+			ia32_sct_map[iter->__NR_] = (void *)iter->ff;
 #endif
-			}else{
-				procmon_info("Hook %s\n", iter->name);
-				iter->rf = (void *)sys_call_table[iter->__NR_];
-				sys_call_table[iter->__NR_] = (void *)iter->ff;
-			}
-
-			add_syscalls_state_table_entry(iter->name, &iter->state);
-			iter->counter = new(sizeof(atomic_t));
-			atomic_set(iter->counter, 0);
+		} else {
+			procmon_info("Hook %s\n", iter->name);
+			iter->rf = (void *)sct_map[iter->__NR_];
+			sct_map[iter->__NR_] = (void *)iter->ff;
 		}
 
-		set_sct_ro();
+		add_syscalls_state_table_entry(iter->name, &iter->state);
+		iter->counter = new(sizeof(atomic_t));
+		atomic_set(iter->counter, 0);
 	}
+
+	return 0;
+}
+
+void hook_calls(void)
+{
+	if (!get_sct())
+		return;
+
+	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
+	if (!sct_map) {
+		procmon_error("Can't get writable SCT mapping\n");
+		goto out;
+	}
+
+#ifdef CONFIG_IA32_EMULATION
+	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
+	if (!ia32_sct_map) {
+		procmon_error("Can't get writable IA32_SCT mapping\n");
+		goto out;
+	}
+#endif
+
+	/* stop the fucking machine */
+	stop_machine(do_hook_calls, NULL, 0);
+
+out:
+#ifdef CONFIG_IA32_EMULATION
+	vunmap((void *)((unsigned long)ia32_sct_map & PAGE_MASK)), ia32_sct_map = NULL;
+#endif
+	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 }
 
 /*****************************************************************************\
@@ -191,26 +178,52 @@ void hook_calls(void){
 | HOOK_IA32 did.                                                              |
 \*****************************************************************************/
 
-void unhook_calls(void){
+static int do_unhook_calls(void * arg)
+{
 	syscall_info_t *iter;
 
-	if(get_sct() && set_sct_rw()){
-
-		iter = __start_syscalls;
-		for(; iter < __stop_syscalls; ++iter){
-			if(iter->is32){
+	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter) {
+		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-				procmon_info("Unhook IA32 %s\n", iter->name);
-				ia32_sys_call_table[iter->__NR_] = (void *)iter->rf;
+			procmon_info("Unhook IA32 %s\n", iter->name);
+			ia32_sct_map[iter->__NR_] = (void *)iter->rf;
 #endif
-			}else{
-				procmon_info("Unhook %s\n", iter->name);
-				sys_call_table[iter->__NR_] = (void *)iter->rf;
-			}
+		} else {
+			procmon_info("Unhook %s\n", iter->name);
+			sct_map[iter->__NR_] = (void *)iter->rf;
 		}
-
-		set_sct_ro();
 	}
+
+	return 0;
+}
+
+void unhook_calls(void)
+{
+	if (!get_sct())
+		return;
+
+	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
+	if (!sct_map) {
+		procmon_error("Can't get writable SCT mapping\n");
+		goto out;
+	}
+
+#ifdef CONFIG_IA32_EMULATION
+	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
+	if (!ia32_sct_map) {
+		procmon_error("Can't get writable IA32_SCT mapping\n");
+		goto out;
+	}
+#endif
+
+	/* stop the fucking machine */
+	stop_machine(do_unhook_calls, NULL, 0);
+
+out:
+#ifdef CONFIG_IA32_EMULATION
+	vunmap((void *)((unsigned long)ia32_sct_map & PAGE_MASK)), ia32_sct_map = NULL;
+#endif
+	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 }
 
 /*****************************************************************************\

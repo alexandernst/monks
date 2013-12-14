@@ -23,8 +23,10 @@
 #endif
 
 #include <linux/preempt.h>
+#include <linux/stop_machine.h>
 
 #include "msgs.h"
+#include "utils.h"
 #include "control.h"
 #include "../udis86/udis86.h"
 #include "../common/mem_ops.h"
@@ -155,12 +157,7 @@ void *get_ia32_sys_call_table(void);
 void *get_sys_call_table(void);
 #endif
 
-void setback_cr0(unsigned long val);
-unsigned long clear_and_return_cr0(void);
-
 int get_sct(void);
-int set_sct_rw(void);
-int set_sct_ro(void);
 
 void hook_calls(void);
 void unhook_calls(void);
