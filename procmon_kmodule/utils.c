@@ -14,13 +14,12 @@
 
 void *map_writable(void *addr, size_t len){
 	void *vaddr;
-	int nr_pages = DIV_ROUND_UP(offset_in_page(addr) + len, PAGE_SIZE);
+	int i, nr_pages = DIV_ROUND_UP(offset_in_page(addr) + len, PAGE_SIZE);
 	struct page **pages = kmalloc(nr_pages * sizeof(*pages), GFP_KERNEL);
 	void *page_addr = (void *)((unsigned long)addr & PAGE_MASK);
-	int i;
 
 	if (pages == NULL)
-			return NULL;
+		return NULL;
 
 	for (i = 0; i < nr_pages; i++) {
 		if (__module_address((unsigned long)page_addr) == NULL) {
@@ -30,16 +29,16 @@ void *map_writable(void *addr, size_t len){
 			pages[i] = vmalloc_to_page(page_addr);
 		}
 		if (pages[i] == NULL) {
-			kfree(pages);
-			return NULL;
+			vaddr = NULL;
+			goto out;
 		}
 		page_addr += PAGE_SIZE;
 	}
 	vaddr = vmap(pages, nr_pages, VM_MAP, PAGE_KERNEL);
+
+out:
 	kfree(pages);
-	if (vaddr == NULL)
-		return NULL;
-	return vaddr + offset_in_page(addr);
+	return vaddr == NULL ? NULL : vaddr + offset_in_page(addr);
 }
 
 char *path_from_fd(unsigned int fd){
