@@ -107,6 +107,65 @@ static int get_sct(void){
 |                                      END                                    |
 \*****************************************************************************/
 
+/*****************************************************************************\
+| Create a stub that will replace the real syscall.                           |
+| The stub is just a chuck of executable memory, kmalloced from the module    |
+| and filled with opcode. Also, the stub will survive procmon's unloading.    |
+|                                                                             |
+| The stub will do the following things:                                      |
+|                                                                             |
+| 1. Save syscall arguments                                                   |
+| 2. Call atomic_inc with the counter of the current hijacked syscall         |
+| 3. Call the real syscall                                                    |
+| 4. Save the returned value                                                  |
+| 5. Call the hooked syscall with the arguments that were saved earlier       |
+| 6. Call atomic_dec with the counter of the current hijacked syscall         |
+| 7. Return the result from the call to the real syscall                      |
+\*****************************************************************************/
+
+static void *create_stub(syscall_info_t *iter){
+	return (void *)iter->ff;
+}
+
+#ifdef CONFIG_IA32_EMULATION
+static void *create_stub32(syscall_info_t *iter){
+	return (void *)iter->ff;
+}
+#endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
+/*****************************************************************************\
+| Destroy a stub will actually change the stub's opcode so it will destroy    |
+| itself when there are no more sleeping calls that will use the stub.        |
+|                                                                             |
+| That means that the content of the stub will look like the following:       |
+|                                                                             |
+| 1.Save syscall arguments                                                    |
+| 2. Call atomic_inc with the counter of the current hijacked syscall         |
+| 3. Call the real syscall                                                    |
+| 4. Save the returned value                                                  |
+| 5. Call atomic_dec with the counter of the current hijacked syscall         |
+| 6. If the atomic_counter is equal to 0 then make the stub free itself       |
+| 7. Return the result from the call to the real syscall                      |
+\*****************************************************************************/
+
+static void *destroy_stub(syscall_info_t *iter){
+	return (void *)iter->rf;
+}
+
+#ifdef CONFIG_IA32_EMULATION
+static void *destroy_stub32(syscall_info_t *iter){
+	return (void *)iter->rf;
+}
+#endif
+
+/*****************************************************************************\
+|                                      END                                    |
+\*****************************************************************************/
+
 #define __NR_syscall_max	512	/* TODO: find out real value */
 
 /*****************************************************************************\
@@ -127,12 +186,12 @@ static int do_hook_calls(void *arg){
 #ifdef CONFIG_IA32_EMULATION
 			procmon_info("Hook IA32 %s\n", iter->name);
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
-			ia32_sct_map[iter->__NR_] = (void *)iter->ff;
+			ia32_sct_map[iter->__NR_] = create_stub32(iter);
 #endif
 		}else{
 			procmon_info("Hook %s\n", iter->name);
 			iter->rf = (void *)sct_map[iter->__NR_];
-			sct_map[iter->__NR_] = (void *)iter->ff;
+			sct_map[iter->__NR_] = create_stub(iter);
 		}
 	}
 
@@ -183,11 +242,11 @@ static int do_unhook_calls(void *arg){
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			procmon_info("Unhook IA32 %s\n", iter->name);
-			ia32_sct_map[iter->__NR_] = (void *)iter->rf;
+			ia32_sct_map[iter->__NR_] = destroy_stub32(iter);
 #endif
 		}else{
 			procmon_info("Unhook %s\n", iter->name);
-			sct_map[iter->__NR_] = (void *)iter->rf;
+			sct_map[iter->__NR_] = destroy_stub(iter);
 		}
 	}
 
@@ -239,43 +298,4 @@ int safe_to_unload(void){
 	}
 
 	return 1;
-}
-
-/*****************************************************************************\
-| Create a stub that will replace the real syscall.                           |
-| The stub is just a chuck of executable memory, kmalloced from the module    |
-| and filled with opcode. Also, the stub will survive procmon's unloading.    |
-|                                                                             |
-| The stub will do the following things:                                      |
-|                                                                             |
-| 1. Save syscall arguments                                                   |
-| 2. Call atomic_inc with the counter of the current hijacked syscall         |
-| 3. Call the real syscall                                                    |
-| 4. Save the returned value                                                  |
-| 5. Call the hooked syscall with the arguments that were saved earlier       |
-| 6. Call atomic_dec with the counter of the current hijacked syscall         |
-| 7. Return the result from the call to the real syscall                      |
-\*****************************************************************************/
-
-static void *create_stub(){
-
-}
-
-/*****************************************************************************\
-| Destroy a stub will actually change the stub's opcode so it will destroy    |
-| itself when there are no more sleeping calls that will use the stub.        |
-|                                                                             |
-| That means that the content of the stub will look like the following:       |
-|                                                                             |
-| 1.Save syscall arguments                                                    |
-| 2. Call atomic_inc with the counter of the current hijacked syscall         |
-| 3. Call the real syscall                                                    |
-| 4. Save the returned value                                                  |
-| 5. Call atomic_dec with the counter of the current hijacked syscall         |
-| 6. If the atomic_counter is equal to 0 then make the stub free itself       |
-| 7. Return the result from the call to the real syscall                      |
-\*****************************************************************************/
-
-static void destroy_stub(){
-
 }
