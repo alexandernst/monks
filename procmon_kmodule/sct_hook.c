@@ -119,6 +119,10 @@ static int do_hook_calls(void *arg){
 	syscall_info_t *iter;
 
 	for(iter = __start_syscalls; iter < __stop_syscalls; iter++){
+		add_syscalls_state_table_entry(iter->name, &iter->state);
+		iter->counter = new(sizeof(atomic_t));
+		atomic_set(iter->counter, 0);
+
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			procmon_info("Hook IA32 %s\n", iter->name);
@@ -130,10 +134,6 @@ static int do_hook_calls(void *arg){
 			iter->rf = (void *)sct_map[iter->__NR_];
 			sct_map[iter->__NR_] = (void *)iter->ff;
 		}
-
-		add_syscalls_state_table_entry(iter->name, &iter->state);
-		iter->counter = new(sizeof(atomic_t));
-		atomic_set(iter->counter, 0);
 	}
 
 	return 0;
