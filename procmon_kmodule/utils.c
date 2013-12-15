@@ -18,17 +18,17 @@ void *map_writable(void *addr, size_t len){
 	struct page **pages = kmalloc(nr_pages * sizeof(*pages), GFP_KERNEL);
 	void *page_addr = (void *)((unsigned long)addr & PAGE_MASK);
 
-	if (pages == NULL)
+	if(pages == NULL)
 		return NULL;
 
-	for (i = 0; i < nr_pages; i++) {
-		if (__module_address((unsigned long)page_addr) == NULL) {
+	for(i = 0; i < nr_pages; i++){
+		if(__module_address((unsigned long)page_addr) == NULL){
 			pages[i] = virt_to_page(page_addr);
 			WARN_ON(!PageReserved(pages[i]));
-		} else {
+		}else{
 			pages[i] = vmalloc_to_page(page_addr);
 		}
-		if (pages[i] == NULL) {
+		if(pages[i] == NULL){
 			vaddr = NULL;
 			goto out;
 		}

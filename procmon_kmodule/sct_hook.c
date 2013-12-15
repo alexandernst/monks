@@ -115,18 +115,17 @@ static int get_sct(void){
 | Once we have that information, we hook all the available syscalls           |
 \*****************************************************************************/
 
-static int do_hook_calls(void * arg)
-{
+static int do_hook_calls(void *arg){
 	syscall_info_t *iter;
 
-	for (iter = __start_syscalls; iter < __stop_syscalls; iter++) {
-		if (iter->is32) {
+	for(iter = __start_syscalls; iter < __stop_syscalls; iter++){
+		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			procmon_info("Hook IA32 %s\n", iter->name);
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
 			ia32_sct_map[iter->__NR_] = (void *)iter->ff;
 #endif
-		} else {
+		}else{
 			procmon_info("Hook %s\n", iter->name);
 			iter->rf = (void *)sct_map[iter->__NR_];
 			sct_map[iter->__NR_] = (void *)iter->ff;
@@ -140,20 +139,19 @@ static int do_hook_calls(void * arg)
 	return 0;
 }
 
-void hook_calls(void)
-{
-	if (!get_sct())
+void hook_calls(void){
+	if(!get_sct())
 		return;
 
 	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
-	if (!sct_map) {
+	if(!sct_map){
 		procmon_error("Can't get writable SCT mapping\n");
 		goto out;
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
-	if (!ia32_sct_map) {
+	if(!ia32_sct_map){
 		procmon_error("Can't get writable IA32_SCT mapping\n");
 		goto out;
 	}
@@ -178,17 +176,16 @@ out:
 | HOOK_IA32 did.                                                              |
 \*****************************************************************************/
 
-static int do_unhook_calls(void * arg)
-{
+static int do_unhook_calls(void *arg){
 	syscall_info_t *iter;
 
-	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter) {
+	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter){
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			procmon_info("Unhook IA32 %s\n", iter->name);
 			ia32_sct_map[iter->__NR_] = (void *)iter->rf;
 #endif
-		} else {
+		}else{
 			procmon_info("Unhook %s\n", iter->name);
 			sct_map[iter->__NR_] = (void *)iter->rf;
 		}
@@ -197,20 +194,19 @@ static int do_unhook_calls(void * arg)
 	return 0;
 }
 
-void unhook_calls(void)
-{
-	if (!get_sct())
+void unhook_calls(void){
+	if(!get_sct())
 		return;
 
 	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
-	if (!sct_map) {
+	if(!sct_map){
 		procmon_error("Can't get writable SCT mapping\n");
 		goto out;
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
-	if (!ia32_sct_map) {
+	if(!ia32_sct_map){
 		procmon_error("Can't get writable IA32_SCT mapping\n");
 		goto out;
 	}
