@@ -240,3 +240,42 @@ int safe_to_unload(void){
 
 	return 1;
 }
+
+/*****************************************************************************\
+| Create a stub that will replace the real syscall.                           |
+| The stub is just a chuck of executable memory, kmalloced from the module    |
+| and filled with opcode. Also, the stub will survive procmon's unloading.    |
+|                                                                             |
+| The stub will do the following things:                                      |
+|                                                                             |
+| 1. Save syscall arguments                                                   |
+| 2. Call atomic_inc with the counter of the current hijacked syscall         |
+| 3. Call the real syscall                                                    |
+| 4. Save the returned value                                                  |
+| 5. Call the hooked syscall with the arguments that were saved earlier       |
+| 6. Call atomic_dec with the counter of the current hijacked syscall         |
+| 7. Return the result from the call to the real syscall                      |
+\*****************************************************************************/
+
+static void *create_stub(){
+
+}
+
+/*****************************************************************************\
+| Destroy a stub will actually change the stub's opcode so it will destroy    |
+| itself when there are no more sleeping calls that will use the stub.        |
+|                                                                             |
+| That means that the content of the stub will look like the following:       |
+|                                                                             |
+| 1.Save syscall arguments                                                    |
+| 2. Call atomic_inc with the counter of the current hijacked syscall         |
+| 3. Call the real syscall                                                    |
+| 4. Save the returned value                                                  |
+| 5. Call atomic_dec with the counter of the current hijacked syscall         |
+| 6. If the atomic_counter is equal to 0 then make the stub free itself       |
+| 7. Return the result from the call to the real syscall                      |
+\*****************************************************************************/
+
+static void destroy_stub(){
+
+}
