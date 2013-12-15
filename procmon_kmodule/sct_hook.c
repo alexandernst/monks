@@ -81,7 +81,7 @@ void *get_sys_call_table(void){
 | Method to get the system call table                                         |
 \*****************************************************************************/
 
-int get_sct(void){
+static int get_sct(void){
 	sys_call_table = get_sys_call_table();
 	if(!sys_call_table){
 		procmon_info("syscall_table is NULL, quitting...\n");

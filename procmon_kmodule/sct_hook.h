@@ -157,8 +157,6 @@ void *get_ia32_sys_call_table(void);
 void *get_sys_call_table(void);
 #endif
 
-int get_sct(void);
-
 void hook_calls(void);
 void unhook_calls(void);
 int safe_to_unload(void);
