@@ -124,7 +124,59 @@ static int get_sct(void){
 \*****************************************************************************/
 
 static void *create_stub(syscall_info_t *iter){
-	return (void *)iter->ff;
+	unsigned char *bytecode;
+
+	#ifdef __i386__
+		return (void *)iter->ff;
+	#else
+
+		/*
+		push rbp;
+		mov rbp, rsp;
+		sub rsp, 80; //80 bytes for stack, 10 args of 64 bits
+
+		mov rax, &iter->ff;
+		call rax; //not used as we're not actually calling a syscall 
+
+		mov rsp, rbp;
+		pop rbp;
+		ret;
+		*/
+
+		int i;
+		uintptr_t addr;
+		unsigned char  opcode[] = {
+			0x55,
+			0x48, 0x89, 0xE5,
+			0x48, 0x83, 0xEC, 0x50,
+
+			0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //addr
+			0xFF, 0xD0,
+
+			0x48, 0x89, 0xEC,
+			0x5D,
+			0xC3
+		};
+
+		bytecode = __vmalloc(sizeof(opcode), GFP_KERNEL, PAGE_KERNEL_EXEC);
+
+		//patch addr
+		addr = iter->ff;
+		memcpy(opcode + 10, &addr, sizeof(uintptr_t));
+		
+		memcpy(bytecode, &opcode, sizeof(opcode));
+
+		printk("&iter->ff: %p\n", (void *)iter->ff);
+		printk("Bytecode: \n");
+		for(i = 0; i < sizeof(opcode); ++i){
+			printk("%02x", bytecode[i]);
+		}
+		printk("\nEnd\n");
+
+		return bytecode;
+		//return (void *)iter->ff;
+
+	#endif
 }
 
 #ifdef CONFIG_IA32_EMULATION
