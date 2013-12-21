@@ -137,45 +137,45 @@ static void *create_stub(syscall_info_t *iter){
 			0x48, 0x89, 0xE5,                                           //mov rbp, rsp;
 			0x48, 0x83, 0xEC, 0x40,                                     //sub rsp, 64; //8 bytes for rax content + 48 bytes for 6 args + 8 bytes for syscall result
 
-			0x48, 0x89, 0x45, 0x00,                                     //mov [rbp], rax;
-			0x48, 0x89, 0x7D, 0xF8,                                     //mov [rbp - 8], rdi;
-			0x48, 0x89, 0x75, 0xF0,                                     //mov [rbp - 16], rsi;
-			0x48, 0x89, 0x55, 0xE8,                                     //mov [rbp - 24], rdx;
-			0x48, 0x89, 0x4D, 0xE0,                                     //mov [rbp - 32], rcx;
-			0x4C, 0x89, 0x45, 0xD8,                                     //mov [rbp - 40], r8;
-			0x4C, 0x89, 0x4D, 0xD0,                                     //mov [rbp - 48], r9;
+			0x48, 0x89, 0x45, 0xF8,                                     //mov [rbp - 8], rax;
+			0x48, 0x89, 0x7D, 0xF0,                                     //mov [rbp - 16], rdi;
+			0x48, 0x89, 0x75, 0xE8,                                     //mov [rbp - 24], rsi;
+			0x48, 0x89, 0x55, 0xE0,                                     //mov [rbp - 32], rdx;
+			0x48, 0x89, 0x4D, 0xD8,                                     //mov [rbp - 40], rcx;
+			0x4C, 0x89, 0x45, 0xD0,                                     //mov [rbp - 48], r8;
+			0x4C, 0x89, 0x4D, 0xC8,                                     //mov [rbp - 56], r9;
 
 /*38*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_inc;
 /*48*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
 /*60*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->rf;
-			0x48, 0x8B, 0x7D, 0xF8,                                     //mov rdi, [rbp - 8];
-			0x48, 0x8B, 0x75, 0xF0,                                     //mov rsi, [rbp - 16];
-			0x48, 0x8B, 0x55, 0xE8,                                     //mov rdx, [rbp - 24];
-			0x48, 0x8B, 0x4D, 0xE0,                                     //mov rcx, [rbp - 32];
-			0x4C, 0x8B, 0x45, 0xD8,                                     //mov r8, [rbp - 40];
-			0x4C, 0x8B, 0x4D, 0xD0,                                     //mov r9, [rbp - 48];
+			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
+			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
+			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
+			0x48, 0x8B, 0x4D, 0xD8,                                     //mov rcx, [rbp - 40];
+			0x4C, 0x8B, 0x45, 0xD0,                                     //mov r8, [rbp - 48];
+			0x4C, 0x8B, 0x4D, 0xC8,                                     //mov r9, [rbp - 56];
 			0xFF, 0xD0,                                                 //call rax;
 
-			0x48, 0x89, 0x45, 0xC8,                                     //mov [rbp - 56], rax;
+			0x48, 0x89, 0x45, 0xC0,                                     //mov [rbp - 64], rax;
 
 			//TODO: Call iter->ff only if procmon_state == 1 or iter->state == 1
 
 /*100*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->ff;
-			0x48, 0x8B, 0x7D, 0xF8,                                     //mov rdi, [rbp - 8];
-			0x48, 0x8B, 0x75, 0xF0,                                     //mov rsi, [rbp - 16];
-			0x48, 0x8B, 0x55, 0xE8,                                     //mov rdx, [rbp - 24];
-			0x48, 0x8B, 0x4D, 0xE0,                                     //mov rcx, [rbp - 32];
-			0x4C, 0x8B, 0x45, 0xD8,                                     //mov r8, [rbp - 40];
-			0x4C, 0x8B, 0x4D, 0xD0,                                     //mov r9, [rbp - 48];
+			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
+			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
+			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
+			0x48, 0x8B, 0x4D, 0xD8,                                     //mov rcx, [rbp - 40];
+			0x4C, 0x8B, 0x45, 0xD0,                                     //mov r8, [rbp - 48];
+			0x4C, 0x8B, 0x4D, 0xC8,                                     //mov r9, [rbp - 56];
 			0xFF, 0xD0,                                                 //call rax;
 
 /*136*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_dec;
 /*146*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
-			0x48, 0x8B, 0x45, 0xC8,                                     //mov rax, [rbp - 56];
+			0x48, 0x8B, 0x45, 0xC0,                                     //mov rax, [rbp - 64];
 
 			0x48, 0x89, 0xEC,                                           //mov rsp, rbp;
 			0x5D,                                                       //pop rbp;
