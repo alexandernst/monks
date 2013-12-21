@@ -88,7 +88,7 @@ struct idtr{
 
 #define __REGISTER_SYSCALL(F)									\
 	static syscall_info_t __syscall_info___NR_##F				\
-	__attribute__((section(".syscalls"), aligned(1))) = {		\
+	__attribute__((section(".syscalls"), aligned(1), used)) = { \
 		.counter = NULL,										\
 		.name = "__NR_" #F,										\
 		.is32 = 0,												\
