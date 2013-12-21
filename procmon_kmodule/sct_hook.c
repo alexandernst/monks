@@ -124,55 +124,85 @@ static int get_sct(void){
 \*****************************************************************************/
 
 static void *create_stub(syscall_info_t *iter){
+	void *addr;
 	unsigned char *bytecode;
 
 	#ifdef __i386__
 		return (void *)iter->ff;
 	#else
 
-		/*
-		push rbp;
-		mov rbp, rsp;
-		sub rsp, 80; //80 bytes for stack, 10 args of 64 bits
-
-		mov rax, &iter->ff;
-		call rax; //not used as we're not actually calling a syscall 
-
-		mov rsp, rbp;
-		pop rbp;
-		ret;
-		*/
-
 		int i;
-		uintptr_t addr;
-		unsigned char  opcode[] = {
-			0x55,
-			0x48, 0x89, 0xE5,
-			0x48, 0x83, 0xEC, 0x50,
+		unsigned char opcode[] = {
+			0x55,                                                       //push rbp;
+			0x48, 0x89, 0xE5,                                           //mov rbp, rsp;
+			0x48, 0x83, 0xEC, 0x40,                                     //sub rsp, 64; //8 bytes for rax content + 48 bytes for 6 args + 8 bytes for syscall result
 
-			0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //addr
-			0xFF, 0xD0,
+			0x48, 0x89, 0x45, 0x00,                                     //mov [rbp], rax;
+			0x48, 0x89, 0x7D, 0xF8,                                     //mov [rbp - 8], rdi;
+			0x48, 0x89, 0x75, 0xF0,                                     //mov [rbp - 16], rsi;
+			0x48, 0x89, 0x55, 0xE8,                                     //mov [rbp - 24], rdx;
+			0x48, 0x89, 0x4D, 0xE0,                                     //mov [rbp - 32], rcx;
+			0x4C, 0x89, 0x45, 0xD8,                                     //mov [rbp - 40], r8;
+			0x4C, 0x89, 0x4D, 0xD0,                                     //mov [rbp - 48], r9;
 
-			0x48, 0x89, 0xEC,
-			0x5D,
-			0xC3
+/*38*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_inc;
+/*48*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
+			0xFF, 0xD0,                                                 //call rax;
+
+/*60*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->rf;
+			0x48, 0x8B, 0x7D, 0xF8,                                     //mov rdi, [rbp - 8];
+			0x48, 0x8B, 0x75, 0xF0,                                     //mov rsi, [rbp - 16];
+			0x48, 0x8B, 0x55, 0xE8,                                     //mov rdx, [rbp - 24];
+			0x48, 0x8B, 0x4D, 0xE0,                                     //mov rcx, [rbp - 32];
+			0x4C, 0x8B, 0x45, 0xD8,                                     //mov r8, [rbp - 40];
+			0x4C, 0x8B, 0x4D, 0xD0,                                     //mov r9, [rbp - 48];
+			0xFF, 0xD0,                                                 //call rax;
+
+			0x48, 0x89, 0x45, 0xC8,                                     //mov [rbp - 56], rax;
+
+			//TODO: Call iter->ff only if procmon_state == 1 or iter->state == 1
+
+/*100*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->ff;
+			0x48, 0x8B, 0x7D, 0xF8,                                     //mov rdi, [rbp - 8];
+			0x48, 0x8B, 0x75, 0xF0,                                     //mov rsi, [rbp - 16];
+			0x48, 0x8B, 0x55, 0xE8,                                     //mov rdx, [rbp - 24];
+			0x48, 0x8B, 0x4D, 0xE0,                                     //mov rcx, [rbp - 32];
+			0x4C, 0x8B, 0x45, 0xD8,                                     //mov r8, [rbp - 40];
+			0x4C, 0x8B, 0x4D, 0xD0,                                     //mov r9, [rbp - 48];
+			0xFF, 0xD0,                                                 //call rax;
+
+/*136*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_dec;
+/*146*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
+			0xFF, 0xD0,                                                 //call rax;
+
+			0x48, 0x8B, 0x45, 0xC8,                                     //mov rax, [rbp - 56];
+
+			0x48, 0x89, 0xEC,                                           //mov rsp, rbp;
+			0x5D,                                                       //pop rbp;
+			0xC3                                                        //ret;
 		};
 
 		bytecode = __vmalloc(sizeof(opcode), GFP_KERNEL, PAGE_KERNEL_EXEC);
 
-		//patch addr
-		addr = iter->ff;
-		memcpy(opcode + 10, &addr, sizeof(uintptr_t));
+		//patch addrs
+		addr = &atomic_inc;
+		memcpy(opcode + 38, &addr, sizeof(void *)); //&atomic_inc
+		memcpy(opcode + 48, &iter->counter, sizeof(void *)); //&iter->counter
+		memcpy(opcode + 60, &iter->rf, sizeof(void *)); //&iter->rf
+		memcpy(opcode + 100, &iter->ff, sizeof(void *)); //&iter->ff
+		addr = &atomic_dec;
+		memcpy(opcode + 136, &addr, sizeof(void *)); //&atomic_dec
+		memcpy(opcode + 146, &iter->counter, sizeof(void *)); //&iter->counter
 		
-		memcpy(bytecode, &opcode, sizeof(opcode));
-
+		memcpy(bytecode, opcode, sizeof(opcode));
+/*
 		printk("&iter->ff: %p\n", (void *)iter->ff);
 		printk("Bytecode: \n");
 		for(i = 0; i < sizeof(opcode); ++i){
 			printk("%02x", bytecode[i]);
 		}
 		printk("\nEnd\n");
-
+*/
 		return bytecode;
 		//return (void *)iter->ff;
 
