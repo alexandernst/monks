@@ -109,7 +109,7 @@ static int get_sct(void){
 
 /*****************************************************************************\
 | Create a stub that will replace the real syscall.                           |
-| The stub is just a chuck of executable memory, kmalloced from the module    |
+| The stub is just a chunk of executable memory, kmalloc-ed from the module   |
 | and filled with opcode. Also, the stub will survive procmon's unloading.    |
 |                                                                             |
 | The stub will do the following things:                                      |
@@ -195,7 +195,7 @@ static void *create_stub32(syscall_info_t *iter){
 |                                                                             |
 | That means that the content of the stub will look like the following:       |
 |                                                                             |
-| 1.Save syscall arguments                                                    |
+| 1. Save syscall arguments                                                   |
 | 2. Call atomic_inc with the counter of the current hijacked syscall         |
 | 3. Call the real syscall                                                    |
 | 4. Save the returned value                                                  |
