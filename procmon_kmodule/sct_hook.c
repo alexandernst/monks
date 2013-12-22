@@ -124,6 +124,7 @@ static int get_sct(void){
 \*****************************************************************************/
 
 static void *create_stub(syscall_info_t *iter){
+	int i;
 	void *addr;
 	unsigned char *bytecode;
 
@@ -131,7 +132,6 @@ static void *create_stub(syscall_info_t *iter){
 		return (void *)iter->ff;
 	#else
 
-		int i;
 		unsigned char opcode[] = {
 			0x55,                                                       //push rbp;
 			0x48, 0x89, 0xE5,                                           //mov rbp, rsp;
@@ -145,11 +145,11 @@ static void *create_stub(syscall_info_t *iter){
 			0x4C, 0x89, 0x45, 0xD0,                                     //mov [rbp - 48], r8;
 			0x4C, 0x89, 0x4D, 0xC8,                                     //mov [rbp - 56], r9;
 
-/*38*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_inc;
-/*48*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
+/*38*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_inc;
+/*48*/		0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
-/*60*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->rf;
+/*60*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->rf;
 			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
 			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
 			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
@@ -160,9 +160,9 @@ static void *create_stub(syscall_info_t *iter){
 
 			0x48, 0x89, 0x45, 0xC0,                                     //mov [rbp - 64], rax;
 
-			//TODO: Call iter->ff only if procmon_state == 1 or iter->state == 1
+			//TODO: Call iter->ff only if procmon_state == 1 and iter->state == 1
 
-/*100*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &iter->ff;
+/*100*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->ff;
 			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
 			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
 			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
@@ -171,8 +171,8 @@ static void *create_stub(syscall_info_t *iter){
 			0x4C, 0x8B, 0x4D, 0xC8,                                     //mov r9, [rbp - 56];
 			0xFF, 0xD0,                                                 //call rax;
 
-/*136*/		0x48, 0xB8, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rax, &atomic_dec;
-/*146*/		0x48, 0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //mov rdi, &iter->counter;
+/*136*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_dec;
+/*146*/		0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
 			0x48, 0x8B, 0x45, 0xC0,                                     //mov rax, [rbp - 64];
@@ -195,6 +195,7 @@ static void *create_stub(syscall_info_t *iter){
 		memcpy(opcode + 146, &iter->counter, sizeof(void *)); //&iter->counter
 		
 		memcpy(bytecode, opcode, sizeof(opcode));
+
 /*
 		printk("&iter->ff: %p\n", (void *)iter->ff);
 		printk("Bytecode: \n");
@@ -204,7 +205,7 @@ static void *create_stub(syscall_info_t *iter){
 		printk("\nEnd\n");
 */
 		return bytecode;
-		//return (void *)iter->ff;
+		//return (void *)iter->rf;
 
 	#endif
 }
