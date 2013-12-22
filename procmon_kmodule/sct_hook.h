@@ -34,6 +34,8 @@
 #define to_x86_ptr(x) (void *)(x)
 #define to_x64_ptr(x) (void *)(0xffffffff00000000 | x)
 
+extern int procmon_state;
+
 typedef struct syscall_info_t {
 	atomic_t *counter;
 	char *name;
