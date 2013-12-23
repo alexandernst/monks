@@ -145,11 +145,11 @@ static void *create_stub(syscall_info_t *iter){
 			0x4C, 0x89, 0x45, 0xD0,                                     //mov [rbp - 48], r8;
 			0x4C, 0x89, 0x4D, 0xC8,                                     //mov [rbp - 56], r9;
 
-/*38*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_inc;
-/*48*/		0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
+			0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_inc;
+			0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
-/*60*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->rf;
+			0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->rf;
 			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
 			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
 			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
@@ -160,18 +160,15 @@ static void *create_stub(syscall_info_t *iter){
 
 			0x48, 0x89, 0x45, 0xC0,                                     //mov [rbp - 64], rax;
 
-			//TODO: Call iter->ff only if procmon_state == 1 and iter->state == 1
-/*100*/		0x48, 0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, [&procmon_state];
-			0x48, 0xC7, 0xC7, 0x01, 0x00, 0x00, 0x00,                   //mov rdi, 1;
-			0x48, 0x39, 0xF8,                                           //cmp rax, rdi;
-			0x75, 0x3A,                                                 //jne $+2+22+36;
+			0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,       //mov eax, [&procmon_state];
+			0x83, 0xF8, 0x01,                                           //cmp eax, 1;
+			0x75, 0x32,                                                 //jne $+2+14+36;
 
-/*122*/		0x48, 0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, [iter->state];
-			0x48, 0xC7, 0xC7, 0x01, 0x00, 0x00, 0x00,                   //mov rdi, 1;
-			0x48, 0x39, 0xF8,                                           //cmp rax, rdi;
+			0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,       //mov eax, [&iter->state];
+			0x83, 0xF8, 0x01,                                           //cmp eax, 1;
 			0x75, 0x24,                                                 //jne $+2+36;
 
-/*144*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->ff;
+			0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &iter->ff;
 			0x48, 0x8B, 0x7D, 0xF0,                                     //mov rdi, [rbp - 16];
 			0x48, 0x8B, 0x75, 0xE8,                                     //mov rsi, [rbp - 24];
 			0x48, 0x8B, 0x55, 0xE0,                                     //mov rdx, [rbp - 32];
@@ -180,8 +177,8 @@ static void *create_stub(syscall_info_t *iter){
 			0x4C, 0x8B, 0x4D, 0xC8,                                     //mov r9, [rbp - 56];
 			0xFF, 0xD0,                                                 //call rax;
 
-/*180*/		0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_dec;
-/*190*/		0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
+			0x48, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rax, &atomic_dec;
+			0x48, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //mov rdi, &iter->counter;
 			0xFF, 0xD0,                                                 //call rax;
 
 			0x48, 0x8B, 0x45, 0xC0,                                     //mov rax, [rbp - 64];
@@ -199,24 +196,32 @@ static void *create_stub(syscall_info_t *iter){
 		memcpy(opcode + 48, &iter->counter, sizeof(void *)); //&iter->counter
 		memcpy(opcode + 60, &iter->rf, sizeof(void *)); //&iter->rf
 		addr = &procmon_state;
-		memcpy(opcode + 100, &addr, sizeof(void *)); //&procmon_state
+		memcpy(opcode + 99, &addr, sizeof(void *)); //&procmon_state
 		addr = &iter->state;
-		memcpy(opcode + 122, &addr, sizeof(void *)); //&iter->state
-		memcpy(opcode + 144, &iter->ff, sizeof(void *)); //&iter->ff
+		memcpy(opcode + 113, &addr, sizeof(void *)); //&iter->state
+		memcpy(opcode + 128, &iter->ff, sizeof(void *)); //&iter->ff
 		addr = &atomic_dec;
-		memcpy(opcode + 180, &addr, sizeof(void *)); //&atomic_dec
-		memcpy(opcode + 190, &iter->counter, sizeof(void *)); //&iter->counter
+		memcpy(opcode + 164, &addr, sizeof(void *)); //&atomic_dec
+		memcpy(opcode + 174, &iter->counter, sizeof(void *)); //&iter->counter
 		
 		memcpy(bytecode, opcode, sizeof(opcode));
 
 /*
-		printk("&iter->ff: %p\n", (void *)iter->ff);
+		printk("&atomic_inc: %p\n", &atomic_inc);
+		printk("&iter->counter: %p\n", iter->counter);
+		printk("&iter->rf: %p\n", iter->rf);
+		printk("&procmon_state: %p\n", &procmon_state);
+		printk("&iter->state: %p\n", &iter->state);
+		printk("&iter->ff: %p\n", iter->ff);
+		printk("&atomic_dec: %p\n", &atomic_dec);
+
 		printk("Bytecode: \n");
 		for(i = 0; i < sizeof(opcode); ++i){
 			printk("%02x", bytecode[i]);
 		}
 		printk("\nEnd\n");
 */
+		
 		return bytecode;
 		//return (void *)iter->rf;
 
