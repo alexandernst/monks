@@ -124,7 +124,6 @@ static int get_sct(void){
 \*****************************************************************************/
 
 static void *create_stub(syscall_info_t *iter){
-	int i;
 	void *addr;
 	unsigned char *bytecode;
 
@@ -207,6 +206,7 @@ static void *create_stub(syscall_info_t *iter){
 		memcpy(bytecode, opcode, sizeof(opcode));
 
 /*
+		int i;
 		printk("&atomic_inc: %p\n", &atomic_inc);
 		printk("&iter->counter: %p\n", iter->counter);
 		printk("&iter->rf: %p\n", iter->rf);
@@ -221,7 +221,7 @@ static void *create_stub(syscall_info_t *iter){
 		}
 		printk("\nEnd\n");
 */
-		
+
 		return bytecode;
 		//return (void *)iter->rf;
 

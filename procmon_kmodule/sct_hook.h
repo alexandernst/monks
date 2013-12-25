@@ -98,17 +98,19 @@ struct idtr{
 		.rf = &real_sys_##F,									\
 	};
 
-#define __INCR(F)												\
-	atomic_inc(__syscall_info___NR_##F.counter);
-
-#define __DECR(F)												\
-	atomic_dec(__syscall_info___NR_##F.counter);
-
-#define __STATE(F)												\
-	__syscall_info___NR_##F.state
-
-#define __REAL_SYSCALL(F)										\
-	((typeof(real_sys_##F))__syscall_info___NR_##F.rf)
+//8 bytes for return address + 8 bytes for stach push
+//TODO: Write better docs about this giant hack
+//tips for when about to write: stack
+//also, size of value or address
+#define __GET_SYSCALL_RESULT(x)									\
+	__asm__ __volatile__(										\
+		".intel_syntax noprefix;"								\
+		"mov %0, [rbp + 8 + 8];"								\
+		".att_syntax;"											\
+		: "=r" (x)												\
+		:														\
+		:														\
+	);
 
 #ifdef CONFIG_IA32_EMULATION
 
