@@ -98,10 +98,34 @@ struct idtr{
 		.rf = &real_sys_##F,									\
 	};
 
-//8 bytes for return address + 8 bytes for stach push
-//TODO: Write better docs about this giant hack
-//tips for when about to write: stack
-//also, size of value or address
+/*****************************************************************************************\
+| RESULT MACROS                                                                           |
+| Each fake syscall function should have access to the result of the real syscall call.   |
+| This macro gives access to that result value by accessing the stack of the caller.      |
+| Each fake syscall is called from it's stub. Each stub reserves 64 bytes on the stack.   |
+| 8 bytes for the RAX register, 48 bytes for the 6 arguments that a syscall can have and  |
+| 8 bytes for the result of the syscall call. Those last 8 bytes are the ones that this   |
+| macro accesses.                                                                         |
+| We know (guaranteed because of how the stub works) that there isn't anything else on    |
+| the stack, so we can play with it without any real danger.                              |
+| To access those last 8 bytes we need to keep in mind a few things. There are 8 bytes on |
+| the stack for the return address. Also, when the fake syscall is called, the RBP value  |
+| is pushed on the stack, which means 8 more bytes. That means that if we get the current |
+| RBP and add it 8 + 8 well get directly into the caller's stack, which is what we want.  |
+|                                                                                         |
+| NOTE: Don't confuse the way the stack works. We need to ADD 16 bytes instead of REST 16 |
+| bytes because the stacks grows downwards.                                               |
+| Also note that this explanation is valid for x64 platforms. On x86 well have EAX        |
+| instead of RAX, the return value takes 4 bytes and a push takes another 4 bytes, so     |
+| that will make 8 bytes in total.                                                        |
+|                                                                                         |
+| NOTE: Keep in mind that we are reading 8 bytes (4 bytes on x86) from the stack, which   |
+| can contain a value or an address. It's up to you to know what the real syscall will    |
+| return. If the returned value fits in 8 bytes (4 bytes on x86), you just pass a         |
+| variable to this macro. If the syscall returns a pointer, then you'll need to pass this |
+| macro a pointer.                                                                        |
+\*****************************************************************************************/
+
 #define __GET_SYSCALL_RESULT(x)									\
 	__asm__ __volatile__(										\
 		".intel_syntax noprefix;"								\
