@@ -111,13 +111,13 @@ struct idtr{
 | To access those last 8 bytes we need to keep in mind a few things. There are 8 bytes on |
 | the stack for the return address. Also, when the fake syscall is called, the RBP value  |
 | is pushed on the stack, which means 8 more bytes. That means that if we get the current |
-| RBP and add it 8 + 8 well get directly into the caller's stack, which is what we want.  |
+| RBP and add it 8 + 8 we'll get directly into the caller's stack, which is what we want. |
 |                                                                                         |
 | NOTE: Don't confuse the way the stack works. We need to ADD 16 bytes instead of REST 16 |
 | bytes because the stacks grows downwards.                                               |
 | Also note that this explanation is valid for x64 platforms. On x86 well have EAX        |
-| instead of RAX, the return value takes 4 bytes and a push takes another 4 bytes, so     |
-| that will make 8 bytes in total.                                                        |
+| instead of RAX, EBP instead of RBP, the return value will take 4 bytes and a push will  |
+| take another 4 bytes, so that will make 8 bytes in total.                               |
 |                                                                                         |
 | NOTE: Keep in mind that we are reading 8 bytes (4 bytes on x86) from the stack, which   |
 | can contain a value or an address. It's up to you to know what the real syscall will    |
