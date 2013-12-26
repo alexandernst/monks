@@ -1,5 +1,7 @@
 #include "sct_hook.h"
 
+#define __NR_syscall_max	512	/* TODO: find out real value */
+
 void **sys_call_table = NULL;
 static void **sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
@@ -266,8 +268,6 @@ static void *destroy_stub32(syscall_info_t *iter){
 /*****************************************************************************\
 |                                      END                                    |
 \*****************************************************************************/
-
-#define __NR_syscall_max	512	/* TODO: find out real value */
 
 /*****************************************************************************\
 | This is where the magic happens. We iterate over the .syscalls ELF section  |
