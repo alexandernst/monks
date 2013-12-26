@@ -2,7 +2,6 @@
 
 __REGISTER_SYSCALL(read);
 
-asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage void hooked_sys_read(unsigned int fd, char __user *buf, size_t count){
 	ssize_t r;
 	syscall_intercept_info *i;

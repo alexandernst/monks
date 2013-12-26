@@ -6,7 +6,6 @@
 #include "../sct_hook.h"
 #include "../../common/mem_ops.h"
 
-extern asmlinkage ssize_t (*real_sys_read)(unsigned int fd, char __user *buf, size_t count);
 extern asmlinkage void hooked_sys_read(unsigned int fd, char __user *buf, size_t count);
 
 #ifdef CONFIG_IA32_EMULATION
