@@ -103,6 +103,23 @@ struct idtr{
 		.ff = hooked_sys_##F,                                                 \
 	};
 
+#ifdef CONFIG_IA32_EMULATION
+#define __REGISTER_SYSCALL32(F)                                               \
+	static syscall_info_t __syscall_info___NR32_##F                           \
+	__attribute__((section(".syscalls"), aligned(1), used)) = {               \
+		.counter = NULL,                                                      \
+		.name = "__NR32_" #F,                                                 \
+		.is32 = 1,                                                            \
+		.state = 1,                                                           \
+		.__NR_ = __NR32_##F,                                                  \
+		.ff = hooked_sys32_##F,                                               \
+	};
+#endif
+
+/*****************************************************************************\
+|                                     END                                     |
+\*****************************************************************************/
+
 /*****************************************************************************\
 | RESULT MACROS                                                               |
 | Each fake syscall function should have access to the result of the real     |
@@ -132,6 +149,17 @@ struct idtr{
 | you'll need to pass this macro a pointer.                                   |
 \*****************************************************************************/
 
+#ifdef __i386__
+#define __GET_SYSCALL_RESULT(x)                                               \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov %0, [ebp + 4 + 4];"                                              \
+		".att_syntax;"                                                        \
+		: "=r" (x)                                                            \
+		:                                                                     \
+		:                                                                     \
+	);
+#else
 #define __GET_SYSCALL_RESULT(x)                                               \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
@@ -141,37 +169,22 @@ struct idtr{
 		:                                                                     \
 		:                                                                     \
 	);
+#endif
 
 #ifdef CONFIG_IA32_EMULATION
-
-#define __REGISTER_SYSCALL32(F)                                               \
-	static syscall_info_t __syscall_info___NR32_##F                           \
-	__attribute__((section(".syscalls"), aligned(1), used)) = {               \
-		.counter = NULL,                                                      \
-		.name = "__NR32_" #F,                                                 \
-		.is32 = 1,                                                            \
-		.state = 1,                                                           \
-		.__NR_ = __NR32_##F,                                                  \
-		.ff = hooked_sys32_##F,                                               \
-		.rf = &real_sys32_##F,                                                \
-	};
-
-#define __INCR32(F)												\
-	atomic_inc(__syscall_info___NR32_##F.counter);
-
-#define __DECR32(F)												\
-	atomic_dec(__syscall_info___NR32_##F.counter);
-
-#define __STATE32(F)											\
-	__syscall_info___NR32_##F.state
-
-#define __REAL_SYSCALL32(F)										\
-	((typeof(real_sys32_##F))__syscall_info___NR32_##F.rf)
-
+#define __GET_SYSCALL_RESULT32(x)                                             \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov %0, [ebp + 4 + 4];"                                              \
+		".att_syntax;"                                                        \
+		: "=r" (x)                                                            \
+		:                                                                     \
+		:                                                                     \
+	);
 #endif
 
 /*****************************************************************************\
-|                                      END                                    |
+|                                     END                                     |
 \*****************************************************************************/
 
 unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len);
