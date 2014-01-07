@@ -110,6 +110,56 @@ static int get_sct(void){
 \*****************************************************************************/
 
 /*****************************************************************************\
+|                            |                                                |
+| --------------             | This is how the stack looks like when the stub |
+| | arg 6      | ebp + 28    | is executed and the args are saved.            |
+| --------------             |                                                |
+| --------------             | Note that this is valid for both x86 and x64   |
+| | arg 5      | ebp + 24    | architectures. The only differences are the    |
+| --------------             | size of each value, which on x86 is 4 bytes,   |
+| --------------             | and on x64 is 8 bytes, and the register used   |
+| | arg 4      | ebp + 20    | to access the stack, which on x86 is called    |
+| --------------             | EBP, while on x64 is called RBP.               |
+| --------------             |                                                |
+| | arg 3      | ebp + 16    | This means that each value after EBP should be |
+| --------------             | multiplied by 2 for x64.                       |
+| --------------             |                                                |
+| | arg 2      | ebp + 12    | There are 7 local variables on the stack.      |
+| --------------             | The first one is where the return value of the |
+| --------------             | real syscall function is stored for later use. |
+| | arg 1      | ebp + 8     | The rest of the local variables are used to    |
+| --------------             | store the values of the arguments, so they can |
+| --------------             | be passed later to the fake syscall function.  |
+| | Ret Addr   | ebp + 4     |                                                |
+| --------------             | Keep in mind that on x86 all the arguments are |
+| --------------             | passed on the stack, from right to left, which |
+| | EBP        | ebp + 0     | means that the first argument is on the        |
+| --------------             | hightest position, while the last argument is  |
+| --------------             | on the lowest position.                        |
+| | Ret val    | ebp - 4     |                                                |
+| --------------             | On the other hand, on x64 arguments are passed |
+| --------------             | via the registers, in this order: RDI, RSI,    |
+| | arg6  copy | ebp - 8     | RDX, RCX, R8, R9.                              |
+| --------------             |                                                |
+| --------------             | In both x86 and x64 the result of the syscall  |
+| | arg5  copy | ebp - 12    | function is saved in a register. EAX on x86,   |
+| --------------             | RAX on x64.                                    |
+| --------------             |                                                |
+| | arg4  copy | ebp - 16    |                                                |
+| --------------             |                                                |
+| --------------             |                                                |
+| | arg3  copy | ebp - 20    |                                                |
+| --------------             |                                                |
+| --------------             |                                                |
+| | arg2  copy | ebp - 24    |                                                |
+| --------------             |                                                |
+| --------------             |                                                |
+| | arg1  copy | ebp - 28    |                                                |
+| --------------             |                                                |
+|                            |                                                |
+\*****************************************************************************/
+
+/*****************************************************************************\
 | Create a stub that will replace the real syscall.                           |
 | The stub is just a chunk of executable memory, kmalloc-ed from the module   |
 | and filled with opcode. Also, the stub will survive procmon's unloading.    |
@@ -134,15 +184,21 @@ static void *create_stub(syscall_info_t *iter){
 	unsigned char opcode[] = {
 		0x55,                                                       //push ebp;
 		0x89, 0xE5,                                                 //mov ebp, esp;
-		0x83, 0xEC, 0x20,                                           //sub esp, 32; //4 bytes for rax content + 24 bytes for 6 args + 4 bytes for syscall result
+		0x83, 0xEC, 0x1C,                                           //sub esp, 28; //4 bytes for syscall result + 24 bytes for 6 args
 
-		0x89, 0x45, 0xFC,                                           //mov [ebp - 4], eax;
-		0x89, 0x5D, 0xF8,                                           //mov [ebp - 8], ebx;
-		0x89, 0x4D, 0xF4,                                           //mov [ebp - 12], ecx;
-		0x89, 0x55, 0xF0,                                           //mov [ebp - 16], edx;
-		0x89, 0x75, 0xEC,                                           //mov [ebp - 20], esi;
-		0x89, 0x7D, 0xE8,                                           //mov [ebp - 24], edi;
-		0x89, 0x6D, 0xE4,                                           //mov [ebp - 28], ebp;
+		//Save args on the stack
+		0x8B, 0x45, 0x08,                                           //mov eax, [ebp + 8]; 
+		0x89, 0x45, 0xE4,                                           //mov [ebp - 28], eax;
+		0x8B, 0x45, 0x0C,                                           //mov eax, [ebp + 12];
+		0x89, 0x45, 0xE8,                                           //mov [ebp - 24], eax;
+		0x8B, 0x45, 0x10,                                           //mov eax, [ebp + 16];
+		0x89, 0x45, 0xEC,                                           //mov [ebp - 20], eax;
+		0x8B, 0x45, 0x14,                                           //mov eax, [ebp + 20];
+		0x89, 0x45, 0xF0,                                           //mov [ebp - 16], eax;
+		0x8B, 0x45, 0x18,                                           //mov eax, [ebp + 24];
+		0x89, 0x45, 0xF4,                                           //mov [ebp - 12], eax;
+		0x8B, 0x45, 0x1C,                                           //mov eax, [ebp + 28];
+		0x89, 0x45, 0xF8,                                           //mov [ebp - 8], eax; 
 
 		0xB8, 0x00, 0x00, 0x00, 0x00,                               //mov eax, &iter->rf;
 		0xFF, 0xD0,                                                 //call eax;
@@ -158,7 +214,7 @@ static void *create_stub(syscall_info_t *iter){
 	//addr = &atomic_inc;
 	//memcpy(opcode + 38, &addr, sizeof(void *)); //&atomic_inc
 	//memcpy(opcode + 48, &iter->counter, sizeof(void *)); //&iter->counter
-	memcpy(opcode + 28, &iter->rf, sizeof(void *)); //&iter->rf
+	memcpy(opcode + 43, &iter->rf, sizeof(void *)); //&iter->rf
 	//addr = &procmon_state;
 	//memcpy(opcode + 99, &addr, sizeof(void *)); //&procmon_state
 	//addr = &iter->state;
@@ -173,6 +229,8 @@ static void *create_stub(syscall_info_t *iter){
 	#else
 
 	unsigned char opcode[] = {
+		//TODO: Do we really need to store RAX? I'm guessing not...
+		//TODO: Change a little bit the way this works to make it match with that big comment I wrote for x86!
 		0x55,                                                       //push rbp;
 		0x48, 0x89, 0xE5,                                           //mov rbp, rsp;
 		0x48, 0x83, 0xEC, 0x40,                                     //sub rsp, 64; //8 bytes for rax content + 48 bytes for 6 args + 8 bytes for syscall result
