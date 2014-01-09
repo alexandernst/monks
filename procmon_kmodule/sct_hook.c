@@ -31,6 +31,38 @@ unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn
 	return result;
 }
 
+void ud_patch_addr(void *entry, void *addr){
+	ud_t ud;
+	void *patch_addr;
+
+	ud_init(&ud);
+	ud_set_mode(&ud, BITS_PER_LONG);
+	ud_set_vendor(&ud, UD_VENDOR_ANY);
+	ud_set_input_buffer(&ud, entry, 256); //TODO call ud_get_stub_size() when implemented
+
+	while(ud_disassemble(&ud)){
+		if(ud.mnemonic == UD_Imov && ud.operand[1].type == UD_OP_IMM){	
+			switch(ud.operand[1].size){
+				case 32:
+					patch_addr = entry + ud_insn_off(&ud) + 1;
+					if(memcmp(patch_addr, "\x00\x00\x00\x00", 4) == 0){
+						memcpy(patch_addr, &addr, sizeof(void *));
+						return;
+					}
+					break;
+				case 64:
+					patch_addr = entry + ud_insn_off(&ud) + 2;
+					if(memcmp(patch_addr, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) == 0){
+						memcpy(patch_addr, &addr, sizeof(void *));
+						return;
+					}
+					break;
+			}
+			
+		}
+	}
+}
+
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
 #ifdef __i386__
 void *get_sys_call_table(void){
@@ -214,7 +246,9 @@ static void *create_stub(syscall_info_t *iter){
 	//addr = &atomic_inc;
 	//memcpy(opcode + 38, &addr, sizeof(void *)); //&atomic_inc
 	//memcpy(opcode + 48, &iter->counter, sizeof(void *)); //&iter->counter
-	memcpy(opcode + 43, &iter->rf, sizeof(void *)); //&iter->rf
+
+	//memcpy(opcode + 43, &iter->rf, sizeof(void *)); //&iter->rf
+
 	//addr = &procmon_state;
 	//memcpy(opcode + 99, &addr, sizeof(void *)); //&procmon_state
 	//addr = &iter->state;
@@ -225,6 +259,7 @@ static void *create_stub(syscall_info_t *iter){
 	//memcpy(opcode + 174, &iter->counter, sizeof(void *)); //&iter->counter
 	
 	memcpy(bytecode, opcode, sizeof(opcode));
+	ud_patch_addr(bytecode, iter->rf);
 
 	#else
 
@@ -306,24 +341,23 @@ static void *create_stub(syscall_info_t *iter){
 
 	#endif
 
-/*
-	int i;
-	printk("&atomic_inc: %p\n", &atomic_inc);
-	printk("&iter->counter: %p\n", iter->counter);
-	printk("&iter->rf: %p\n", iter->rf);
-	printk("&procmon_state: %p\n", &procmon_state);
-	printk("&iter->state: %p\n", &iter->state);
-	printk("&iter->ff: %p\n", iter->ff);
-	printk("&atomic_dec: %p\n", &atomic_dec);
+	//int i;
+	//printk("&atomic_inc: %p\n", &atomic_inc);
+	//printk("&iter->counter: %p\n", iter->counter);
+	//printk("&iter->rf: %p\n", iter->rf);
+	//printk("&procmon_state: %p\n", &procmon_state);
+	//printk("&iter->state: %p\n", &iter->state);
+	//printk("&iter->ff: %p\n", iter->ff);
+	//printk("&atomic_dec: %p\n", &atomic_dec);
 
-	printk("Bytecode: \n");
-	for(i = 0; i < sizeof(opcode); ++i){
-		printk("%02x", bytecode[i]);
-	}
-	printk("\nEnd\n");
+	//printk("Bytecode: \n");
+	//for(i = 0; i < sizeof(opcode); ++i){
+	//	printk("%02x", bytecode[i]);
+	//}
+	//printk("\nEnd\n");
 
-	return (void *)iter->rf;
-*/
+	//return (void *)iter->rf;
+
 	return bytecode;
 }
 

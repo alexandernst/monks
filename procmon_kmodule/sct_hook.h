@@ -187,6 +187,7 @@ struct idtr{
 |                                     END                                     |
 \*****************************************************************************/
 
+void ud_patch_addr(void *entry, void *addr);
 unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len);
 
 void *get_writable_sct(void *sct_addr);
