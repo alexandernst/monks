@@ -226,57 +226,25 @@ static int get_sct(void){
 
 static void *create_stub(syscall_info_t *iter){
 	void *addr;
+	uint64_t stub_size;
 	unsigned char *bytecode;
 
 	#ifdef __i386__
 
-	unsigned char opcode[] = {
-		0x55,                                                       //push ebp;
-		0x89, 0xE5,                                                 //mov ebp, esp;
-		0x83, 0xEC, 0x1C,                                           //sub esp, 28; //4 bytes for syscall result + 24 bytes for 6 args
-
-		//Save args on the stack
-		0x8B, 0x45, 0x08,                                           //mov eax, [ebp + 8]; 
-		0x89, 0x45, 0xE4,                                           //mov [ebp - 28], eax;
-		0x8B, 0x45, 0x0C,                                           //mov eax, [ebp + 12];
-		0x89, 0x45, 0xE8,                                           //mov [ebp - 24], eax;
-		0x8B, 0x45, 0x10,                                           //mov eax, [ebp + 16];
-		0x89, 0x45, 0xEC,                                           //mov [ebp - 20], eax;
-		0x8B, 0x45, 0x14,                                           //mov eax, [ebp + 20];
-		0x89, 0x45, 0xF0,                                           //mov [ebp - 16], eax;
-		0x8B, 0x45, 0x18,                                           //mov eax, [ebp + 24];
-		0x89, 0x45, 0xF4,                                           //mov [ebp - 12], eax;
-		0x8B, 0x45, 0x1C,                                           //mov eax, [ebp + 28];
-		0x89, 0x45, 0xF8,                                           //mov [ebp - 8], eax; 
-
-		0xB8, 0x00, 0x00, 0x00, 0x00,                               //mov eax, &iter->rf;
-		0xFF, 0xD0,                                                 //call eax;
-
-		0x89, 0xEC,                                                 //mov esp, ebp;
-		0x5D,                                                       //pop ebp;
-		0xC3                                                        //ret;
-	};
-
-	bytecode = __vmalloc(sizeof(opcode), GFP_KERNEL, PAGE_KERNEL_EXEC);
+	extern void *stub_32;
+	stub_size = ud_get_stub_size(&stub_32);
+	bytecode = __vmalloc(stub_size, GFP_KERNEL, PAGE_KERNEL_EXEC);
+	memcpy(bytecode, &stub_32, stub_size);
 
 	//patch addrs
-	//addr = &atomic_inc;
-	//memcpy(opcode + 38, &addr, sizeof(void *)); //&atomic_inc
-	//memcpy(opcode + 48, &iter->counter, sizeof(void *)); //&iter->counter
-
-	//memcpy(opcode + 43, &iter->rf, sizeof(void *)); //&iter->rf
-
-	//addr = &procmon_state;
-	//memcpy(opcode + 99, &addr, sizeof(void *)); //&procmon_state
-	//addr = &iter->state;
-	//memcpy(opcode + 113, &addr, sizeof(void *)); //&iter->state
-	//memcpy(opcode + 128, &iter->ff, sizeof(void *)); //&iter->ff
-	//addr = &atomic_dec;
-	//memcpy(opcode + 164, &addr, sizeof(void *)); //&atomic_dec
-	//memcpy(opcode + 174, &iter->counter, sizeof(void *)); //&iter->counter
-	
-	memcpy(bytecode, opcode, sizeof(opcode));
+	//ud_patch_addr(bytecode, &atomic_inc); //&atomic_inc
+	//ud_patch_addr(bytecode, iter->counter); //&iter->counter
 	ud_patch_addr(bytecode, iter->rf);
+	//ud_patch_addr(bytecode, &procmon_state); //&procmon_state
+	//ud_patch_addr(bytecode, &iter->state); //&iter->state
+	//ud_patch_addr(bytecode, iter->ff); //&iter->ff
+	//ud_patch_addr(bytecode, &atomic_dec); //&atomic_dec
+	//ud_patch_addr(bytecode, iter->counter); //&iter->counter
 
 	#else
 
