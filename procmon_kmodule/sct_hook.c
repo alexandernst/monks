@@ -38,7 +38,7 @@ void ud_patch_addr(void *entry, void *addr){
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
-	ud_set_input_buffer(&ud, entry, 256); //TODO call ud_get_stub_size() when implemented
+	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
 
 	while(ud_disassemble(&ud)){
 		if(ud.mnemonic == UD_Imov && ud.operand[1].type == UD_OP_IMM){
@@ -69,7 +69,7 @@ uint64_t ud_get_stub_size(void *entry){
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
-	ud_set_input_buffer(&ud, entry, 256); //TODO call ud_get_stub_size() when implemented
+	ud_set_input_buffer(&ud, entry, 512);
 
 	while(ud_disassemble(&ud)){
 		if(ud.mnemonic == UD_Iret){
