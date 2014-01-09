@@ -41,7 +41,7 @@ void ud_patch_addr(void *entry, void *addr){
 	ud_set_input_buffer(&ud, entry, 256); //TODO call ud_get_stub_size() when implemented
 
 	while(ud_disassemble(&ud)){
-		if(ud.mnemonic == UD_Imov && ud.operand[1].type == UD_OP_IMM){	
+		if(ud.mnemonic == UD_Imov && ud.operand[1].type == UD_OP_IMM){
 			switch(ud.operand[1].size){
 				case 32:
 					patch_addr = entry + ud_insn_off(&ud) + 1;
@@ -61,6 +61,23 @@ void ud_patch_addr(void *entry, void *addr){
 			
 		}
 	}
+}
+
+uint64_t ud_get_stub_size(void *entry){
+	ud_t ud;
+
+	ud_init(&ud);
+	ud_set_mode(&ud, BITS_PER_LONG);
+	ud_set_vendor(&ud, UD_VENDOR_ANY);
+	ud_set_input_buffer(&ud, entry, 256); //TODO call ud_get_stub_size() when implemented
+
+	while(ud_disassemble(&ud)){
+		if(ud.mnemonic == UD_Iret){
+			return ud_insn_off(&ud) + 1; //+1 because we need to count 1 byte for the ret instruction
+		}
+	}
+
+	return 0;
 }
 
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
