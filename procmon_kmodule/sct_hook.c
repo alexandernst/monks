@@ -45,14 +45,14 @@ void ud_patch_addr(void *entry, void *addr){
 			switch(ud.operand[1].size){
 				case 32:
 					patch_addr = entry + ud_insn_off(&ud) + 1;
-					if(memcmp(patch_addr, "\x00\x00\x00\x00", 4) == 0){
+					if(memcmp(patch_addr, "\x00\x00\x00\x00", sizeof(void *)) == 0){
 						memcpy(patch_addr, &addr, sizeof(void *));
 						return;
 					}
 					break;
 				case 64:
 					patch_addr = entry + ud_insn_off(&ud) + 2;
-					if(memcmp(patch_addr, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) == 0){
+					if(memcmp(patch_addr, "\x00\x00\x00\x00\x00\x00\x00\x00", sizeof(void *)) == 0){
 						memcpy(patch_addr, &addr, sizeof(void *));
 						return;
 					}
@@ -173,37 +173,40 @@ static int get_sct(void){
 | | arg 3      | ebp + 16    | This means that each value after EBP should be |
 | --------------             | multiplied by 2 for x64.                       |
 | --------------             |                                                |
-| | arg 2      | ebp + 12    | There are 7 local variables on the stack.      |
-| --------------             | The first one is where the return value of the |
+| | arg 2      | ebp + 12    | There are 9 local variables on the stack.      |
+| --------------             | The first two are temp value that are used to  |
+| --------------             | swap values.                                   |
+| | arg 1      | ebp + 8     | The third one is where the return value of the |
 | --------------             | real syscall function is stored for later use. |
-| | arg 1      | ebp + 8     | The rest of the local variables are used to    |
-| --------------             | store the values of the arguments, so they can |
+| --------------             | The rest of the local variables are used to    |
+| | Ret Addr   | ebp + 4     | store the values of the arguments, so they can |
 | --------------             | be passed later to the fake syscall function.  |
-| | Ret Addr   | ebp + 4     |                                                |
-| --------------             | Keep in mind that on x86 all the arguments are |
+| --------------             |                                                |
+| | EBP        | ebp + 0     | Keep in mind that on x86 all the arguments are |
 | --------------             | passed on the stack, from right to left, which |
-| | EBP        | ebp + 0     | means that the first argument is on the        |
-| --------------             | hightest position, while the last argument is  |
+| --------------             | means that the first argument is on the        |
+| | Temp1 val  | ebp - 4     | hightest position, while the last argument is  |
 | --------------             | on the lowest position.                        |
-| | Ret val    | ebp - 4     |                                                |
-| --------------             | On the other hand, on x64 arguments are passed |
+| --------------             |                                                |
+| | Ret val    | ebp - 8     | On the other hand, on x64 arguments are passed |
 | --------------             | via the registers, in this order: RDI, RSI,    |
-| | arg6  copy | ebp - 8     | RDX, RCX, R8, R9.                              |
-| --------------             |                                                |
+| --------------             | RDX, RCX, R8, R9.                              |
+| | arg6  copy | ebp - 12    |                                                |
 | --------------             | In both x86 and x64 the result of the syscall  |
-| | arg5  copy | ebp - 12    | function is saved in a register. EAX on x86,   |
-| --------------             | RAX on x64.                                    |
-| --------------             |                                                |
-| | arg4  copy | ebp - 16    |                                                |
+| --------------             | function is saved in a register. EAX on x86,   |
+| | arg5  copy | ebp - 16    | RAX on x64.                                    |
 | --------------             |                                                |
 | --------------             |                                                |
-| | arg3  copy | ebp - 20    |                                                |
+| | arg4  copy | ebp - 20    |                                                |
 | --------------             |                                                |
 | --------------             |                                                |
-| | arg2  copy | ebp - 24    |                                                |
+| | arg3  copy | ebp - 24    |                                                |
 | --------------             |                                                |
 | --------------             |                                                |
-| | arg1  copy | ebp - 28    |                                                |
+| | arg2  copy | ebp - 28    |                                                |
+| --------------             |                                                |
+| --------------             |                                                |
+| | arg1  copy | ebp - 32    |                                                |
 | --------------             |                                                |
 |                            |                                                |
 \*****************************************************************************/
@@ -237,14 +240,14 @@ static void *create_stub(syscall_info_t *iter){
 	memcpy(bytecode, &stub_32, stub_size);
 
 	//patch addrs
-	//ud_patch_addr(bytecode, &atomic_inc); //&atomic_inc
-	//ud_patch_addr(bytecode, iter->counter); //&iter->counter
+	ud_patch_addr(bytecode, iter->counter); //&iter->counter
+	ud_patch_addr(bytecode, &atomic_inc); //&atomic_inc
 	ud_patch_addr(bytecode, iter->rf);
 	//ud_patch_addr(bytecode, &procmon_state); //&procmon_state
 	//ud_patch_addr(bytecode, &iter->state); //&iter->state
-	//ud_patch_addr(bytecode, iter->ff); //&iter->ff
-	//ud_patch_addr(bytecode, &atomic_dec); //&atomic_dec
-	//ud_patch_addr(bytecode, iter->counter); //&iter->counter
+	ud_patch_addr(bytecode, iter->ff); //&iter->ff
+	ud_patch_addr(bytecode, iter->counter); //&iter->counter
+	ud_patch_addr(bytecode, &atomic_dec); //&atomic_dec
 
 	#else
 
@@ -326,20 +329,20 @@ static void *create_stub(syscall_info_t *iter){
 
 	#endif
 
-	//int i;
-	//printk("&atomic_inc: %p\n", &atomic_inc);
-	//printk("&iter->counter: %p\n", iter->counter);
-	//printk("&iter->rf: %p\n", iter->rf);
-	//printk("&procmon_state: %p\n", &procmon_state);
-	//printk("&iter->state: %p\n", &iter->state);
-	//printk("&iter->ff: %p\n", iter->ff);
-	//printk("&atomic_dec: %p\n", &atomic_dec);
+	int i;
+	printk("&atomic_inc: %p\n", &atomic_inc);
+	printk("&iter->counter: %p\n", iter->counter);
+	printk("&iter->rf: %p\n", iter->rf);
+	printk("&procmon_state: %p\n", &procmon_state);
+	printk("&iter->state: %p\n", &iter->state);
+	printk("&iter->ff: %p\n", iter->ff);
+	printk("&atomic_dec: %p\n", &atomic_dec);
 
-	//printk("Bytecode: \n");
-	//for(i = 0; i < sizeof(opcode); ++i){
-	//	printk("%02x", bytecode[i]);
-	//}
-	//printk("\nEnd\n");
+	printk("Bytecode: \n");
+	for(i = 0; i < ud_get_stub_size(&stub_32); ++i){
+		printk("%02x", bytecode[i]);
+	}
+	printk("\nEnd\n");
 
 	//return (void *)iter->rf;
 
