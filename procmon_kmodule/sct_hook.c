@@ -73,7 +73,7 @@ uint64_t ud_get_stub_size(void *entry){
 
 	while(ud_disassemble(&ud)){
 		if(ud.mnemonic == UD_Iret){
-			return ud_insn_off(&ud) + 1; //+1 because we need to count 1 byte for the ret instruction
+			return ud_insn_off(&ud) + ud_insn_len(&ud);
 		}
 	}
 
