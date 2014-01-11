@@ -1,6 +1,6 @@
 .intel_syntax noprefix
-.global stub_32
-stub_32:
+.global stub
+stub:
 	push ebp
 	mov ebp, esp
 	sub esp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
