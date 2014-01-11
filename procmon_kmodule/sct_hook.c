@@ -40,7 +40,7 @@ void ud_patch_addr(void *entry, void *addr){
 	ptr_size = sizeof(void *);
 
 #ifdef CONFIG_X86_32
-	match = "\x00\x00\x00\x00";
+	match = "\x10\x10\x10\x10";
 #elif CONFIG_X86_64
 	match = "\x10\x10\x10\x10\x10\x10\x10\x10";
 #endif

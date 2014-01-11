@@ -25,28 +25,28 @@ stub:
 	#Call atomic_inc (first save first syscall arg)
 	mov eax, [ebp - 32]
 	mov [ebp - 4], eax
-	mov eax, 0x00000000 #&iter->counter
+	mov eax, 0x10101010 #&iter->counter
 	mov [ebp - 32], eax
-	mov eax, 0x00000000 #&atomic_inc
+	mov eax, 0x10101010 #&atomic_inc
 	call eax
 	mov eax, [ebp - 4]
 	mov [ebp - 32], eax
 
 	#Call real syscall and save return value
-	mov eax, 0x00000000 #&iter->rf
+	mov eax, 0x10101010 #&iter->rf
 	call eax
 	mov [ebp - 8], eax
 
 	#TODO Check procmon_state and iter->state for skip
 
 	#Call fake syscall
-	mov eax, 0x00000000 #&iter->ff
+	mov eax, 0x10101010 #&iter->ff
 	call eax
 
 	#Call atomic_dec
-	mov eax, 0x00000000 #&iter->counter
+	mov eax, 0x10101010 #&iter->counter
 	mov [ebp - 32], eax
-	mov eax, 0x00000000 #&atomic_dec
+	mov eax, 0x10101010 #&atomic_dec
 	call eax
 
 	#Restore real syscall result to eax
