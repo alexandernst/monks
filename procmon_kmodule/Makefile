@@ -5,20 +5,17 @@ ccflags-y	:= -g -Wall -nostdinc
 ldflags-y	:= -T$(src)/sections.lds
 
 obj-m		:= $(NAME).o
-obj-y		:= syscalls/ \
-				../udis86/libudis86/
+obj-y		:= syscalls/ ../udis86/libudis86/
 
-$(NAME)-y	:= 	main.o control.o sct_hook.o netlink.o utils.o \
-		   		syscalls/built-in.o \
-		   		../common/mem_ops.o ../common/serialize.o \
-		   		../udis86/libudis86/built-in.o \
-		   		../udis86/libudis86/syn.o \
-		   		../udis86/libudis86/syn-intel.o
-ifeq ($(CONFIG_X86_32),y)
-$(NAME)-y	+= stub_32.o
-else
-$(NAME)-y	+= stub_64.o
-endif
+$(NAME)-y := main.o control.o sct_hook.o netlink.o utils.o \
+             syscalls/built-in.o \
+             ../common/mem_ops.o ../common/serialize.o
+
+$(NAME)-y += ../udis86/libudis86/built-in.o \
+             ../udis86/libudis86/syn.o \
+             ../udis86/libudis86/syn-intel.o
+
+$(NAME)-y	+= stubs.o
 
 new: clean all
 
