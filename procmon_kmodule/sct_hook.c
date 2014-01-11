@@ -33,32 +33,34 @@ unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn
 
 void ud_patch_addr(void *entry, void *addr){
 	ud_t ud;
+	char *match;
 	void *patch_addr;
+	int offset, ptr_size;
+
+	ptr_size = sizeof(void *);
+
+#ifdef CONFIG_X86_32
+	match = "\x00\x00\x00\x00";
+#elif CONFIG_X86_64
+	match = "\x10\x10\x10\x10\x10\x10\x10\x10";
+#endif
 
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
+	ud_set_syntax(&ud, UD_SYN_INTEL);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
 	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
 
 	while(ud_disassemble(&ud)){
-		if(ud.mnemonic == UD_Imov && ud.operand[1].type == UD_OP_IMM){
-			switch(ud.operand[1].size){
-				case 32:
-					patch_addr = entry + ud_insn_off(&ud) + 1;
-					if(memcmp(patch_addr, "\x00\x00\x00\x00", sizeof(void *)) == 0){
-						memcpy(patch_addr, &addr, sizeof(void *));
-						return;
-					}
-					break;
-				case 64:
-					patch_addr = entry + ud_insn_off(&ud) + 2;
-					if(memcmp(patch_addr, "\x00\x00\x00\x00\x00\x00\x00\x00", sizeof(void *)) == 0){
-						memcpy(patch_addr, &addr, sizeof(void *));
-						return;
-					}
-					break;
+		if(ud.mnemonic == UD_Imov && (ud.operand[1].type == UD_OP_IMM || ud.operand[1].type == UD_OP_MEM)){
+			offset = ud_insn_len(&ud) - ptr_size;
+			patch_addr = entry + ud_insn_off(&ud) + offset;
+
+			if(offset > 0 && !memcmp(patch_addr, match, ptr_size)){
+				procmon_info("MOV (offset: %d, type: %d): %s\n", offset, ud.operand[1].type, ud_insn_asm(&ud));
+				memcpy(patch_addr, &addr, ptr_size);
+				return;
 			}
-			
 		}
 	}
 }
