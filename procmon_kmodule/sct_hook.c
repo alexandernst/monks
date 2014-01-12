@@ -196,14 +196,13 @@ static int do_hook_calls(void *arg){
 		iter->counter = new(sizeof(atomic_t));
 		atomic_set(iter->counter, 0);
 
+		procmon_info("Hook %s\n", iter->name);
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-			procmon_info("Hook IA32 %s\n", iter->name);
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
 			ia32_sct_map[iter->__NR_] = create_stub32(iter);
 #endif
 		}else{
-			procmon_info("Hook %s\n", iter->name);
 			iter->rf = (void *)sct_map[iter->__NR_];
 			sct_map[iter->__NR_] = create_stub(iter);
 		}
@@ -253,8 +252,8 @@ static int do_unhook_calls(void *arg){
 	syscall_info_t *iter;
 
 	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter){
+		procmon_info("Unhook %s\n", iter->name);
 		if(iter->is32){
-			procmon_info("Unhook %s\n", iter->name);
 #ifdef CONFIG_IA32_EMULATION
 			ia32_sct_map[iter->__NR_] = destroy_stub32(iter);
 #endif
@@ -288,10 +287,10 @@ void unhook_calls(void){
 	stop_machine(do_unhook_calls, NULL, 0);
 
 out:
+	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
 	vunmap((void *)((unsigned long)ia32_sct_map & PAGE_MASK)), ia32_sct_map = NULL;
 #endif
-	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 }
 
 /*****************************************************************************\
