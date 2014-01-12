@@ -253,10 +253,10 @@ void hook_calls(void){
 	stop_machine(do_hook_calls, NULL, 0);
 
 out:
+	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
 	vunmap((void *)((unsigned long)ia32_sct_map & PAGE_MASK)), ia32_sct_map = NULL;
 #endif
-	vunmap((void *)((unsigned long)sct_map & PAGE_MASK)), sct_map = NULL;
 }
 
 /*****************************************************************************\
