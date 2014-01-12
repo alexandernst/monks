@@ -123,8 +123,8 @@ static void *create_stub(syscall_info_t *iter){
 	ud_patch_addr(bytecode, iter->counter); //&iter->counter
 	ud_patch_addr(bytecode, &atomic_inc); //&atomic_inc
 	ud_patch_addr(bytecode, iter->rf);
-	//ud_patch_addr(bytecode, &procmon_state); //&procmon_state
-	//ud_patch_addr(bytecode, &iter->state); //&iter->state
+	ud_patch_addr(bytecode, &procmon_state); //&procmon_state
+	ud_patch_addr(bytecode, &iter->state); //&iter->state
 	ud_patch_addr(bytecode, iter->ff); //&iter->ff
 	ud_patch_addr(bytecode, iter->counter); //&iter->counter
 	ud_patch_addr(bytecode, &atomic_dec); //&atomic_dec

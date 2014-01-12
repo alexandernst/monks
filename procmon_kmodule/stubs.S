@@ -90,12 +90,19 @@ stub:
 	call eax
 	mov [ebp - 8], eax
 
-	#TODO Check procmon_state and iter->state for skip
+	mov eax, [0x10101010] #[&procmon_state]
+	cmp eax, 1
+	jne skip_ff
+
+	mov eax, [0x10101010] #[&iter->state]
+	cmp eax, 1
+	jne skip_ff
 
 	#Call fake syscall
 	mov eax, 0x10101010 #&iter->ff
 	call eax
 
+skip_ff:
 	#Call atomic_dec
 	mov eax, 0x10101010 #&iter->counter
 	mov [ebp - 32], eax
@@ -139,7 +146,6 @@ stub:
 	mov r8, [rbp - 48]
 	mov r9, [rbp - 56]
 	call rax
-
 	mov [rbp - 64], rax
 
 	mov eax, [0x1010101010101010] #[&procmon_state]
