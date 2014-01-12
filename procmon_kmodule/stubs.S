@@ -57,6 +57,7 @@
 
 .global stub
 stub:
+	#Create stack frame
 	push ebp
 	mov ebp, esp
 	sub esp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
@@ -84,10 +85,11 @@ stub:
 	call eax
 	mov [ebp - 8], eax
 
+	#Check if procmon's state or the syscall's state are
+	#set to 0, and if so, skip calling the fake syscall
 	mov eax, [0x10101010] #[&procmon_state]
 	cmp eax, 1
 	jne skip_ff
-
 	mov eax, [0x10101010] #[&iter->state]
 	cmp eax, 1
 	jne skip_ff
@@ -104,6 +106,7 @@ skip_ff:
 	#Restore real syscall result to eax
 	mov eax, [ebp - 8]
 
+	#Exit
 	mov esp, ebp
 	pop ebp
 	ret
@@ -114,10 +117,12 @@ skip_ff:
 	#TODO: Change a little bit the way this works to make it match with that big comment I wrote for x86!
 .global stub
 stub:
+	#Create stack frame
 	push rbp
 	mov rbp, rsp
 	sub rsp, 64; #8 bytes for rax content + 48 bytes for 6 args + 8 bytes for syscall resul
 
+	#Save args on the stack
 	mov [rbp - 8], rax
 	mov [rbp - 16], rdi
 	mov [rbp - 24], rsi
@@ -126,9 +131,11 @@ stub:
 	mov [rbp - 48], r8
 	mov [rbp - 56], r9
 
+	#Call atomic_inc
 	mov rax, 0x1010101010101010 #&iter->counter
 	lock inc qword ptr [rax]
 
+	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	mov rdi, [rbp - 16]
 	mov rsi, [rbp - 24]
@@ -139,14 +146,16 @@ stub:
 	call rax
 	mov [rbp - 64], rax
 
+	#Check if procmon's state or the syscall's state are
+	#set to 0, and if so, skip calling the fake syscall
 	mov eax, [0x1010101010101010] #[&procmon_state]
 	cmp eax, 1
 	jne skip_ff
-
 	mov eax, [0x1010101010101010] #[&iter->state]
 	cmp eax, 1
 	jne skip_ff
 
+	#Call fake syscall
 	mov rax, 0x1010101010101010 #&iter->ff
 	mov rdi, [rbp - 16]
 	mov rsi, [rbp - 24]
@@ -157,11 +166,14 @@ stub:
 	call rax
 
 skip_ff:
+	#Call atomic_dec
 	mov rax, 0x1010101010101010 #&iter->counter
 	lock dec qword ptr [rax]
 
+	#Restore real syscall result to eax
 	mov rax, [rbp - 64]
 
+	#Exit
 	mov rsp, rbp
 	pop rbp
 	ret
