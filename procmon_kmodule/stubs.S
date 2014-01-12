@@ -126,9 +126,8 @@ stub:
 	mov [rbp - 48], r8
 	mov [rbp - 56], r9
 
-	mov rax, 0x1010101010101010 #&atomic_inc
-	mov rdi, 0x1010101010101010 #&iter->counter
-	call rax
+	mov rax, 0x1010101010101010 #&iter->counter
+	lock inc qword ptr [rax]
 
 	mov rax, 0x1010101010101010 #&iter->rf
 	mov rdi, [rbp - 16]
@@ -158,9 +157,8 @@ stub:
 	call rax
 
 skip_ff:
-	mov rax, 0x1010101010101010 #&atomic_dec
-	mov rdi, 0x1010101010101010 #&iter->counter
-	call rax
+	mov rax, 0x1010101010101010 #&iter->counter
+	lock dec qword ptr [rax]
 
 	mov rax, [rbp - 64]
 

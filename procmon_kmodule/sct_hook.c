@@ -117,37 +117,19 @@ static void *create_stub(syscall_info_t *iter){
 	bytecode = __vmalloc(stub_size, GFP_KERNEL, PAGE_KERNEL_EXEC);
 	memcpy(bytecode, &stub, stub_size);
 
-	#ifdef __i386__
-
 	//patch addrs
 	ud_patch_addr(bytecode, iter->counter); //&iter->counter
-	ud_patch_addr(bytecode, iter->rf);
+	ud_patch_addr(bytecode, iter->rf); //&iter->rf
 	ud_patch_addr(bytecode, &procmon_state); //&procmon_state
 	ud_patch_addr(bytecode, &iter->state); //&iter->state
 	ud_patch_addr(bytecode, iter->ff); //&iter->ff
 	ud_patch_addr(bytecode, iter->counter); //&iter->counter
 
-	#else
-
-	//patch addrs
-	ud_patch_addr(bytecode, &atomic_inc); //&atomic_inc
-	ud_patch_addr(bytecode, iter->counter); //&iter->counter
-	ud_patch_addr(bytecode, iter->rf);
-	ud_patch_addr(bytecode, &procmon_state); //&procmon_state
-	ud_patch_addr(bytecode, &iter->state); //&iter->state
-	ud_patch_addr(bytecode, iter->ff); //&iter->ff
-	ud_patch_addr(bytecode, &atomic_dec); //&atomic_dec
-	ud_patch_addr(bytecode, iter->counter); //&iter->counter
-
-	#endif
-
-	printk("&atomic_inc: %p\n", &atomic_inc);
 	printk("&iter->counter: %p\n", iter->counter);
 	printk("&iter->rf: %p\n", iter->rf);
 	printk("&procmon_state: %p\n", &procmon_state);
 	printk("&iter->state: %p\n", &iter->state);
 	printk("&iter->ff: %p\n", iter->ff);
-	printk("&atomic_dec: %p\n", &atomic_dec);
 
 	printk("Bytecode: \n");
 	for(i = 0; i < stub_size; ++i){
@@ -271,12 +253,11 @@ static int do_unhook_calls(void *arg){
 
 	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter){
 		if(iter->is32){
+			procmon_info("Unhook %s\n", iter->name);
 #ifdef CONFIG_IA32_EMULATION
-			procmon_info("Unhook IA32 %s\n", iter->name);
 			ia32_sct_map[iter->__NR_] = destroy_stub32(iter);
 #endif
 		}else{
-			procmon_info("Unhook %s\n", iter->name);
 			sct_map[iter->__NR_] = destroy_stub(iter);
 		}
 	}
