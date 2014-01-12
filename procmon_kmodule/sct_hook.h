@@ -44,7 +44,7 @@ typedef struct syscall_info_t {
 extern syscall_info_t __start_syscalls[];
 extern syscall_info_t __stop_syscalls[];
 
-#ifdef __i386__
+#ifdef CONFIG_X86_32
 struct idt_descriptor{
 	unsigned short offset_low;
 	unsigned short selector;
@@ -146,7 +146,7 @@ struct idtr{
 | you'll need to pass this macro a pointer.                                   |
 \*****************************************************************************/
 
-#ifdef __i386__
+#ifdef CONFIG_X86_32
 #define __GET_SYSCALL_RESULT(x)                                               \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
@@ -185,15 +185,15 @@ struct idtr{
 \*****************************************************************************/
 
 void *get_writable_sct(void *sct_addr);
-#if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
-#ifdef __i386__
+#if defined(CONFIG_X86_32) || defined(CONFIG_IA32_EMULATION)
+#ifdef CONFIG_X86_32
 void *get_sys_call_table(void);
-#elif defined(__x86_64__)
+#elif defined(CONFIG_X86_64)
 void *get_ia32_sys_call_table(void);
 #endif
 #endif
 
-#ifdef __x86_64__
+#ifdef CONFIG_X86_64
 void *get_sys_call_table(void);
 #endif
 
