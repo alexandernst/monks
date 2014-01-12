@@ -6,6 +6,6 @@
 
 uint64_t ud_get_stub_size(void *entry);
 void ud_patch_addr(void *entry, void *addr);
-unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len);
+void *ud_find_syscall_table_addr(void *entry);
 
 #endif

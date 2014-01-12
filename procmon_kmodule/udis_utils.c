@@ -52,20 +52,23 @@ void ud_patch_addr(void *entry, void *addr){
 	}
 }
 
-unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len){
+void *ud_find_syscall_table_addr(void *entry){
 	ud_t ud;
-	unsigned int result = 0;
 
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
-	ud_set_input_buffer(&ud, entry, limit);
+	ud_set_input_buffer(&ud, entry, 512);
 
 	while(ud_disassemble(&ud)){
-		if(ud.mnemonic == insn_mne && ud_insn_len(&ud) == insn_len){
-			return ud.operand[0].lval.sdword;
+		if(ud.mnemonic == UD_Icall && ud_insn_len(&ud) == 7){
+#ifdef CONFIG_X86_32
+			return (void *)ud.operand[0].lval.udword;
+#elif defined(CONFIG_X86_64)
+			return (void *)(0xffffffff00000000 | ud.operand[0].lval.udword);
+#endif
 		}
 	}
 
-	return result;
+	return NULL;
 }

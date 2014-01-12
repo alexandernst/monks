@@ -13,47 +13,38 @@ static void **ia32_sct_map = NULL;
 | Functions to get the address of the system call table on each arch          |
 \*****************************************************************************/
 
-#if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
-#ifdef __i386__
+#if defined(CONFIG_X86_32) || defined(CONFIG_IA32_EMULATION)
+#ifdef CONFIG_X86_32
 void *get_sys_call_table(void){
-#elif defined(__x86_64__)
+#elif defined(CONFIG_IA32_EMULATION)
 void *get_ia32_sys_call_table(void){
 #endif
 	struct idtr idtr;
 	struct idt_descriptor idtd;
 	void *system_call;
-	unsigned int ptr;
 
 	asm volatile("sidt %0" : "=m" (idtr));
 	memcpy(&idtd, idtr.base + 0x80 * sizeof(idtd), sizeof(idtd));
 
-#ifdef __i386__
+#ifdef CONFIG_X86_32
 	system_call = (void *)((idtd.offset_high << 16) | idtd.offset_low);
-
-	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
-	return ptr ? to_x86_ptr(ptr) : NULL;
-
-#elif defined(__x86_64__)
+#elif defined(CONFIG_IA32_EMULATION)
 	system_call = (void *)(((long)idtd.offset_high << 32) | (idtd.offset_middle << 16) | idtd.offset_low);
-	
-	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
-	return ptr ? to_x64_ptr(ptr) : NULL;
-
 #endif
+
+	return ud_find_syscall_table_addr(system_call);
 }
 #endif
 
-#ifdef __x86_64__
+#ifdef CONFIG_X86_64
 void *get_sys_call_table(void){
 	int low, high;
 	void *system_call;
-	unsigned int ptr;
 
 	asm volatile("rdmsr" : "=a" (low), "=d" (high) : "c" (0xc0000082));
 	system_call = (void *)(((u64)high << 32) | low);
 
-	ptr = ud_find_insn_arg(system_call, 512, UD_Icall, 7);
-	return ptr ? to_x64_ptr(ptr) : NULL;
+	return ud_find_syscall_table_addr(system_call);
 }
 #endif
 
