@@ -75,15 +75,9 @@ stub:
 	mov eax, [ebp + 28]
 	mov [ebp - 12], eax
 
-	#Call atomic_inc (first save first syscall arg)
-	mov eax, [ebp - 32]
-	mov [ebp - 4], eax
+	#Call atomic_inc
 	mov eax, 0x10101010 #&iter->counter
-	mov [ebp - 32], eax
-	mov eax, 0x10101010 #&atomic_inc
-	call eax
-	mov eax, [ebp - 4]
-	mov [ebp - 32], eax
+	lock inc dword ptr [eax]
 
 	#Call real syscall and save return value
 	mov eax, 0x10101010 #&iter->rf
@@ -105,9 +99,7 @@ stub:
 skip_ff:
 	#Call atomic_dec
 	mov eax, 0x10101010 #&iter->counter
-	mov [ebp - 32], eax
-	mov eax, 0x10101010 #&atomic_dec
-	call eax
+	lock dec dword ptr [eax]
 
 	#Restore real syscall result to eax
 	mov eax, [ebp - 8]
