@@ -144,6 +144,7 @@ static void *create_stub(syscall_info_t *iter){
 
 #ifdef CONFIG_IA32_EMULATION
 static void *create_stub32(syscall_info_t *iter){
+	//TODO
 	return (void *)iter->rf;
 }
 #endif
