@@ -125,11 +125,11 @@ static void *create_stub(syscall_info_t *iter){
 	ud_patch_addr(bytecode, iter->ff);
 	ud_patch_addr(bytecode, iter->counter);
 
-	printk("&iter->counter: %p\n", iter->counter);
-	printk("&iter->rf: %p\n", iter->rf);
-	printk("&procmon_state: %p\n", &procmon_state);
-	printk("&iter->state: %p\n", &iter->state);
-	printk("&iter->ff: %p\n", iter->ff);
+	printk("&iter->counter: 0x%p\n", iter->counter);
+	printk("&iter->rf: 0x%p\n", iter->rf);
+	printk("&procmon_state: 0x%p\n", &procmon_state);
+	printk("&iter->state: 0x%p\n", &iter->state);
+	printk("&iter->ff: 0x%p\n", iter->ff);
 
 	printk("Bytecode: \n");
 	for(i = 0; i < stub_size; ++i){
