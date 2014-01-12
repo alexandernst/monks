@@ -109,7 +109,7 @@ stub:
 	pop ebp
 	ret
 
-#elif CONFIG_X86_64
+#elif defined(CONFIG_X86_64)
 
 	#TODO: Do we really need to store RAX? I'm guessing not...
 	#TODO: Change a little bit the way this works to make it match with that big comment I wrote for x86!

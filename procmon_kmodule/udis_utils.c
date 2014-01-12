@@ -27,7 +27,7 @@ void ud_patch_addr(void *entry, void *addr){
 
 #ifdef CONFIG_X86_32
 	match = "\x10\x10\x10\x10";
-#elif CONFIG_X86_64
+#elif defined(CONFIG_X86_64)
 	match = "\x10\x10\x10\x10\x10\x10\x10\x10";
 #endif
 
