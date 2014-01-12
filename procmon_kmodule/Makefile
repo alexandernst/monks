@@ -8,7 +8,7 @@ obj-m		:= $(NAME).o
 obj-y		:= syscalls/ ../udis86/libudis86/
 
 $(NAME)-y := main.o control.o sct_hook.o netlink.o utils.o \
-             syscalls/built-in.o \
+             udis_utils.o syscalls/built-in.o \
              ../common/mem_ops.o ../common/serialize.o
 
 $(NAME)-y += ../udis86/libudis86/built-in.o \

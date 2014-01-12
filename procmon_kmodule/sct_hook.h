@@ -28,7 +28,7 @@
 #include "msgs.h"
 #include "utils.h"
 #include "control.h"
-#include "../udis86/udis86.h"
+#include "udis_utils.h"
 #include "../common/mem_ops.h"
 
 #define to_x86_ptr(x) (void *)(x)
@@ -186,10 +186,6 @@ struct idtr{
 /*****************************************************************************\
 |                                     END                                     |
 \*****************************************************************************/
-
-void ud_patch_addr(void *entry, void *addr);
-unsigned int ud_find_insn_arg(void *entry, int limit, enum ud_mnemonic_code insn_mne, int insn_len);
-uint64_t ud_get_stub_size(void *entry);
 
 void *get_writable_sct(void *sct_addr);
 #if defined(__i386__) || defined(CONFIG_IA32_EMULATION)
