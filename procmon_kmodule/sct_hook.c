@@ -103,9 +103,9 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	uint64_t stub_size;
 	unsigned char *bytecode;
 
-	stub_size = ud_get_stub_size(&stub);
+	stub_size = ud_get_stub_size(stub);
 	bytecode = __vmalloc(stub_size, GFP_KERNEL, PAGE_KERNEL_EXEC);
-	memcpy(bytecode, &stub, stub_size);
+	memcpy(bytecode, stub, stub_size);
 
 	//patch addrs
 	ud_patch_addr(bytecode, iter->counter);
@@ -181,11 +181,11 @@ static int do_hook_calls(void *arg){
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
-			ia32_sct_map[iter->__NR_] = create_stub(iter, stub_32);
+			ia32_sct_map[iter->__NR_] = create_stub(iter, &stub_32);
 #endif
 		}else{
 			iter->rf = (void *)sct_map[iter->__NR_];
-			sct_map[iter->__NR_] = create_stub(iter, stub);
+			sct_map[iter->__NR_] = create_stub(iter, &stub);
 		}
 	}
 
@@ -240,10 +240,10 @@ static int do_unhook_calls(void *arg){
 		procmon_info("Unhook %s\n", iter->name);
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-			ia32_sct_map[iter->__NR_] = destroy_stub(iter, stub_32);
+			ia32_sct_map[iter->__NR_] = destroy_stub(iter, &stub_32);
 #endif
 		}else{
-			sct_map[iter->__NR_] = destroy_stub(iter, stub);
+			sct_map[iter->__NR_] = destroy_stub(iter, &stub);
 		}
 	}
 
