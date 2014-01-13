@@ -289,15 +289,19 @@ out:
 \*****************************************************************************/
 
 int safe_to_unload(void){
+	int i;
 	syscall_info_t *iter = __start_syscalls;
 
 	for(; iter < __stop_syscalls; ++iter){
-		procmon_info("Unloading syscall %s\n", iter->name);
-		if(iter->counter && atomic_read(iter->counter) > 0){
+		i = atomic_read(iter->counter);
+		procmon_info("Unloading syscall %s (counter: %d)\n", iter->name, i);
+		if(i > 0){
 			return 0;
-		}else if(iter->counter && atomic_read(iter->counter) == 0){
-			del(iter->counter);
 		}
+	}
+
+	for(; iter < __stop_syscalls; ++iter){
+		del(iter->counter);
 	}
 
 	return 1;
