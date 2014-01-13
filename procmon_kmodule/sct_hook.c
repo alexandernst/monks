@@ -98,9 +98,8 @@ static int get_sct(void){
 | 7. Return the result from the call to the real syscall                      |
 \*****************************************************************************/
 
-static void *create_stub(syscall_info_t *iter){
+static void *create_stub(syscall_info_t *iter, void *stub){
 	int i;
-	extern void *stub;
 	uint64_t stub_size;
 	unsigned char *bytecode;
 
@@ -133,13 +132,6 @@ static void *create_stub(syscall_info_t *iter){
 	return bytecode;
 }
 
-#ifdef CONFIG_IA32_EMULATION
-static void *create_stub32(syscall_info_t *iter){
-	//TODO
-	return (void *)iter->rf;
-}
-#endif
-
 /*****************************************************************************\
 |                                     END                                     |
 \*****************************************************************************/
@@ -159,15 +151,9 @@ static void *create_stub32(syscall_info_t *iter){
 | 7. Return the result from the call to the real syscall                      |
 \*****************************************************************************/
 
-static void *destroy_stub(syscall_info_t *iter){
+static void *destroy_stub(syscall_info_t *iter, void *stub){
 	return (void *)iter->rf;
 }
-
-#ifdef CONFIG_IA32_EMULATION
-static void *destroy_stub32(syscall_info_t *iter){
-	return (void *)iter->rf;
-}
-#endif
 
 /*****************************************************************************\
 |                                     END                                     |
@@ -180,6 +166,10 @@ static void *destroy_stub32(syscall_info_t *iter){
 \*****************************************************************************/
 
 static int do_hook_calls(void *arg){
+	extern void *stub;
+#ifdef CONFIG_IA32_EMULATION
+	extern void *stub_32;
+#endif	
 	syscall_info_t *iter;
 
 	for(iter = __start_syscalls; iter < __stop_syscalls; iter++){
@@ -191,11 +181,11 @@ static int do_hook_calls(void *arg){
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
-			ia32_sct_map[iter->__NR_] = create_stub32(iter);
+			ia32_sct_map[iter->__NR_] = create_stub(iter, stub_32);
 #endif
 		}else{
 			iter->rf = (void *)sct_map[iter->__NR_];
-			sct_map[iter->__NR_] = create_stub(iter);
+			sct_map[iter->__NR_] = create_stub(iter, stub);
 		}
 	}
 
@@ -240,16 +230,20 @@ out:
 \*****************************************************************************/
 
 static int do_unhook_calls(void *arg){
+	extern void *stub;
+#ifdef CONFIG_IA32_EMULATION
+	extern void *stub_32;
+#endif	
 	syscall_info_t *iter;
 
 	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter){
 		procmon_info("Unhook %s\n", iter->name);
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-			ia32_sct_map[iter->__NR_] = destroy_stub32(iter);
+			ia32_sct_map[iter->__NR_] = destroy_stub(iter, stub_32);
 #endif
 		}else{
-			sct_map[iter->__NR_] = destroy_stub(iter);
+			sct_map[iter->__NR_] = destroy_stub(iter, stub);
 		}
 	}
 
