@@ -172,7 +172,7 @@ static int do_hook_calls(void *arg){
 #endif	
 	syscall_info_t *iter;
 
-	for(iter = __start_syscalls; iter < __stop_syscalls; iter++){
+	for_each_syscall(iter) {
 		add_syscalls_state_table_entry(iter->name, &iter->state);
 		iter->counter = new(sizeof(atomic_t));
 		atomic_set(iter->counter, 0);
@@ -236,7 +236,7 @@ static int do_unhook_calls(void *arg){
 #endif	
 	syscall_info_t *iter;
 
-	for(iter = __start_syscalls; iter < __stop_syscalls; ++iter){
+	for_each_syscall(iter) {
 		procmon_info("Unhook %s\n", iter->name);
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
@@ -284,18 +284,19 @@ out:
 
 int safe_to_unload(void){
 	int i;
-	syscall_info_t *iter = __start_syscalls;
+	syscall_info_t *iter;
 
-	for(; iter < __stop_syscalls; ++iter){
+	for_each_syscall(iter) {
+		if (!iter->counter)
+			continue;
+
 		i = atomic_read(iter->counter);
 		procmon_info("Unloading syscall %s (counter: %d)\n", iter->name, i);
 		if(i > 0){
 			return 0;
 		}
-	}
 
-	for(; iter < __stop_syscalls; ++iter){
-		del(iter->counter);
+		del(iter->counter), iter->counter = NULL;
 	}
 
 	return 1;

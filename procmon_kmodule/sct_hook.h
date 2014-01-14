@@ -44,6 +44,9 @@ typedef struct syscall_info_t {
 extern syscall_info_t __start_syscalls[];
 extern syscall_info_t __stop_syscalls[];
 
+#define for_each_syscall(item)		\
+	for (item = __start_syscalls; item < __stop_syscalls; item++)
+
 #ifdef CONFIG_X86_32
 struct idt_descriptor{
 	unsigned short offset_low;
