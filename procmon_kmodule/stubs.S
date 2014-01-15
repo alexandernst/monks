@@ -188,17 +188,17 @@ stub_32:
 	sub rsp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
 
 	#Save args on the stack
-	mov eax, [rbp + 8]
+	mov eax, dword [rbp + 8]
 	mov dword [rbp - 32], eax
-	mov eax, [rbp + 12]
+	mov eax, dword [rbp + 12]
 	mov dword [rbp - 28], eax
-	mov eax, [rbp + 16]
+	mov eax, dword [rbp + 16]
 	mov dword [rbp - 24], eax
-	mov eax, [rbp + 20]
+	mov eax, dword [rbp + 20]
 	mov dword [rbp - 20], eax
-	mov eax, [rbp + 24]
+	mov eax, dword [rbp + 24]
 	mov dword [rbp - 16], eax
-	mov eax, [rbp + 28]
+	mov eax, dword [rbp + 28]
 	mov dword [rbp - 12], eax
 
 	#Call atomic_inc
@@ -229,7 +229,7 @@ skip_ff32:
 	lock dec qword ptr [rax]
 
 	#Restore real syscall result to rax
-	mov eax, [rbp - 8]
+	mov eax, dword [rbp - 8]
 
 	#Exit
 	mov rsp, rbp
