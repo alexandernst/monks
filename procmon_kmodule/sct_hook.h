@@ -175,7 +175,7 @@ struct idtr{
 #define __GET_SYSCALL_RESULT32(x)                                             \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
-		"mov %0, [ebp + 4 + 4 + 24];"                                         \
+		"mov %0, [ebp + 8 + 8 + 24];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
 		:                                                                     \
