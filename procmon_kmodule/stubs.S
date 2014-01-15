@@ -170,7 +170,7 @@ skip_ff:
 	mov rax, 0x1010101010101010 #&iter->counter
 	lock dec qword ptr [rax]
 
-	#Restore real syscall result to eax
+	#Restore real syscall result to rax
 	mov rax, [rbp - 64]
 
 	#Exit
@@ -178,9 +178,64 @@ skip_ff:
 	pop rbp
 	ret
 
+#if defined(CONFIG_IA32_EMULATION)
+
 .global stub_32
 stub_32:
+	#Create stack frame
+	push rbp
+	mov rbp, rsp
+	sub rsp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
+
+	#Save args on the stack
+	mov eax, [rbp + 8]
+	mov [rbp - 32], eax
+	mov eax, [rbp + 12]
+	mov [rbp - 28], eax
+	mov eax, [rbp + 16]
+	mov [rbp - 24], eax
+	mov eax, [rbp + 20]
+	mov [rbp - 20], eax
+	mov eax, [rbp + 24]
+	mov [rbp - 16], eax
+	mov eax, [rbp + 28]
+	mov [rbp - 12], eax
+
+	#Call atomic_inc
+	mov rax, 0x1010101010101010 #&iter->counter
+	lock inc qword ptr [rax]
+
+	#Call real syscall and save return value
+	mov rax, 0x1010101010101010 #&iter->rf
+	call rax
+	mov [rbp - 8], eax
+
+	#Check if procmon's state or the syscall's state are
+	#set to 0, and if so, skip calling the fake syscall
+	mov eax, [0x1010101010101010] #[&procmon_state]
+	cmp eax, 1
+	jne skip_ff32
+	mov eax, [0x1010101010101010] #[&iter->state]
+	cmp eax, 1
+	jne skip_ff32
+
+	#Call fake syscall
+	mov rax, 0x1010101010101010 #&iter->ff
+	call rax
+
+skip_ff32:
+	#Call atomic_dec
+	mov rax, 0x1010101010101010 #&iter->counter
+	lock dec qword ptr [rax]
+
+	#Restore real syscall result to rax
+	mov rax, [rbp - 8]
+
+	#Exit
+	mov rsp, rbp
+	pop rbp
 	ret
+#endif
 
 #endif
 
