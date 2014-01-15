@@ -189,17 +189,17 @@ stub_32:
 
 	#Save args on the stack
 	mov eax, [rbp + 8]
-	mov [rbp - 32], eax
+	mov dword [rbp - 32], eax
 	mov eax, [rbp + 12]
-	mov [rbp - 28], eax
+	mov dword [rbp - 28], eax
 	mov eax, [rbp + 16]
-	mov [rbp - 24], eax
+	mov dword [rbp - 24], eax
 	mov eax, [rbp + 20]
-	mov [rbp - 20], eax
+	mov dword [rbp - 20], eax
 	mov eax, [rbp + 24]
-	mov [rbp - 16], eax
+	mov dword [rbp - 16], eax
 	mov eax, [rbp + 28]
-	mov [rbp - 12], eax
+	mov dword [rbp - 12], eax
 
 	#Call atomic_inc
 	mov rax, 0x1010101010101010 #&iter->counter
@@ -208,7 +208,7 @@ stub_32:
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov [rbp - 8], eax
+	mov dword [rbp - 8], eax
 
 	#Check if procmon's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -229,7 +229,7 @@ skip_ff32:
 	lock dec qword ptr [rax]
 
 	#Restore real syscall result to rax
-	mov rax, [rbp - 8]
+	mov eax, [rbp - 8]
 
 	#Exit
 	mov rsp, rbp
