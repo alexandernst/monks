@@ -1,4 +1,9 @@
-#include "read.h"
+#include "syscall.h"
+
+extern asmlinkage void hooked_sys_read(unsigned int fd, char __user *buf, size_t count);
+#ifdef CONFIG_IA32_EMULATION
+extern asmlinkage void hooked_sys32_read(unsigned int fd, char __user *buf, size_t count);
+#endif
 
 __REGISTER_SYSCALL(read);
 
