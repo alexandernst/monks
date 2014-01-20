@@ -5,4 +5,5 @@
 !common/
 !procmon/
 !procmon_kmodule/
+!procmon_kmodule/syscalls/
 !udis86/
