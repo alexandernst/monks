@@ -108,12 +108,12 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	memcpy(bytecode, stub, stub_size);
 
 	//patch addrs
-	ud_patch_addr(bytecode, iter->counter);
+	//ud_patch_addr(bytecode, iter->counter);
 	ud_patch_addr(bytecode, iter->rf);
 	ud_patch_addr(bytecode, &procmon_state);
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->ff);
-	ud_patch_addr(bytecode, iter->counter);
+	//ud_patch_addr(bytecode, iter->counter);
 
 	printk("&iter->counter: 0x%p\n", iter->counter);
 	printk("&iter->rf: 0x%p\n", iter->rf);
@@ -127,9 +127,9 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	}
 	printk("\nEnd\n");
 
-	//return (void *)iter->rf;
-
 	return bytecode;
+
+	//return (void *)iter->rf;
 }
 
 /*****************************************************************************\
@@ -153,7 +153,6 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 
 static void *destroy_stub(syscall_info_t *iter, void *stub){
 
-	/*
 	int i;
 	unsigned char *addr;
 	uint64_t stub_size;
@@ -170,9 +169,8 @@ static void *destroy_stub(syscall_info_t *iter, void *stub){
 	printk("\nEnd\n");
 
 	return stub;
-	*/
 
-	return iter->rf;
+	//return iter->rf;
 }
 
 /*****************************************************************************\

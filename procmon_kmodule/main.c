@@ -44,9 +44,9 @@ static void __exit hook_exit(void){
 
 	unhook_calls();
 
-	while(!safe_to_unload()){
-		msleep_interruptible(500);
-	}
+	//while(!safe_to_unload()){
+	//	msleep_interruptible(500);
+	//}
 	
 	nl_halt();
 

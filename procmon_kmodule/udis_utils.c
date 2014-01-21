@@ -53,8 +53,15 @@ void ud_patch_addr(void *entry, void *addr){
 }
 
 void ud_patch_cmp(void *entry){
+	int i;
 	ud_t ud;
 	void *patch_addr;
+
+	addrs_t patch_addrs;
+	patch_addrs.addr1 = NULL;
+	patch_addrs.len1 = 0;
+	patch_addrs.addr2 = NULL;
+	patch_addrs.len2 = 0;
 
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
@@ -63,7 +70,35 @@ void ud_patch_cmp(void *entry){
 	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
 
 	while(ud_disassemble(&ud)){
+
+		if(ud.mnemonic != UD_Ijnz){
+			//We're at the very first instruction
+			if(patch_addrs.addr2 == NULL){
+				patch_addrs.addr2 = entry + ud_insn_off(&ud);
+				patch_addrs.len2 = ud_insn_len(&ud);
+
+			//We're at any other instruction
+			}else{
+				patch_addrs.addr1 = patch_addrs.addr2;
+				patch_addrs.len1 = patch_addrs.len2;
+
+				patch_addrs.addr2 = entry + ud_insn_off(&ud);
+				patch_addrs.len2 = ud_insn_len(&ud);
+			}
+		}
+
 		if(ud.mnemonic == UD_Ijnz){ //same as jne
+			//patch addr1 with NOPs
+			for(i = 0; i < patch_addrs.len1; i++){
+				memcpy(patch_addrs.addr1 + i, "\x90", 1);
+			}
+
+			//patch addr2 with NOPs
+			for(i = 0; i < patch_addrs.len2; i++){
+				memcpy(patch_addrs.addr2 + i, "\x90", 1);
+			}
+
+			//patch current addr with JMP
 			patch_addr = entry + ud_insn_off(&ud);
 
 			memcpy(patch_addr, "\xEB", 1); //EB is jmp instruction
