@@ -250,10 +250,6 @@ out:
 \*****************************************************************************/
 
 static int do_unhook_calls(void *arg){
-	extern void *stub;
-#ifdef CONFIG_IA32_EMULATION
-	extern void *stub_32;
-#endif	
 	syscall_info_t *iter;
 
 	for_each_syscall(iter) {
