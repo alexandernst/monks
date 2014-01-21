@@ -52,6 +52,25 @@ void ud_patch_addr(void *entry, void *addr){
 	}
 }
 
+void ud_patch_cmp(void *entry){
+	ud_t ud;
+	void *patch_addr;
+
+	ud_init(&ud);
+	ud_set_mode(&ud, BITS_PER_LONG);
+	ud_set_syntax(&ud, UD_SYN_INTEL);
+	ud_set_vendor(&ud, UD_VENDOR_ANY);
+	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
+
+	while(ud_disassemble(&ud)){
+		if(ud.mnemonic == UD_Ijnz){ //same as jne
+			patch_addr = entry + ud_insn_off(&ud);
+
+			memcpy(patch_addr, "\xEB", 1); //EB is jmp instruction
+		}
+	}
+}
+
 void *ud_find_syscall_table_addr(void *entry){
 	ud_t ud;
 

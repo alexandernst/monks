@@ -6,6 +6,7 @@
 
 uint64_t ud_get_stub_size(void *entry);
 void ud_patch_addr(void *entry, void *addr);
+void ud_patch_cmp(void *entry);
 void *ud_find_syscall_table_addr(void *entry);
 
 #endif

@@ -152,7 +152,27 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 \*****************************************************************************/
 
 static void *destroy_stub(syscall_info_t *iter, void *stub){
-	return (void *)iter->rf;
+
+	/*
+	int i;
+	unsigned char *addr;
+	uint64_t stub_size;
+	stub_size = ud_get_stub_size(stub);
+
+	addr = stub;
+
+	ud_patch_cmp(stub);
+
+	printk("Bytecode: \n");
+	for(i = 0; i < stub_size; ++i){
+		printk("%02x", addr[i]);
+	}
+	printk("\nEnd\n");
+
+	return stub;
+	*/
+
+	return iter->rf;
 }
 
 /*****************************************************************************\
@@ -240,10 +260,10 @@ static int do_unhook_calls(void *arg){
 		procmon_info("Unhook %s\n", iter->name);
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
-			ia32_sct_map[iter->__NR_] = destroy_stub(iter, &stub_32);
+			ia32_sct_map[iter->__NR_] = destroy_stub(iter, ia32_sct_map[iter->__NR_]);
 #endif
 		}else{
-			sct_map[iter->__NR_] = destroy_stub(iter, &stub);
+			sct_map[iter->__NR_] = destroy_stub(iter, sct_map[iter->__NR_]);
 		}
 	}
 
