@@ -108,14 +108,11 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	memcpy(bytecode, stub, stub_size);
 
 	//patch addrs
-	//ud_patch_addr(bytecode, iter->counter);
 	ud_patch_addr(bytecode, iter->rf);
 	ud_patch_addr(bytecode, &procmon_state);
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->ff);
-	//ud_patch_addr(bytecode, iter->counter);
 
-	printk("&iter->counter: 0x%p\n", iter->counter);
 	printk("&iter->rf: 0x%p\n", iter->rf);
 	printk("&procmon_state: 0x%p\n", &procmon_state);
 	printk("&iter->state: 0x%p\n", &iter->state);
@@ -192,8 +189,6 @@ static int do_hook_calls(void *arg){
 
 	for_each_syscall(iter) {
 		add_syscalls_state_table_entry(iter->name, &iter->state);
-		iter->counter = new(sizeof(atomic_t));
-		atomic_set(iter->counter, 0);
 
 		procmon_info("Hook %s\n", iter->name);
 		if(iter->is32){
@@ -295,23 +290,3 @@ out:
 /*****************************************************************************\
 |                                     END                                     |
 \*****************************************************************************/
-
-int safe_to_unload(void){
-	int i;
-	syscall_info_t *iter;
-
-	for_each_syscall(iter) {
-		if (!iter->counter)
-			continue;
-
-		i = atomic_read(iter->counter);
-		procmon_info("Unloading syscall %s (counter: %d)\n", iter->name, i);
-		if(i > 0){
-			return 0;
-		}
-
-		del(iter->counter), iter->counter = NULL;
-	}
-
-	return 1;
-}

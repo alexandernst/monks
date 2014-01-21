@@ -32,7 +32,6 @@
 #include "../common/mem_ops.h"
 
 typedef struct syscall_info_t {
-	atomic_t *counter;
 	char *name;
 	int is32;
 	int state;
@@ -95,7 +94,6 @@ struct idtr{
 #define __REGISTER_SYSCALL(F)                                                 \
 	static syscall_info_t __syscall_info___NR_##F                             \
 	__attribute__((section(".syscalls"), aligned(1), used)) = {               \
-		.counter = NULL,                                                      \
 		.name = "__NR_" #F,                                                   \
 		.is32 = 0,                                                            \
 		.state = 1,                                                           \
@@ -107,7 +105,6 @@ struct idtr{
 #define __REGISTER_SYSCALL32(F)                                               \
 	static syscall_info_t __syscall_info___NR32_##F                           \
 	__attribute__((section(".syscalls"), aligned(1), used)) = {               \
-		.counter = NULL,                                                      \
 		.name = "__NR32_" #F,                                                 \
 		.is32 = 1,                                                            \
 		.state = 1,                                                           \
@@ -202,6 +199,5 @@ void *get_sys_call_table(void);
 
 void hook_calls(void);
 void unhook_calls(void);
-int safe_to_unload(void);
 
 #endif

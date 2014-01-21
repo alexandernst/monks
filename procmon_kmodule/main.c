@@ -43,10 +43,6 @@ static void __exit hook_exit(void){
 	unregister_procmon_controls();
 
 	unhook_calls();
-
-	//while(!safe_to_unload()){
-	//	msleep_interruptible(500);
-	//}
 	
 	nl_halt();
 

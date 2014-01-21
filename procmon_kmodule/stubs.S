@@ -76,10 +76,6 @@ stub:
 	mov eax, [ebp + 28]
 	mov [ebp - 12], eax
 
-	#Call atomic_inc
-	#mov eax, 0x10101010 #&iter->counter
-	#lock inc dword ptr [eax]
-
 	#Call real syscall and save return value
 	mov eax, 0x10101010 #&iter->rf
 	call eax
@@ -99,10 +95,6 @@ stub:
 	call eax
 
 skip_ff:
-	#Call atomic_dec
-	#mov eax, 0x10101010 #&iter->counter
-	#lock dec dword ptr [eax]
-
 	#Restore real syscall result to eax
 	mov eax, [ebp - 8]
 
@@ -130,10 +122,6 @@ stub:
 	mov [rbp - 40], rcx
 	mov [rbp - 48], r8
 	mov [rbp - 56], r9
-
-	#Call atomic_inc
-	#mov rax, 0x1010101010101010 #&iter->counter
-	#lock inc qword ptr [rax]
 
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
@@ -166,10 +154,6 @@ stub:
 	call rax
 
 skip_ff:
-	#Call atomic_dec
-	#mov rax, 0x1010101010101010 #&iter->counter
-	#lock dec qword ptr [rax]
-
 	#Restore real syscall result to rax
 	mov rax, [rbp - 64]
 
@@ -201,10 +185,6 @@ stub_32:
 	mov eax, dword [rbp + 28]
 	mov dword [rbp - 12], eax
 
-	#Call atomic_inc
-	#mov rax, 0x1010101010101010 #&iter->counter
-	#lock inc qword ptr [rax]
-
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
@@ -224,10 +204,6 @@ stub_32:
 	call rax
 
 skip_ff32:
-	#Call atomic_dec
-	#mov rax, 0x1010101010101010 #&iter->counter
-	#lock dec qword ptr [rax]
-
 	#Restore real syscall result to rax
 	mov eax, dword [rbp - 8]
 
