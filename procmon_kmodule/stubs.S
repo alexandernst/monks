@@ -13,28 +13,28 @@
 #| | arg 3      | ebp + 16   | This means that each value after EBP should be |
 #| --------------            | multiplied by 2 for x64.                       |
 #| --------------            |                                                |
-#| | arg 2      | ebp + 12   | There are 9 local variables on the stack.      |
-#| --------------            | The first two are temp value that are used to  |
-#| --------------            | swap values.                                   |
-#| | arg 1      | ebp + 8    | The third one is where the return value of the |
+#| | arg 2      | ebp + 12   | There are 7 local variables on the stack.      |
+#| --------------            | The first one is where the return value of the |
 #| --------------            | real syscall function is stored for later use. |
-#| --------------            | The rest of the local variables are used to    |
-#| | Ret Addr   | ebp + 4    | store the values of the arguments, so they can |
+#| | arg 1      | ebp + 8    | The rest of the local variables are used to    |
+#| --------------            | store the values of the arguments, so they can |
 #| --------------            | be passed later to the fake syscall function.  |
-#| --------------            |                                                |
-#| | EBP        | ebp + 0    | Keep in mind that on x86 all the arguments are |
+#| | Ret Addr   | ebp + 4    |                                                |
+#| --------------            | Keep in mind that on x86 all the arguments are |
 #| --------------            | passed on the stack, from right to left, which |
-#| --------------            | means that the first argument is on the        |
-#| | Ret val    | ebp - 4    | hightest position, while the last argument is  |
+#| | EBP        | ebp + 0    | means that the first argument is on the        |
+#| --------------            | hightest position, while the last argument is  |
 #| --------------            | on the lowest position.                        |
-#| --------------            |                                                |
-#| | arg6  copy | ebp - 8    | On the other hand, on x64 arguments are passed |
+#| | Ret val    | ebp - 4    |                                                |
+#| --------------            | On the other hand, on x64 arguments are passed |
 #| --------------            | via the registers, in this order: RDI, RSI,    |
-#| --------------            | RDX, RCX, R8, R9.                              |
-#| | arg5  copy | ebp - 12   |                                                |
+#| | arg6  copy | ebp - 8    | RDX, RCX, R8, R9.                              |
+#| --------------            |                                                |
 #| --------------            | In both x86 and x64 the result of the syscall  |
-#| --------------            | function is saved in a register. EAX on x86,   |
-#| | arg4  copy | ebp - 16   | RAX on x64.                                    |
+#| | arg5  copy | ebp - 12   | function is saved in a register. EAX on x86,   |
+#| --------------            | RAX on x64.                                    |
+#| --------------            |                                                |
+#| | arg4  copy | ebp - 16   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
 #| | arg3  copy | ebp - 20   |                                                |
