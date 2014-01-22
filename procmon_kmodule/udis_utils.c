@@ -43,8 +43,6 @@ void ud_patch_addr(void *entry, void *addr){
 			patch_addr = entry + ud_insn_off(&ud) + offset;
 
 			if(offset > 0 && !memcmp(patch_addr, match, ptr_size)){
-				//TODO Remove when done with stubs work. Also remove msgs.h from header
-				procmon_info("MOV (offset: %d, type: %d): %s\n", offset, ud.operand[1].type, ud_insn_asm(&ud));
 				memcpy(patch_addr, &addr, ptr_size);
 				return;
 			}
@@ -90,18 +88,20 @@ void ud_patch_cmp(void *entry){
 		if(ud.mnemonic == UD_Ijnz){ //same as jne
 			//patch addr1 with NOPs
 			for(i = 0; i < patch_addrs.len1; i++){
+				//90 is NOP instruction
 				memcpy(patch_addrs.addr1 + i, "\x90", 1);
 			}
 
 			//patch addr2 with NOPs
 			for(i = 0; i < patch_addrs.len2; i++){
+				//90 is NOP instruction
 				memcpy(patch_addrs.addr2 + i, "\x90", 1);
 			}
 
 			//patch current addr with JMP
 			patch_addr = entry + ud_insn_off(&ud);
-
-			memcpy(patch_addr, "\xEB", 1); //EB is jmp instruction
+			//EB is JMP instruction
+			memcpy(patch_addr, "\xEB", 1);
 		}
 	}
 }

@@ -1,7 +1,6 @@
 #ifndef UDIS_UTILS_H_INCLUDED
 #define UDIS_UTILS_H_INCLUDED
 
-#include "msgs.h"
 #include "../udis86/udis86.h"
 
 typedef struct addrs_t {
