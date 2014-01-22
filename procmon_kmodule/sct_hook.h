@@ -122,26 +122,29 @@ struct idtr{
 | Each fake syscall function should have access to the result of the real     |
 | syscall call. This macro gives access to that result value by accessing the |
 | stack of the caller. Each fake syscall is called from it's stub. Each stub  |
-| reserves 64 bytes on the stack. 8 bytes for the RAX register, 48 bytes for  |
-| the 6 arguments that a syscall can have and 8 bytes for the result of the   |
-| syscall call. Those last 8 bytes are the ones that this macro accesses.     |
-| We know (guaranteed because of how the stub works) that there isn't         |
-| anything else on the stack, so we can play with it without any real danger. |
-| To access those last 8 bytes we need to keep in mind a few things. There    |
-| are 8 bytes on the stack for the return address. Also, when the fake        |
-| syscall is called, the RBP value is pushed on the stack, which means 8 more |
-| bytes. That means that if we get the current RBP and add it 8 + 8 we'll get |
-| directly into the caller's stack, which is what we want.                    |
+| reserves 28 bytes on the stack. 4 bytes for the syscall result and 24 bytes |
+| for the 6 arguments that a syscall can have. The first 4 bytes are the ones |
+| that this macro accesses. We know (guaranteed because of how the stub works)|
+| that there isn't anything else on the stack, so we can play with it without |
+| any real danger. To access those first 4 bytes we need to keep in mind a    |
+| few things. There are 4 bytes on the stack for the return address. Also,    |
+| when the fake syscall is called, the EBP value is pushed on the stack,      |
+| which means 4 more bytes. That means that if we get the current EBP and add |
+| it 8 + 8 we'll get directly into the caller's stack, which is what we want. |
+| From there on, we only need to add yet another 6 * 4 bytes and we'll reach  |
+| the syscall return value. Please have a look at stubs.S for an actual       |
+| graphic representation of how the stack looks like when a stub is being     |
+| executed.                                                                   |
 |                                                                             |
-| NOTE: Don't confuse the way the stack works. We need to ADD 16 bytes        |
-| instead of REST 16 bytes because the stacks grows downwards. Also note that |
-| this explanation is valid for x64 platforms. On x86 we'll have EAX instead  |
-| of RAX, EBP instead of RBP, the return value will take 4 bytes and a push   |
-| will take another 4 bytes, so that will make 8 bytes in total.              |
+| NOTE: Don't confuse the way the stack works. We need to ADD 8 bytes         |
+| instead of REST 8 bytes because the stacks grows downwards. Also note that  |
+| this explanation is valid for x86 platforms. On x64 we'll have RAX instead  |
+| of EAX, RBP instead of EBP, the return value will take 8 bytes and a push   |
+| will take another 8 bytes, so that will make 16 bytes in total.             |
 |                                                                             |
-| NOTE: Keep in mind that we are reading 8 bytes (4 bytes on x86) from the    |
+| NOTE: Keep in mind that we are reading 4 bytes (8 bytes on x64) from the    |
 | stack, which can contain a value or an address. It's up to you to know what |
-| the real syscall will return. If the returned value fits in 8 bytes, you    |
+| the real syscall will return. If the returned value fits in 4 bytes, you    |
 | just pass a variable to this macro. If the syscall returns a pointer, then  |
 | you'll need to pass this macro a pointer.                                   |
 \*****************************************************************************/
@@ -153,8 +156,6 @@ struct idtr{
 		"mov %0, [ebp + 4 + 4 + 24];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
-		:                                                                     \
-		:                                                                     \
 	);
 #else
 #define __GET_SYSCALL_RESULT(x)                                               \
@@ -163,8 +164,6 @@ struct idtr{
 		"mov %0, [rbp + 8 + 8 + 48];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
-		:                                                                     \
-		:                                                                     \
 	);
 #endif
 
@@ -175,8 +174,6 @@ struct idtr{
 		"mov %0, [rbp + 8 + 8 + 24];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
-		:                                                                     \
-		:                                                                     \
 	);
 #endif
 
