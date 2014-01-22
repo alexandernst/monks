@@ -113,16 +113,16 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->ff);
 
-	printk("&iter->rf: 0x%p\n", iter->rf);
-	printk("&procmon_state: 0x%p\n", &procmon_state);
-	printk("&iter->state: 0x%p\n", &iter->state);
-	printk("&iter->ff: 0x%p\n", iter->ff);
+	procmon_info("&iter->rf: 0x%p\n", iter->rf);
+	procmon_info("&procmon_state: 0x%p\n", &procmon_state);
+	procmon_info("&iter->state: 0x%p\n", &iter->state);
+	procmon_info("&iter->ff: 0x%p\n", iter->ff);
 
-	printk("Bytecode: \n");
+	procmon_info("Bytecode: \n");
 	for(i = 0; i < stub_size; ++i){
-		printk("%02x", bytecode[i]);
+		procmon_info("%02x", bytecode[i]);
 	}
-	printk("\nEnd\n");
+	procmon_info("\nEnd\n");
 
 	return bytecode;
 
@@ -159,11 +159,11 @@ static void *destroy_stub(syscall_info_t *iter, void *stub){
 
 	ud_patch_cmp(stub);
 
-	printk("Bytecode: \n");
+	procmon_info("Bytecode: \n");
 	for(i = 0; i < stub_size; ++i){
-		printk("%02x", addr[i]);
+		procmon_info("%02x", addr[i]);
 	}
-	printk("\nEnd\n");
+	procmon_info("\nEnd\n");
 
 	return stub;
 
