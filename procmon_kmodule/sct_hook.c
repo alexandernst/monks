@@ -90,16 +90,13 @@ static int get_sct(void){
 | The stub will do the following things:                                      |
 |                                                                             |
 | 1. Save syscall arguments                                                   |
-| 2. Call atomic_inc with the counter of the current hijacked syscall         |
-| 3. Call the real syscall                                                    |
-| 4. Save the returned value                                                  |
-| 5. Call the hooked syscall with the arguments that were saved earlier       |
-| 6. Call atomic_dec with the counter of the current hijacked syscall         |
-| 7. Return the result from the call to the real syscall                      |
+| 2. Call the real syscall                                                    |
+| 3. Save the returned value                                                  |
+| 4. Maybe call the hooked syscall with the arguments that were saved earlier |
+| 5. Return the result from the call to the real syscall                      |
 \*****************************************************************************/
 
 static void *create_stub(syscall_info_t *iter, void *stub){
-	int i;
 	uint64_t stub_size;
 	unsigned char *bytecode;
 
@@ -113,20 +110,7 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->ff);
 
-	procmon_info("&iter->rf: 0x%p\n", iter->rf);
-	procmon_info("&procmon_state: 0x%p\n", &procmon_state);
-	procmon_info("&iter->state: 0x%p\n", &iter->state);
-	procmon_info("&iter->ff: 0x%p\n", iter->ff);
-
-	procmon_info("Bytecode: \n");
-	for(i = 0; i < stub_size; ++i){
-		procmon_info("%02x", bytecode[i]);
-	}
-	procmon_info("\nEnd\n");
-
-	return bytecode;
-
-	//return (void *)iter->rf;
+	return bytecode; //iter->rf;
 }
 
 /*****************************************************************************\
@@ -134,40 +118,20 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 \*****************************************************************************/
 
 /*****************************************************************************\
-| Destroy a stub will actually change the stub's opcode so it will destroy    |
-| itself when there are no more sleeping calls that will use the stub.        |
-|                                                                             |
+| Destroy a stub will actually change the stub's opcode so it will call only  |
+| the real syscall.                                                           |
 | That means that the content of the stub will look like the following:       |
 |                                                                             |
 | 1. Save syscall arguments                                                   |
-| 2. Call atomic_inc with the counter of the current hijacked syscall         |
-| 3. Call the real syscall                                                    |
-| 4. Save the returned value                                                  |
-| 5. Call atomic_dec with the counter of the current hijacked syscall         |
-| 6. If the atomic_counter is equal to 0 then make the stub free itself       |
-| 7. Return the result from the call to the real syscall                      |
+| 2. Call the real syscall                                                    |
+| 3. Save the returned value                                                  |
+| 4. Return the result from the call to the real syscall                      |
 \*****************************************************************************/
 
 static void *destroy_stub(syscall_info_t *iter, void *stub){
-
-	int i;
-	unsigned char *addr;
-	uint64_t stub_size;
-	stub_size = ud_get_stub_size(stub);
-
-	addr = stub;
-
 	ud_patch_cmp(stub);
 
-	procmon_info("Bytecode: \n");
-	for(i = 0; i < stub_size; ++i){
-		procmon_info("%02x", addr[i]);
-	}
-	procmon_info("\nEnd\n");
-
-	return stub;
-
-	//return iter->rf;
+	return stub; //iter->rf;
 }
 
 /*****************************************************************************\
@@ -187,10 +151,11 @@ static int do_hook_calls(void *arg){
 #endif	
 	syscall_info_t *iter;
 
-	for_each_syscall(iter) {
-		add_syscalls_state_table_entry(iter->name, &iter->state);
+	for_each_syscall(iter){
 
+		add_syscalls_state_table_entry(iter->name, &iter->state);
 		procmon_info("Hook %s\n", iter->name);
+
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			iter->rf = (void *)ia32_sct_map[iter->__NR_];
@@ -245,8 +210,10 @@ out:
 static int do_unhook_calls(void *arg){
 	syscall_info_t *iter;
 
-	for_each_syscall(iter) {
+	for_each_syscall(iter){
+
 		procmon_info("Unhook %s\n", iter->name);
+		
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
 			ia32_sct_map[iter->__NR_] = destroy_stub(iter, ia32_sct_map[iter->__NR_]);
