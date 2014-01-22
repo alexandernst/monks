@@ -25,28 +25,25 @@
 #| | EBP        | ebp + 0    | Keep in mind that on x86 all the arguments are |
 #| --------------            | passed on the stack, from right to left, which |
 #| --------------            | means that the first argument is on the        |
-#| | Temp1 val  | ebp - 4    | hightest position, while the last argument is  |
+#| | Ret val    | ebp - 4    | hightest position, while the last argument is  |
 #| --------------            | on the lowest position.                        |
 #| --------------            |                                                |
-#| | Ret val    | ebp - 8    | On the other hand, on x64 arguments are passed |
+#| | arg6  copy | ebp - 8    | On the other hand, on x64 arguments are passed |
 #| --------------            | via the registers, in this order: RDI, RSI,    |
 #| --------------            | RDX, RCX, R8, R9.                              |
-#| | arg6  copy | ebp - 12   |                                                |
+#| | arg5  copy | ebp - 12   |                                                |
 #| --------------            | In both x86 and x64 the result of the syscall  |
 #| --------------            | function is saved in a register. EAX on x86,   |
-#| | arg5  copy | ebp - 16   | RAX on x64.                                    |
+#| | arg4  copy | ebp - 16   | RAX on x64.                                    |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg4  copy | ebp - 20   |                                                |
+#| | arg3  copy | ebp - 20   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg3  copy | ebp - 24   |                                                |
+#| | arg2  copy | ebp - 24   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg2  copy | ebp - 28   |                                                |
-#| --------------            |                                                |
-#| --------------            |                                                |
-#| | arg1  copy | ebp - 32   |                                                |
+#| | arg1  copy | ebp - 28   |                                                |
 #| --------------            |                                                |
 #|                           |                                                |
 #\****************************************************************************/
@@ -60,26 +57,26 @@ stub:
 	#Create stack frame
 	push ebp
 	mov ebp, esp
-	sub esp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
+	sub esp, 28 #4 bytes for syscall result and 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, [ebp + 8]
-	mov [ebp - 32], eax
-	mov eax, [ebp + 12]
 	mov [ebp - 28], eax
-	mov eax, [ebp + 16]
+	mov eax, [ebp + 12]
 	mov [ebp - 24], eax
-	mov eax, [ebp + 20]
+	mov eax, [ebp + 16]
 	mov [ebp - 20], eax
-	mov eax, [ebp + 24]
+	mov eax, [ebp + 20]
 	mov [ebp - 16], eax
-	mov eax, [ebp + 28]
+	mov eax, [ebp + 24]
 	mov [ebp - 12], eax
+	mov eax, [ebp + 28]
+	mov [ebp - 8], eax
 
 	#Call real syscall and save return value
 	mov eax, 0x10101010 #&iter->rf
 	call eax
-	mov [ebp - 8], eax
+	mov [ebp - 4], eax
 
 	#Check if procmon's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -96,7 +93,7 @@ stub:
 
 skip_ff:
 	#Restore real syscall result to eax
-	mov eax, [ebp - 8]
+	mov eax, [ebp - 4]
 
 	#Exit
 	mov esp, ebp
@@ -169,26 +166,26 @@ stub_32:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 32 #4 bytes for tmp, 4 bytes for syscall result and 24 bytes for 6 args
+	sub rsp, 28 #4 bytes for syscall result and 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, dword [rbp + 8]
-	mov dword [rbp - 32], eax
-	mov eax, dword [rbp + 12]
 	mov dword [rbp - 28], eax
-	mov eax, dword [rbp + 16]
+	mov eax, dword [rbp + 12]
 	mov dword [rbp - 24], eax
-	mov eax, dword [rbp + 20]
+	mov eax, dword [rbp + 16]
 	mov dword [rbp - 20], eax
-	mov eax, dword [rbp + 24]
+	mov eax, dword [rbp + 20]
 	mov dword [rbp - 16], eax
-	mov eax, dword [rbp + 28]
+	mov eax, dword [rbp + 24]
 	mov dword [rbp - 12], eax
+	mov eax, dword [rbp + 28]
+	mov dword [rbp - 8], eax
 
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov dword [rbp - 8], eax
+	mov dword [rbp - 4], eax
 
 	#Check if procmon's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -205,7 +202,7 @@ stub_32:
 
 skip_ff32:
 	#Restore real syscall result to rax
-	mov eax, dword [rbp - 8]
+	mov eax, dword [rbp - 4]
 
 	#Exit
 	mov rsp, rbp
