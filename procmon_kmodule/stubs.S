@@ -109,10 +109,9 @@ stub:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 64; #8 bytes for rax content + 48 bytes for 6 args + 8 bytes for syscall resul
+	sub rsp, 56; #8 bytes for syscall result + 48 bytes for 6 args
 
 	#Save args on the stack
-	mov [rbp - 8], rax
 	mov [rbp - 16], rdi
 	mov [rbp - 24], rsi
 	mov [rbp - 32], rdx
@@ -129,7 +128,7 @@ stub:
 	mov r8, [rbp - 48]
 	mov r9, [rbp - 56]
 	call rax
-	mov [rbp - 64], rax
+	mov [rbp - 8], rax
 
 	#Check if procmon's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -152,7 +151,7 @@ stub:
 
 skip_ff:
 	#Restore real syscall result to rax
-	mov rax, [rbp - 64]
+	mov rax, [rbp - 8]
 
 	#Exit
 	mov rsp, rbp

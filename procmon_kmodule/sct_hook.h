@@ -160,7 +160,7 @@ struct idtr{
 #define __GET_SYSCALL_RESULT(x)                                               \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
-		"mov %0, [rbp + 8 + 8];"                                              \
+		"mov %0, [rbp + 8 + 8 + 48];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
 		:                                                                     \
