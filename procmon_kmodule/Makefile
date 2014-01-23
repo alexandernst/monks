@@ -11,9 +11,7 @@ $(NAME)-y := main.o control.o sct_hook.o netlink.o utils.o \
              udis_utils.o syscalls/built-in.o \
              ../common/mem_ops.o ../common/serialize.o
 
-$(NAME)-y += ../udis86/libudis86/built-in.o \
-             ../udis86/libudis86/syn.o \
-             ../udis86/libudis86/syn-intel.o
+$(NAME)-y += ../udis86/libudis86/built-in.o
 
 $(NAME)-y	+= stubs.o
 

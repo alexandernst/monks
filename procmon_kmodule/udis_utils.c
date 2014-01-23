@@ -33,7 +33,6 @@ void ud_patch_addr(void *entry, void *addr){
 
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
-	ud_set_syntax(&ud, UD_SYN_INTEL);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
 	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
 
@@ -63,7 +62,6 @@ void ud_patch_cmp(void *entry){
 
 	ud_init(&ud);
 	ud_set_mode(&ud, BITS_PER_LONG);
-	ud_set_syntax(&ud, UD_SYN_INTEL);
 	ud_set_vendor(&ud, UD_VENDOR_ANY);
 	ud_set_input_buffer(&ud, entry, ud_get_stub_size(entry));
 
