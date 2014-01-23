@@ -177,15 +177,18 @@ int main(int argc, char **argv){
 	close(sock_fd);
 
 	/*Free all the memory we allocated for the data*/
-	in = head;
-	while(!in->next){
-		free_data(in->i);
+	if(head->i && head != tail){
+		in = head;
+		while(!in->next){
+			free_data(in->i);
 
-		tmp = in;
-		in = in->next;
+			tmp = in;
+			in = in->next;
 
-		del(tmp);
+			del(tmp);
+		}
 	}
+
 	/*Free everything else we might have allocated*/
 	del(nlh);
 
