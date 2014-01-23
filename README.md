@@ -20,7 +20,10 @@ Setting Procmon
 
 Keep in mind that this is a WIP and you can end up with a totally frozen 
 kernel! Do *NOT* run this in production machines. I'm *NOT* responsible
-for any data loss or damage in any way.
+for any data loss or damage in any way. That said, I test on a daily basis
+this module on quite some virtual machines, 7, to be precise. Both x86 and
+x64, different distros, different compilers, different kernels from 2.6.37
+up to 3.12.
 
 In order to build this module you'll need some basic stuff (make, gcc), the 
 headers of the kernel you're running on and ncurses library. Once you have all
@@ -34,18 +37,10 @@ To start the actual hijack process, once loaded the module, run
 ```sysctl procmon.state=1```, then you'll probably want to run 
 ```./procmon-viewer``` to see an actual output.
 
-To stop it just run hit ```Q```. To stop the module run ```sysctl procmon.state=0```.
+To stop it just run hit ```q```. To stop the module run ```sysctl procmon.state=0```.
 
 If your distro has ```libkmod```, you can use procmon's viewer command line
 switches instead to do all those actions (load/unload, start/stop).
-
-Keep in mind that the module will protect your kernel while unloading. That 
-means that if any process (both in userland and in the kernel itself) expected 
-to call one of the hijacked syscalls, the module will wait those processes to 
-call what they need to call. This may take from 1ms to days. If there's a really 
-long delay, try killing/restarting some processes that may have scheduled a 
-call. For example, the module won't unload until you press ```Enter``` on all 
-consoles that had any activity while the module was loaded.
 
 The UI is based on ```ncurses```. Anyways, right now there is almost no functional
 code, just a basic viewer.
@@ -60,15 +55,14 @@ systems/methods. Probably all of them work better than Procmon, but they have
 one disadvantage: they require you to recompile the kernel or they are not 
 enabled by default in some distros.
 
+Also, Procmon will ```just work```. What this module does to ```just work``` is
+hijack/replace all (relevant/interesting) syscalls from the syscall table.
+While this is risky, it will allow you to have a similar tool to Procmon for 
+Windows, without having to recompile the kernel.
+
 Yet another reason: I have fun doing it! I don't seek for this project to be 
 merged into mainline nor being used by every Linux user out there. I'm doing 
 it for myself. Anyways, I'd be glad if it works for you too :)
-
-On the other hand, Procmon will ```just work```.
-What this module does to ```just work``` is hijack/replace all 
-(relevant/interesting) syscalls from the syscall table. While this is risky, 
-it will allow you to have a similar tool to Procmon for Windows, without having
-to recompile the kernel.
 
 Contributing
 =======
