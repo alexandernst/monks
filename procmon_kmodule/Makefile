@@ -29,6 +29,6 @@ all: _prebuild
 _prebuild: unistd_32.h
 
 unistd_32.h:
-	@echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep __NR_ | sed s/__NR_/__NR32_/g > $@
+	@echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep --color=never __NR_ | sed s/__NR_/__NR32_/g > $@
 
 clean-files	+= unistd_32.h
