@@ -1,21 +1,21 @@
-[![Build Status](https://drone.io/github.com/alexandernst/procmon/status.png)](https://drone.io/github.com/alexandernst/procmon/latest) Procmon alternative for Linux - [Main webpage](http://alexandernst.github.io/procmon "Procmon's Homepage")
+[![Build Status](https://drone.io/github.com/alexandernst/monks/status.png)](https://drone.io/github.com/alexandernst/monks/latest) Monks alternative for Linux - [Main webpage](http://alexandernst.github.io/monks "Monks's Homepage")
 
-What is Procmon
+What is Monks
 =======
 
-Procmon is a kernel module that hijacks sys calls and sends information about which
+Monks is a kernel module that hijacks sys calls and sends information about which
 processes called which sys calls, with what arguments did they call them with, 
 what was the return value, etc, and sends that information to a nice ncurses 
 interface.
 
-Said in another way, Procmon is like ```strace```, but tracing all and every single
+Said in another way, Monks is like ```strace```, but tracing all and every single
 process from any user, at any level.
 
 That's how it works:
 
-![How it works](https://raw.github.com/alexandernst/procmon/screenshots/procmon.gif)
+![How it works](https://raw.github.com/alexandernst/monks/screenshots/monks.gif)
 
-Setting Procmon
+Setting Monks
 =======
 
 Keep in mind that this is a WIP and you can end up with a totally frozen 
@@ -30,34 +30,34 @@ headers of the kernel you're running on and ncurses library. Once you have all
 those you just need to run ```make``` inside the root folder of the project.
 
 Loading the module isn't any different from loading any other module. 
-```insmod procmon.ko``` for loading it and ```rmmod procmon.ko``` for 
+```insmod monks.ko``` for loading it and ```rmmod monks.ko``` for 
 unloading it.
 
 To start the actual hijack process, once loaded the module, run 
-```sysctl procmon.state=1```, then you'll probably want to run 
-```./procmon-viewer``` to see an actual output.
+```sysctl monks.state=1```, then you'll probably want to run 
+```./monks-viewer``` to see an actual output.
 
-To stop it just run hit ```q```. To stop the module run ```sysctl procmon.state=0```.
+To stop it just run hit ```q```. To stop the module run ```sysctl monks.state=0```.
 
-If your distro has ```libkmod```, you can use procmon's viewer command line
+If your distro has ```libkmod```, you can use monks's viewer command line
 switches instead to do all those actions (load/unload, start/stop).
 
 The UI is based on ```ncurses```. Anyways, right now there is almost no functional
 code, just a basic viewer.
 
-![Screenshot](https://raw.github.com/alexandernst/procmon/screenshots/screenshot1.jpeg)
+![Screenshot](https://raw.github.com/alexandernst/monks/screenshots/screenshot1.jpeg)
 
-Why Procmon
+Why Monks
 =======
 
 I'm completely aware of ```kprobes```, ```perf``` and all other kernel debug 
-systems/methods. Probably all of them work better than Procmon, but they have 
+systems/methods. Probably all of them work better than Monks, but they have 
 one disadvantage: they require you to recompile the kernel or they are not 
 enabled by default in some distros.
 
-Also, Procmon will ```just work```. What this module does to ```just work``` is
+Also, Monks will ```just work```. What this module does to ```just work``` is
 hijack/replace all (relevant/interesting) syscalls from the syscall table.
-While this is risky, it will allow you to have a similar tool to Procmon for 
+While this is risky, it will allow you to have a similar tool to Monks for 
 Windows, without having to recompile the kernel.
 
 Yet another reason: I have fun doing it! I don't seek for this project to be 
