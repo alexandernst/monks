@@ -3,7 +3,8 @@
 static int scheduled_resize = 0;
 extern syscall_intercept_info_node *head, *curr, *tail;
 
-WINDOW *win_data_box, *win_data;
+WINDOW *header_box, *win_data_box, *win_data;
+int header_box_startx, header_box_starty, header_box_width, header_box_height;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
 int win_data_box_startx, win_data_box_starty, win_data_box_width, win_data_box_height;
 
@@ -83,6 +84,18 @@ void create_win_data_data_box(){
 
 	refresh();
 
+	header_box = create_newwin(header_box_height, header_box_width, header_box_starty, header_box_startx);
+	mvwprintw(header_box, 1, 1,
+		"%-15.20s"       /* Process name */
+		"%10s"           /* PID          */
+		" %-15.10s"      /* Operation    */
+		"%-50.45s"       /* Path         */
+		"%-10.10s"       /* Result       */
+		" %-7.7s",       /* Details      */
+
+		"Process name", "PID", "Operation", "Path", "Result", "Details");
+	wrefresh(header_box);
+
 	win_data_box = create_newwin(win_data_box_height, win_data_box_width, win_data_box_starty, win_data_box_startx);
 	win_data = create_newwin(win_data_height, win_data_width, win_data_starty, win_data_startx);
 
@@ -108,17 +121,26 @@ void schedule_resize(){
 }
 
 void calc_w_size_pos(){
-	win_data_box_height = LINES - 2; /*Leave 2 LINES top/bottom margin*/
+	/*External box (frame)*/
+	win_data_box_height = LINES - 4; /*Leave 2 LINES top/bottom margin*/
 	win_data_box_width = COLS - 4; /*/Leave 4 LINES left/right margin */
 
+	win_data_box_starty = (LINES - win_data_box_height) / 2 + 1;
+	win_data_box_startx = (COLS - win_data_box_width) / 2;
+
+	/*Data box*/
 	win_data_height = win_data_box_height - 2;
 	win_data_width = win_data_box_width - 2;
 
-	win_data_box_starty = (LINES - win_data_box_height) / 2;
-	win_data_box_startx = (COLS - win_data_box_width) / 2;
-
 	win_data_starty = win_data_box_starty + 1;
 	win_data_startx = win_data_box_startx + 1;
+
+	/*Header box*/
+	header_box_height = 3;
+	header_box_width = win_data_box_width;
+
+	header_box_starty = win_data_box_starty - 3;
+	header_box_startx = win_data_box_startx;
 }
 
 void draw_data(syscall_intercept_info_node *in) {
