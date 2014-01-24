@@ -3,9 +3,9 @@ CFLAGS	=	-g -Wall -Wextra -Werror -std=gnu89
 
 LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
 LDLIBS	+=	$(shell pkg-config --silence-errors --libs ncurses)
-OBJS	=	../common/mem_ops.o ../common/deserialize.o netlink.o utils.o ui.o procmon-viewer.o
-SOURCES	=	procmon-viewer.c
-DESTS	=	../procmon-viewer
+OBJS	=	../common/mem_ops.o ../common/deserialize.o netlink.o utils.o ui.o monks-viewer.o
+SOURCES	=	monks-viewer.c
+DESTS	=	../monks-viewer
 
 KMOD	=	$(shell pkg-config --exists libkmod && echo "1" || echo "0")
 
@@ -23,5 +23,5 @@ else
 OBJS += lkm.o
 endif
 
-../procmon-viewer: $(OBJS)
+../monks-viewer: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)

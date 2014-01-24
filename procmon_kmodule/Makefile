@@ -1,4 +1,4 @@
-NAME		:= procmon
+NAME		:= monks
 KDIR		?= /lib/modules/$(shell uname -r)/build
 
 ccflags-y	:= -g -Wall -nostdinc

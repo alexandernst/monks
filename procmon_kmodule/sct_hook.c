@@ -59,19 +59,19 @@ void *get_sys_call_table(void){
 static int get_sct(void){
 	sys_call_table = get_sys_call_table();
 	if(!sys_call_table){
-		procmon_info("syscall_table is NULL, quitting...\n");
+		monks_info("syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		procmon_info("Found syscall_table addr at 0x%p\n", sys_call_table);
+		monks_info("Found syscall_table addr at 0x%p\n", sys_call_table);
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sys_call_table = get_ia32_sys_call_table();
 	if(!ia32_sys_call_table){
-		procmon_info("syscall_table is NULL, quitting...\n");
+		monks_info("syscall_table is NULL, quitting...\n");
 		return 0;
 	}else{
-		procmon_info("Found ia32_syscall_table addr at 0x%p\n", ia32_sys_call_table);
+		monks_info("Found ia32_syscall_table addr at 0x%p\n", ia32_sys_call_table);
 	}
 #endif
 
@@ -85,7 +85,7 @@ static int get_sct(void){
 /*****************************************************************************\
 | Create a stub that will replace the real syscall.                           |
 | The stub is just a chunk of executable memory, kmalloc-ed from the module   |
-| and filled with opcode. Also, the stub will survive procmon's unloading.    |
+| and filled with opcode. Also, the stub will survive monks's unloading.      |
 |                                                                             |
 | The stub will do the following things:                                      |
 |                                                                             |
@@ -106,7 +106,7 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 
 	//patch addrs
 	ud_patch_addr(bytecode, iter->rf);
-	ud_patch_addr(bytecode, &procmon_state);
+	ud_patch_addr(bytecode, &monks_state);
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->ff);
 
@@ -154,7 +154,7 @@ static int do_hook_calls(void *arg){
 	for_each_syscall(iter){
 
 		add_syscalls_state_table_entry(iter->name, &iter->state);
-		procmon_info("Hook %s\n", iter->name);
+		monks_info("Hook %s\n", iter->name);
 
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
@@ -176,14 +176,14 @@ void hook_calls(void){
 
 	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
 	if(!sct_map){
-		procmon_error("Can't get writable SCT mapping\n");
+		monks_error("Can't get writable SCT mapping\n");
 		goto out;
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
 	if(!ia32_sct_map){
-		procmon_error("Can't get writable IA32_SCT mapping\n");
+		monks_error("Can't get writable IA32_SCT mapping\n");
 		goto out;
 	}
 #endif
@@ -212,7 +212,7 @@ static int do_unhook_calls(void *arg){
 
 	for_each_syscall(iter){
 
-		procmon_info("Unhook %s\n", iter->name);
+		monks_info("Unhook %s\n", iter->name);
 		
 		if(iter->is32){
 #ifdef CONFIG_IA32_EMULATION
@@ -232,14 +232,14 @@ void unhook_calls(void){
 
 	sct_map = map_writable(sys_call_table, __NR_syscall_max * sizeof(void *));
 	if(!sct_map){
-		procmon_error("Can't get writable SCT mapping\n");
+		monks_error("Can't get writable SCT mapping\n");
 		goto out;
 	}
 
 #ifdef CONFIG_IA32_EMULATION
 	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
 	if(!ia32_sct_map){
-		procmon_error("Can't get writable IA32_SCT mapping\n");
+		monks_error("Can't get writable IA32_SCT mapping\n");
 		goto out;
 	}
 #endif

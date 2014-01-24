@@ -1,4 +1,4 @@
-SUBDIRS = procmon_kmodule procmon
+SUBDIRS = monks_kmodule monks
 SUBCLEAN = $(addsuffix .clean,$(SUBDIRS))
 
 .PHONY: clean $(SUBDIRS)

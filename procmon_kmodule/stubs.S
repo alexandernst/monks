@@ -78,9 +78,9 @@ stub:
 	call eax
 	mov [ebp - 4], eax
 
-	#Check if procmon's state or the syscall's state are
+	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
-	mov eax, [0x10101010] #[&procmon_state]
+	mov eax, [0x10101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_ff
 	mov eax, [0x10101010] #[&iter->state]
@@ -128,9 +128,9 @@ stub:
 	call rax
 	mov [rbp - 8], rax
 
-	#Check if procmon's state or the syscall's state are
+	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
-	mov eax, [0x1010101010101010] #[&procmon_state]
+	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_ff
 	mov eax, [0x1010101010101010] #[&iter->state]
@@ -184,9 +184,9 @@ stub_32:
 	call rax
 	mov dword [rbp - 4], eax
 
-	#Check if procmon's state or the syscall's state are
+	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
-	mov eax, [0x1010101010101010] #[&procmon_state]
+	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_ff32
 	mov eax, [0x1010101010101010] #[&iter->state]

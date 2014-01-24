@@ -10,7 +10,7 @@ static DECLARE_WAIT_QUEUE_HEAD(nl_wait);
 static struct sk_buff_head nl_queue;
 
 static int nl_send_skb(struct sk_buff *skb){
-	if(procmon_state && client_pid > 0){
+	if(monks_state && client_pid > 0){
 		nlmsg_unicast(nl_sk, skb, client_pid);
 	}else{
 		kfree_skb(skb);

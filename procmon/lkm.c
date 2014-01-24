@@ -102,7 +102,7 @@ int unload(char *kmod_name){
 /*0 == ok, 1 == ko*/
 int start(){
 	int ret = 0;
-	FILE *fp = fopen("/proc/sys/procmon/state", "w");
+	FILE *fp = fopen("/proc/sys/monks/state", "w");
 
 	if(fp == NULL){
 		ret = 1;
@@ -119,7 +119,7 @@ int start(){
 /*0 == ok, 1 == ko*/
 int stop(){
 	int ret = 0;
-	FILE *fp = fopen("/proc/sys/procmon/state", "w");
+	FILE *fp = fopen("/proc/sys/monks/state", "w");
 
 	if(fp == NULL){
 		ret = 1;

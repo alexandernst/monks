@@ -18,9 +18,9 @@
 #include "utils.h"
 #include "netlink.h"
 
-#define PROCMON_VERSION 0.1
-#define PROCMON_MODULE_NAME "procmon"
-#define PROCMON_MODULE_PATH "./procmon.ko"
+#define MONKS_VERSION 0.1
+#define MONKS_MODULE_NAME "monks"
+#define MONKS_MODULE_PATH "./monks.ko"
 
 #define MAXEVENTS 2
 #define MEM_LIMIT 30000

@@ -4,50 +4,50 @@
 | Main methods: _init and _exit                                               |
 \*****************************************************************************/
 
-int procmon_state = 0, client_pid = -1;
+int monks_state = 0, client_pid = -1;
 
 static int __init hook_init(void){
 	static int netlink_id;
 
-	procmon_info("================\n");
-	procmon_info("Starting procmon\n");
+	monks_info("================\n");
+	monks_info("Starting monks\n");
 
 	netlink_id = nl_init();
 	if(netlink_id == -2){
-		procmon_error("Can't create netlink thread\n");
+		monks_error("Can't create netlink thread\n");
 	}else if(netlink_id == -1){
-		procmon_info("Error creating socket.\n");
+		monks_info("Error creating socket.\n");
 	}else{
-		procmon_info("Acquired NETLINK socket (%d)\n", netlink_id);
+		monks_info("Acquired NETLINK socket (%d)\n", netlink_id);
 	}
 
-	set_procmon_control_netlink_id(&netlink_id);
+	set_monks_control_netlink_id(&netlink_id);
 
 	hook_calls();
 
-	if(!register_procmon_controls()){
-		procmon_error("Error creating fs control interface in /proc/sys/procmon/\n");
+	if(!register_monks_controls()){
+		monks_error("Error creating fs control interface in /proc/sys/monks/\n");
 		return -ENOMEM;
 	}
 
-	procmon_info("Successfully loaded\n");
+	monks_info("Successfully loaded\n");
 
 	return 0;
 }
 
 static void __exit hook_exit(void){
-	procmon_state = 0;
+	monks_state = 0;
 
-	procmon_info("Stopping procmon\n");
+	monks_info("Stopping monks\n");
 
-	unregister_procmon_controls();
+	unregister_monks_controls();
 
 	unhook_calls();
 	
 	nl_halt();
 
-	procmon_info("Successfully unloaded\n");
-	procmon_info("================\n");
+	monks_info("Successfully unloaded\n");
+	monks_info("================\n");
 }
 
 /*****************************************************************************\
@@ -58,4 +58,4 @@ module_init(hook_init);
 module_exit(hook_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Alexander Nestorov <alexandernst@gmail.com>");
-MODULE_DESCRIPTION("Procmon alternative for Linux");
+MODULE_DESCRIPTION("Monks alternative for Linux");

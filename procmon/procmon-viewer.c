@@ -1,4 +1,4 @@
-#include "procmon-viewer.h"
+#include "monks-viewer.h"
 
 syscall_intercept_info_node *head, *curr, *tail;
 
@@ -29,55 +29,55 @@ int main(int argc, char **argv){
 			int ret;
 
 			case 'c':
-				ret = check(PROCMON_MODULE_NAME);
+				ret = check(MONKS_MODULE_NAME);
 				if(ret == 0){
-					printf("Procmon kernel module is not loaded.\n");
+					printf("Monks kernel module is not loaded.\n");
 				}else if(ret == 1){
-					printf("Procmon kernel module is loaded.\n");
+					printf("Monks kernel module is loaded.\n");
 				}
 				return 0;
 
 			case 'l':
-				if(load(PROCMON_MODULE_PATH) == 0){
-					printf("Procmon kernel module successfully loaded.\n");
+				if(load(MONKS_MODULE_PATH) == 0){
+					printf("Monks kernel module successfully loaded.\n");
 				}
 				return 0;
 
 			case 'u':
-				if(unload(PROCMON_MODULE_NAME) == 0){
-					printf("Procmon kernel module successfully unloaded.\n");
+				if(unload(MONKS_MODULE_NAME) == 0){
+					printf("Monks kernel module successfully unloaded.\n");
 				}
 				return 0;
 
 			case 's':
 				if(start() == 0){
-					printf("Procmon kernel module successfully started.\n");
+					printf("Monks kernel module successfully started.\n");
 				}
 				return 0;
 
 			case 'e':
 				if(stop() == 0){
-					printf("Procmon kernel module successfully stopped.\n");
+					printf("Monks kernel module successfully stopped.\n");
 				}
 				return 0;
 
 			#endif
 
 			case 'v':
-				printf("Procmon %g\n", PROCMON_VERSION);
+				printf("Monks %g\n", MONKS_VERSION);
 				break;
 
 			case '?':
 				printf(
 					"Possible options are:\n\t"
 						#ifndef __NO_KMOD__
-						"'c' - Check if procmon kernel module is loaded.\n\t"
-						"'l' - Load procmon kernel module.\n\t"
-						"'u' - Unload procmon kernel module.\n\t"
-						"'s' - Start procmon kernel module hijack.\n\t"
-						"'e' - End procmon kernel module hijack.\n\t"
+						"'c' - Check if monks kernel module is loaded.\n\t"
+						"'l' - Load monks kernel module.\n\t"
+						"'u' - Unload monks kernel module.\n\t"
+						"'s' - Start monks kernel module hijack.\n\t"
+						"'e' - End monks kernel module hijack.\n\t"
 						#endif
-						"'v' - Show procmon version.\n"
+						"'v' - Show monks version.\n"
 				);
 				return 1;
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv){
 	/*Get STDIN file descriptor*/
 	stdin_fd = fcntl(STDIN_FILENO,  F_DUPFD, 0);
 
-	/*Set our client PID in Procmon*/
+	/*Set our client PID in Monks*/
 	set_client_pid(getpid());
 
 	/*Make SEGFAULTs play nice with NCURSES*/
@@ -195,7 +195,7 @@ int main(int argc, char **argv){
 	/*End NCURSES mode*/
 	endwin();
 
-	/*Let the procmon module that we're not listening anymore*/
+	/*Let the monks module that we're not listening anymore*/
 	set_client_pid(-1);
 
 	return 0;

@@ -9,7 +9,7 @@
 #include "../common/mem_ops.h"
 #include "../common/serialize.h"
 
-extern int procmon_state, client_pid;
+extern int monks_state, client_pid;
 
 int nl_init(void);
 void nl_halt(void);

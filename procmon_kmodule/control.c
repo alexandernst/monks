@@ -1,12 +1,12 @@
 #include "control.h"
 
 /*****************************************************************************\
-| /proc/sys state and methods related to the control of procmon               |
+| /proc/sys state and methods related to the control of monks                 |
 \*****************************************************************************/
 
 static int nsyscalls_state_table = 0;
 static ctl_table *syscalls_state_table;
-static struct ctl_table_header *procmon_table_header;
+static struct ctl_table_header *monks_table_header;
 
 static ctl_table state_table[] = {
 	{
@@ -15,7 +15,7 @@ static ctl_table state_table[] = {
 	{
 		.procname = "state", .mode = 0666,
 		.proc_handler = &proc_dointvec_minmax,
-		.data = &procmon_state, .maxlen	= sizeof(int),
+		.data = &monks_state, .maxlen	= sizeof(int),
 		.extra1 = "\x00\x00\x00\x00" /*0*/, .extra2 = "\x01\x00\x00\x00" /*1*/
 	},
 	{
@@ -31,23 +31,23 @@ static ctl_table state_table[] = {
 	{ 0 }
 };
 
-static ctl_table procmon_table[] = {
+static ctl_table monks_table[] = {
 	{
-		.procname = "procmon", .mode = 0555,
+		.procname = "monks", .mode = 0555,
 		.child = state_table
 	},
 	{ 0 }
 };
 
-int register_procmon_controls(void){
+int register_monks_controls(void){
 
 	syscalls_state_table = kcalloc(nsyscalls_state_table, sizeof(struct ctl_table), GFP_KERNEL);
 	if(!syscalls_state_table){
 		return 0;
 	}
 
-	procmon_table_header = register_sysctl_table(procmon_table);
-	if(!procmon_table_header){
+	monks_table_header = register_sysctl_table(monks_table);
+	if(!monks_table_header){
 		return 0;
 	}else{
 		return 1;
@@ -75,12 +75,12 @@ void add_syscalls_state_table_entry(char *procname, int *state){
 	state_table[0].child = syscalls_state_table;
 }
 
-void set_procmon_control_netlink_id(int *netlink_id){
-	procmon_table[0].child[2].data = netlink_id;
+void set_monks_control_netlink_id(int *netlink_id){
+	monks_table[0].child[2].data = netlink_id;
 }
 
-void unregister_procmon_controls(void){
-	unregister_sysctl_table(procmon_table_header);
+void unregister_monks_controls(void){
+	unregister_sysctl_table(monks_table_header);
 	kfree(syscalls_state_table);
 }
 
