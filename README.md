@@ -13,7 +13,7 @@ process from any user, at any level.
 
 That's how it works:
 
-![How it works](https://raw.github.com/alexandernst/monks/screenshots/monks.gif)
+![How it works](https://raw.github.com/alexandernst/monks/master/screenshots/monks.gif)
 
 Setting Monks
 =======
@@ -45,7 +45,7 @@ switches instead to do all those actions (load/unload, start/stop).
 The UI is based on ```ncurses```. Anyways, right now there is almost no functional
 code, just a basic viewer.
 
-![Screenshot](https://raw.github.com/alexandernst/monks/screenshots/screenshot1.jpeg)
+![Screenshot](https://raw.github.com/alexandernst/monks/master/screenshots/screenshot1.jpeg)
 
 Why Monks
 =======
