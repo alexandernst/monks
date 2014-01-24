@@ -1,9 +1,4 @@
-*
-!.gitignore
-!Makefile
-!README.md
-!common/
-!procmon/
-!procmon_kmodule/
-!procmon_kmodule/syscalls/
-!udis86/
+monks-viewer
+monks.ko
+*sublime*
+playground/
