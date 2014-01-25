@@ -8,6 +8,35 @@ int header_box_startx, header_box_starty, header_box_width, header_box_height;
 int win_data_startx, win_data_starty, win_data_width, win_data_height;
 int win_data_box_startx, win_data_box_starty, win_data_box_width, win_data_box_height;
 
+char *format(char *fmt, types type, ...){
+	int err;
+	va_list ap;
+
+	char *tmp = new(win_data_width + 1);
+	if(!tmp){
+		return NULL;
+	}
+
+	va_start(ap, type);
+
+	if(type == NUMBER){
+		int val = va_arg(ap, int);
+		err = snprintf(tmp, win_data_width, fmt, val);
+	}else if(type == STRING){
+		char *val = va_arg(ap, char*);
+		err = snprintf(tmp, win_data_width, fmt, val);
+	}
+
+	va_end(ap);
+
+	if(err < 0){
+		del(tmp);
+		return NULL;
+	}
+
+	return tmp;
+}
+
 char *get_str_info(syscall_intercept_info *i){
 	int err;
 	char *tmp = new(win_data_width + 1);
@@ -158,20 +187,27 @@ void draw_data(syscall_intercept_info_node *in) {
 	}
 
 	for(i = win_data_height; i >= 0 && in != NULL && in != head; i--, in = in->prev){
+
+		/*Draw or skip data node but keep cursor on the same line*/
 		if(!filter_i(in->i)){
-			char *s_info = get_str_info(in->i);
 
 			/*Clear line before drawing on it*/
 			wmove(win_data, i, 0);
 			wclrtoeol(win_data);
 
-			/*Draw or skip data node but keep cursor on the same line*/
-			if(s_info){
-				mvwaddstr(win_data, i, 0, s_info);
-				del(s_info);
-			}else{
-				i++;
-			}
+
+			PRINT(i, "%-15.20s", STRING, in->i->pname);
+
+			PRINT(i, "%10u", NUMBER, in->i->pid);
+
+			PRINT(i, " %-15.10s", STRING, in->i->operation);
+
+			PRINT(i, "%-50.45s", STRING, in->i->path);
+
+			PRINT(i, "%-10.10s", STRING, in->i->result);
+
+			PRINT(i, " %-200.200s", STRING, in->i->details);
+
 		}else{
 			i++; /*Do not leave empty lines!*/
 		}
