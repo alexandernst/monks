@@ -136,6 +136,14 @@ int main(int argc, char **argv){
 	/*Init ncurses window*/
 	init_ncurses();
 
+	if(has_colors()){
+		start_color();
+
+		init_pair(GREEN, COLOR_GREEN, COLOR_BLACK);
+		init_pair(RED, COLOR_RED, COLOR_BLACK);
+		init_pair(YELLOW, COLOR_RED, COLOR_BLACK);
+	}
+
 	/*React on resize*/
 	signal(SIGWINCH, schedule_resize);
 

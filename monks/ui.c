@@ -111,8 +111,6 @@ void create_win_data_data_box(){
 		destroy_win(win_data);
 	}
 
-	refresh();
-
 	header_box = create_newwin(header_box_height, header_box_width, header_box_starty, header_box_startx);
 	mvwprintw(header_box, 1, 1,
 		"%-15.20s"       /* Process name */
@@ -121,8 +119,8 @@ void create_win_data_data_box(){
 		"%-50.45s"       /* Path         */
 		"%-10.10s"       /* Result       */
 		" %-7.7s",       /* Details      */
-
 		"Process name", "PID", "Operation", "Path", "Result", "Details");
+
 	wrefresh(header_box);
 
 	win_data_box = create_newwin(win_data_box_height, win_data_box_width, win_data_box_starty, win_data_box_startx);
@@ -173,7 +171,7 @@ void calc_w_size_pos(){
 }
 
 void draw_data(syscall_intercept_info_node *in) {
-	int i;
+	int i, result_color;
 
 	if(scheduled_resize){
 		endwin();
@@ -186,6 +184,7 @@ void draw_data(syscall_intercept_info_node *in) {
 		scheduled_resize = 0;
 	}
 
+	/*Print each row*/
 	for(i = win_data_height; i >= 0 && in != NULL && in != head; i--, in = in->prev){
 
 		/*Draw or skip data node but keep cursor on the same line*/
@@ -195,18 +194,20 @@ void draw_data(syscall_intercept_info_node *in) {
 			wmove(win_data, i, 0);
 			wclrtoeol(win_data);
 
+			/*Print each cell*/
+			PRINT(win_data, i, "%-15.20s", STRING, in->i->pname);
 
-			PRINT(i, "%-15.20s", STRING, in->i->pname);
+			PRINT(win_data, i, "%10u", NUMBER, in->i->pid);
 
-			PRINT(i, "%10u", NUMBER, in->i->pid);
+			PRINT(win_data, i, " %-15.10s", STRING, in->i->operation);
 
-			PRINT(i, " %-15.10s", STRING, in->i->operation);
+			PRINT(win_data, i, "%-50.45s", STRING, in->i->path);
 
-			PRINT(i, "%-50.45s", STRING, in->i->path);
+			SET_ON_COLOR(win_data, result_color, GREEN, RED, strcmp(in->i->result, "Ok") == 0);
+			PRINT(win_data, i, "%-10.10s", STRING, in->i->result);
+			SET_OFF_COLOR(win_data, result_color);
 
-			PRINT(i, "%-10.10s", STRING, in->i->result);
-
-			PRINT(i, " %-200.200s", STRING, in->i->details);
+			PRINT(win_data, i, " %-200.200s", STRING, in->i->details);
 
 		}else{
 			i++; /*Do not leave empty lines!*/
