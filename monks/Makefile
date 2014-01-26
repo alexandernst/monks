@@ -3,7 +3,8 @@ CFLAGS	=	-g -Wall -Wextra -Werror -std=gnu89
 
 LDLIBS	=	$(shell pkg-config --silence-errors --libs libkmod)
 LDLIBS	+=	$(shell pkg-config --silence-errors --libs ncurses)
-OBJS	=	../common/mem_ops.o ../common/deserialize.o netlink.o utils.o ui.o monks-viewer.o
+LDLIBS  +=  -lm
+OBJS	=	../common/mem_ops.o ../common/deserialize.o ../common/string_utils.o netlink.o utils.o ui.o monks-viewer.o
 SOURCES	=	monks-viewer.c
 DESTS	=	../monks-viewer
 

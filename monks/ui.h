@@ -10,11 +10,7 @@
 
 #include "../common/mem_ops.h"
 #include "../common/structures.h"
-
-typedef enum types {
-	NUMBER = 1,
-	STRING = 2
-} types;
+#include "../common/string_utils.h"
 
 typedef enum colors {
 	GREEN = 1,
@@ -85,11 +81,6 @@ typedef enum colors {
 			continue;                                                         \
 		}                                                                     \
 	}
-
-char *format(char *fmt, types type, ...);
-char *get_str_info(syscall_intercept_info *i);
-void rstrip(char *string);
-void lstrip(char *string);
 
 void init_ncurses(void);
 void create_win_data_data_box();
