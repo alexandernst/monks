@@ -26,6 +26,7 @@ void create_win_data_data_box(){
 	}
 
 	refresh();
+
 	header_box = create_newwin(header_box_height, header_box_width, header_box_starty, header_box_startx);
 	mvwprintw(header_box, 1, 1,
 		"%-15.20s"       /* Process name */
@@ -42,6 +43,7 @@ void create_win_data_data_box(){
 	win_data = create_newwin(win_data_height, win_data_width, win_data_starty, win_data_startx);
 
 	wclear(win_data);
+	wrefresh(win_data);
 }
 
 WINDOW *create_newwin(int height, int width, int starty, int startx) {
