@@ -25,6 +25,7 @@ void create_win_data_data_box(){
 		destroy_win(win_data);
 	}
 
+	refresh();
 	header_box = create_newwin(header_box_height, header_box_width, header_box_starty, header_box_startx);
 	mvwprintw(header_box, 1, 1,
 		"%-15.20s"       /* Process name */
