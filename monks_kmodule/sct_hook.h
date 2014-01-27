@@ -36,7 +36,7 @@ typedef struct syscall_info_t {
 	int is32;
 	int state;
 	int __NR_;
-	void *ff;
+	void *pre;
 	void *rf;
 } __attribute__((packed)) syscall_info_t;
 
@@ -98,7 +98,7 @@ struct idtr{
 		.is32 = 0,                                                            \
 		.state = 1,                                                           \
 		.__NR_ = __NR_##F,                                                    \
-		.ff = hooked_sys_##F,                                                 \
+		.pre = hooked_sys_pre_##F,                                            \
 	};
 
 #ifdef CONFIG_IA32_EMULATION
@@ -109,7 +109,7 @@ struct idtr{
 		.is32 = 1,                                                            \
 		.state = 1,                                                           \
 		.__NR_ = __NR32_##F,                                                  \
-		.ff = hooked_sys32_##F,                                               \
+		.pre = hooked_sys32_pre_##F,                                          \
 	};
 #endif
 
@@ -172,6 +172,78 @@ struct idtr{
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
 		"mov %0, [rbp + 8 + 8 + 24];"                                         \
+		".att_syntax;"                                                        \
+		: "=r" (x)                                                            \
+	);
+#endif
+
+/*****************************************************************************\
+|                                     END                                     |
+\*****************************************************************************/
+
+/*****************************************************************************\
+| HOOK INFO MACROS                                                            |
+| The same way we use the stack to store the result of a syscall, we use it   |
+| to store some information about the syscall that is being ran. Each stub    |
+| calls two functions (plus the real syscall): the pre-hook and the post-hook.|
+| When the pre-hook is called, we save the arguments and create a basic node  |
+| of syscall_intercept_info type which is filled with some data. Then it's    |
+| saved here, on the stack, so we can recover it when we're in the post-hook. |
+\*****************************************************************************/
+
+#ifdef CONFIG_X86_32
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov [ebp + 4 + 4 + 28], %0;"                                         \
+		".att_syntax;"                                                        \
+		:                                                                     \
+		: "r" (x)                                                             \
+	);
+#else
+#define __SET_SYSCALL_HOOK_INFO(x)                                            \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov [rbp + 8 + 8 + 56], %0;"                                         \
+		".att_syntax;"                                                        \
+		:                                                                     \
+		: "r" (x)                                                             \
+	);
+#endif
+
+#ifdef CONFIG_IA32_EMULATION
+#define __SET_SYSCALL_HOOK_INFO32(x)                                          \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov [rbp + 8 + 8 + 28], %0;"                                         \
+		".att_syntax;"                                                        \
+		:                                                                     \
+		: "r" (x)                                                             \
+	);
+#endif
+
+#ifdef CONFIG_X86_32
+#define __GET_SYSCALL_HOOK_INFO(x)                                            \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov %0, [rbp + 4 + 4 + 28];"                                         \
+		".att_syntax;"                                                        \
+		: "=r" (x)                                                            \
+	);
+#else
+#define __GET_SYSCALL_HOOK_INFO(x)                                            \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov %0, [rbp + 8 + 8 + 56];"                                         \
+		".att_syntax;"                                                        \
+		: "=r" (x)                                                            \
+	);
+#endif
+
+#ifdef CONFIG_IA32_EMULATION
+#define __GET_SYSCALL_HOOK_INFO32(x)                                          \
+	__asm__ __volatile__(                                                     \
+		".intel_syntax noprefix;"                                             \
+		"mov %0, [rbp + 8 + 8 + 28];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
 	);
