@@ -1,4 +1,4 @@
-[![Build Status](https://drone.io/github.com/alexandernst/monks/status.png)](https://drone.io/github.com/alexandernst/monks/latest) Monks alternative for Linux - [Main webpage](http://alexandernst.github.io/monks "Monks's Homepage")
+[![Build Status](https://drone.io/github.com/alexandernst/monks/status.png)](https://drone.io/github.com/alexandernst/monks/latest) Procmon alternative for Linux - [Main webpage](http://alexandernst.github.io/monks "Monks's Homepage")
 
 What is Monks
 =======
@@ -14,6 +14,13 @@ process from any user, at any level.
 That's how it works:
 
 ![How it works](https://raw.github.com/alexandernst/monks/master/screenshots/monks.gif)
+
+Why that name?
+=======
+
+At first I thought naming the project ```Procmon```, but because that name is already
+a registered trademark and I don't want any troubles, I decided to call it ```Monks```,
+which stands for ```MONitoring Kernel Syscalls```.
 
 Setting Monks
 =======
