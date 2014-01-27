@@ -31,7 +31,7 @@
 #| | Ret val    | ebp - 8    |                                                |
 #| --------------            | On the other hand, on x64 arguments are passed |
 #| --------------            | via the registers, in this order: RDI, RSI,    |
-#| | arg6  copy | ebp - 12    | RDX, RCX, R8, R9.                              |
+#| | arg6  copy | ebp - 12   | RDX, RCX, R8, R9.                              |
 #| --------------            |                                                |
 #| --------------            | In both x86 and x64 the result of the syscall  |
 #| | arg5  copy | ebp - 16   | function is saved in a register. EAX on x86,   |
@@ -112,7 +112,7 @@ stub:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 64; #8 bytes for syscall result + 48 bytes for 6 args
+	sub rsp, 64; #8 bytes for hook info, 8 bytes for result, 48 bytes for 6 args
 
 	#Save args on the stack
 	mov [rbp - 24], rdi
@@ -123,7 +123,7 @@ stub:
 	mov [rbp - 64], r9
 
 	#Check if monks's state or the syscall's state are
-	#set to 0, and if so, skip calling the fake syscall
+	#set to 0, and if so, skip calling the pre-hook
 	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_pre
@@ -131,7 +131,7 @@ stub:
 	cmp eax, 1
 	jne skip_pre
 
-	#Call fake pre syscall
+	#Call pre-hook
 	mov rax, 0x1010101010101010 #&iter->pre
 	mov rdi, [rbp - 24]
 	mov rsi, [rbp - 32]
@@ -154,7 +154,7 @@ skip_pre:
 	mov [rbp - 16], rax
 
 	#Check if monks's state or the syscall's state are
-	#set to 0, and if so, skip calling the fake syscall
+	#set to 0, and if so, skip calling the post-hook
 	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_post
@@ -162,7 +162,7 @@ skip_pre:
 	cmp eax, 1
 	jne skip_post
 
-	#Call fake post syscall
+	#Call post-hook
 	mov rax, 0x1010101010101010 #&iter->post
 	mov rdi, [rbp - 24]
 	mov rsi, [rbp - 32]
