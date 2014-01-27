@@ -37,6 +37,7 @@ typedef struct syscall_info_t {
 	int state;
 	int __NR_;
 	void *pre;
+	void *post;
 	void *rf;
 } __attribute__((packed)) syscall_info_t;
 
@@ -99,6 +100,7 @@ struct idtr{
 		.state = 1,                                                           \
 		.__NR_ = __NR_##F,                                                    \
 		.pre = hooked_sys_pre_##F,                                            \
+		.post = hooked_sys_post_##F,                                          \
 	};
 
 #ifdef CONFIG_IA32_EMULATION
@@ -110,6 +112,7 @@ struct idtr{
 		.state = 1,                                                           \
 		.__NR_ = __NR32_##F,                                                  \
 		.pre = hooked_sys32_pre_##F,                                          \
+		.post = hooked_sys32_post_##F,                                        \
 	};
 #endif
 
