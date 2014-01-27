@@ -105,10 +105,13 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	memcpy(bytecode, stub, stub_size);
 
 	//patch addrs
-	ud_patch_addr(bytecode, iter->rf);
 	ud_patch_addr(bytecode, &monks_state);
 	ud_patch_addr(bytecode, &iter->state);
 	ud_patch_addr(bytecode, iter->pre);
+	ud_patch_addr(bytecode, iter->rf);
+	ud_patch_addr(bytecode, &monks_state);
+	ud_patch_addr(bytecode, &iter->state);
+	ud_patch_addr(bytecode, iter->post);
 
 	return bytecode; //iter->rf;
 }
