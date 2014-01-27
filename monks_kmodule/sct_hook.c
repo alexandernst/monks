@@ -108,7 +108,7 @@ static void *create_stub(syscall_info_t *iter, void *stub){
 	ud_patch_addr(bytecode, iter->rf);
 	ud_patch_addr(bytecode, &monks_state);
 	ud_patch_addr(bytecode, &iter->state);
-	ud_patch_addr(bytecode, iter->ff);
+	ud_patch_addr(bytecode, iter->pre);
 
 	return bytecode; //iter->rf;
 }
