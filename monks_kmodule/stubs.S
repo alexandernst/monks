@@ -24,26 +24,29 @@
 #| --------------            | passed on the stack, from right to left, which |
 #| | EBP        | ebp + 0    | means that the first argument is on the        |
 #| --------------            | hightest position, while the last argument is  |
+#| --------------            |
+#| | Hook info  | ebp - 4    |
+#| --------------            |
 #| --------------            | on the lowest position.                        |
-#| | Ret val    | ebp - 4    |                                                |
+#| | Ret val    | ebp - 8    |                                                |
 #| --------------            | On the other hand, on x64 arguments are passed |
 #| --------------            | via the registers, in this order: RDI, RSI,    |
-#| | arg6  copy | ebp - 8    | RDX, RCX, R8, R9.                              |
+#| | arg6  copy | ebp - 12    | RDX, RCX, R8, R9.                              |
 #| --------------            |                                                |
 #| --------------            | In both x86 and x64 the result of the syscall  |
-#| | arg5  copy | ebp - 12   | function is saved in a register. EAX on x86,   |
+#| | arg5  copy | ebp - 16   | function is saved in a register. EAX on x86,   |
 #| --------------            | RAX on x64.                                    |
 #| --------------            |                                                |
-#| | arg4  copy | ebp - 16   |                                                |
+#| | arg4  copy | ebp - 20   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg3  copy | ebp - 20   |                                                |
+#| | arg3  copy | ebp - 24   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg2  copy | ebp - 24   |                                                |
+#| | arg2  copy | ebp - 28   |                                                |
 #| --------------            |                                                |
 #| --------------            |                                                |
-#| | arg1  copy | ebp - 28   |                                                |
+#| | arg1  copy | ebp - 32   |                                                |
 #| --------------            |                                                |
 #|                           |                                                |
 #\****************************************************************************/
@@ -57,26 +60,28 @@ stub:
 	#Create stack frame
 	push ebp
 	mov ebp, esp
-	sub esp, 28 #4 bytes for syscall result and 24 bytes for 6 args
+	sub esp, 32 #4 bytes for syscall result and 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, [ebp + 8]
-	mov [ebp - 28], eax
+	mov [ebp - 32], eax
 	mov eax, [ebp + 12]
-	mov [ebp - 24], eax
+	mov [ebp - 28], eax
 	mov eax, [ebp + 16]
-	mov [ebp - 20], eax
+	mov [ebp - 24], eax
 	mov eax, [ebp + 20]
-	mov [ebp - 16], eax
+	mov [ebp - 20], eax
 	mov eax, [ebp + 24]
-	mov [ebp - 12], eax
+	mov [ebp - 16], eax
 	mov eax, [ebp + 28]
-	mov [ebp - 8], eax
+	mov [ebp - 12], eax
+
+	#Call pre_hook
 
 	#Call real syscall and save return value
 	mov eax, 0x10101010 #&iter->rf
 	call eax
-	mov [ebp - 4], eax
+	mov [ebp - 8], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -87,13 +92,13 @@ stub:
 	cmp eax, 1
 	jne skip_ff
 
-	#Call fake syscall
+	#Call post_hook
 	mov eax, 0x10101010 #&iter->ff
 	call eax
 
 skip_ff:
 	#Restore real syscall result to eax
-	mov eax, [ebp - 4]
+	mov eax, [ebp - 8]
 
 	#Exit
 	mov esp, ebp
@@ -107,49 +112,69 @@ stub:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 56; #8 bytes for syscall result + 48 bytes for 6 args
+	sub rsp, 64; #8 bytes for syscall result + 48 bytes for 6 args
 
 	#Save args on the stack
-	mov [rbp - 16], rdi
-	mov [rbp - 24], rsi
-	mov [rbp - 32], rdx
-	mov [rbp - 40], rcx
-	mov [rbp - 48], r8
-	mov [rbp - 56], r9
-
-	#Call real syscall and save return value
-	mov rax, 0x1010101010101010 #&iter->rf
-	mov rdi, [rbp - 16]
-	mov rsi, [rbp - 24]
-	mov rdx, [rbp - 32]
-	mov rcx, [rbp - 40]
-	mov r8, [rbp - 48]
-	mov r9, [rbp - 56]
-	call rax
-	mov [rbp - 8], rax
+	mov [rbp - 24], rdi
+	mov [rbp - 32], rsi
+	mov [rbp - 40], rdx
+	mov [rbp - 48], rcx
+	mov [rbp - 56], r8
+	mov [rbp - 64], r9
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
 	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
-	jne skip_ff
+	jne skip_pre
 	mov eax, [0x1010101010101010] #[&iter->state]
 	cmp eax, 1
-	jne skip_ff
+	jne skip_pre
 
-	#Call fake syscall
-	mov rax, 0x1010101010101010 #&iter->ff
-	mov rdi, [rbp - 16]
-	mov rsi, [rbp - 24]
-	mov rdx, [rbp - 32]
-	mov rcx, [rbp - 40]
-	mov r8, [rbp - 48]
-	mov r9, [rbp - 56]
+	#Call fake pre syscall
+	mov rax, 0x1010101010101010 #&iter->pre
+	mov rdi, [rbp - 24]
+	mov rsi, [rbp - 32]
+	mov rdx, [rbp - 40]
+	mov rcx, [rbp - 48]
+	mov r8, [rbp - 56]
+	mov r9, [rbp - 64]
 	call rax
 
-skip_ff:
+skip_pre:
+	#Call real syscall and save return value
+	mov rax, 0x1010101010101010 #&iter->rf
+	mov rdi, [rbp - 24]
+	mov rsi, [rbp - 32]
+	mov rdx, [rbp - 40]
+	mov rcx, [rbp - 48]
+	mov r8, [rbp - 56]
+	mov r9, [rbp - 64]
+	call rax
+	mov [rbp - 16], rax
+
+	#Check if monks's state or the syscall's state are
+	#set to 0, and if so, skip calling the fake syscall
+	mov eax, [0x1010101010101010] #[&monks_state]
+	cmp eax, 1
+	jne skip_post
+	mov eax, [0x1010101010101010] #[&iter->state]
+	cmp eax, 1
+	jne skip_post
+
+	#Call fake post syscall
+	mov rax, 0x1010101010101010 #&iter->post
+	mov rdi, [rbp - 24]
+	mov rsi, [rbp - 32]
+	mov rdx, [rbp - 40]
+	mov rcx, [rbp - 48]
+	mov r8, [rbp - 56]
+	mov r9, [rbp - 64]
+	call rax
+
+skip_post:
 	#Restore real syscall result to rax
-	mov rax, [rbp - 8]
+	mov rax, [rbp - 16]
 
 	#Exit
 	mov rsp, rbp
@@ -163,26 +188,26 @@ stub_32:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 28 #4 bytes for syscall result and 24 bytes for 6 args
+	sub rsp, 32 #4 bytes for syscall result and 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, dword [rbp + 8]
-	mov dword [rbp - 28], eax
+	mov dword [rbp - 32], eax
 	mov eax, dword [rbp + 12]
-	mov dword [rbp - 24], eax
+	mov dword [rbp - 28], eax
 	mov eax, dword [rbp + 16]
-	mov dword [rbp - 20], eax
+	mov dword [rbp - 24], eax
 	mov eax, dword [rbp + 20]
-	mov dword [rbp - 16], eax
+	mov dword [rbp - 20], eax
 	mov eax, dword [rbp + 24]
-	mov dword [rbp - 12], eax
+	mov dword [rbp - 16], eax
 	mov eax, dword [rbp + 28]
-	mov dword [rbp - 8], eax
+	mov dword [rbp - 12], eax
 
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov dword [rbp - 4], eax
+	mov dword [rbp - 8], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the fake syscall
@@ -199,7 +224,7 @@ stub_32:
 
 skip_ff32:
 	#Restore real syscall result to rax
-	mov eax, dword [rbp - 4]
+	mov eax, dword [rbp - 8]
 
 	#Exit
 	mov rsp, rbp
