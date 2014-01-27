@@ -60,7 +60,7 @@ stub:
 	#Create stack frame
 	push ebp
 	mov ebp, esp
-	sub esp, 32 #4 bytes for syscall result and 24 bytes for 6 args
+	sub esp, 32 #4 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, [ebp + 8]
@@ -76,8 +76,20 @@ stub:
 	mov eax, [ebp + 28]
 	mov [ebp - 12], eax
 
-	#Call pre_hook
+	#Check if monks's state or the syscall's state are
+	#set to 0, and if so, skip calling the fake syscall
+	mov eax, [0x10101010] #[&monks_state]
+	cmp eax, 1
+	jne skip_pre
+	mov eax, [0x10101010] #[&iter->state]
+	cmp eax, 1
+	jne skip_pre
 
+	#Call pre-hook
+	mov eax, 0x10101010 #&iter->pre
+	call eax
+
+skip_pre:
 	#Call real syscall and save return value
 	mov eax, 0x10101010 #&iter->rf
 	call eax
@@ -87,16 +99,16 @@ stub:
 	#set to 0, and if so, skip calling the fake syscall
 	mov eax, [0x10101010] #[&monks_state]
 	cmp eax, 1
-	jne skip_ff
+	jne skip_post
 	mov eax, [0x10101010] #[&iter->state]
 	cmp eax, 1
-	jne skip_ff
+	jne skip_post
 
-	#Call post_hook
-	mov eax, 0x10101010 #&iter->ff
+	#Call post-hook
+	mov eax, 0x10101010 #&iter->post
 	call eax
 
-skip_ff:
+skip_post:
 	#Restore real syscall result to eax
 	mov eax, [ebp - 8]
 
