@@ -195,6 +195,7 @@ struct idtr{
 \*****************************************************************************/
 
 #ifdef CONFIG_X86_32
+#define __SET_SYSCALL_HOOK_INFO(x)                                            \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
 		"mov [ebp + 4 + 4 + 28], %0;"                                         \
@@ -228,7 +229,7 @@ struct idtr{
 #define __GET_SYSCALL_HOOK_INFO(x)                                            \
 	__asm__ __volatile__(                                                     \
 		".intel_syntax noprefix;"                                             \
-		"mov %0, [rbp + 4 + 4 + 28];"                                         \
+		"mov %0, [ebp + 4 + 4 + 28];"                                         \
 		".att_syntax;"                                                        \
 		: "=r" (x)                                                            \
 	);
