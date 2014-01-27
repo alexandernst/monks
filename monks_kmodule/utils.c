@@ -45,7 +45,9 @@ char *path_from_fd(unsigned int fd){
 	struct file *file;
 	struct path path;
 	struct files_struct *files = current->files;
-	char *tmp, *pathname = "", *rpathname = new(1);
+	char *tmp, *pathname = "", *rpathname = new(4);
+
+	strcpy(rpathname, "Err");
 
 	spin_lock(&files->file_lock);
 	file = fcheck_files(files, fd);
@@ -72,6 +74,7 @@ char *path_from_fd(unsigned int fd){
 		return rpathname;
 	}
 
+	del(rpathname);
 	rpathname = kstrdup(pathname, GFP_KERNEL);
 	
 	free_page((unsigned long)tmp);
