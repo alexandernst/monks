@@ -77,7 +77,7 @@ stub:
 	mov [ebp - 12], eax
 
 	#Check if monks's state or the syscall's state are
-	#set to 0, and if so, skip calling the fake syscall
+	#set to 0, and if so, skip calling the pre-hook
 	mov eax, [0x10101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_pre
@@ -96,7 +96,7 @@ skip_pre:
 	mov [ebp - 8], eax
 
 	#Check if monks's state or the syscall's state are
-	#set to 0, and if so, skip calling the fake syscall
+	#set to 0, and if so, skip calling the post-hook
 	mov eax, [0x10101010] #[&monks_state]
 	cmp eax, 1
 	jne skip_post
@@ -124,7 +124,7 @@ stub:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 64; #8 bytes for hook info, 8 bytes for result, 48 bytes for 6 args
+	sub rsp, 64 #8 bytes for hook info, 8 bytes for result, 48 bytes for 6 args
 
 	#Save args on the stack
 	mov [rbp - 24], rdi
@@ -200,43 +200,57 @@ stub_32:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 32 #4 bytes for syscall result and 24 bytes for 6 args
+	sub rsp, 36 #8 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
 
 	#Save args on the stack
 	mov eax, dword [rbp + 8]
-	mov dword [rbp - 32], eax
+	mov dword [rbp - 36], eax
 	mov eax, dword [rbp + 12]
-	mov dword [rbp - 28], eax
+	mov dword [rbp - 32], eax
 	mov eax, dword [rbp + 16]
-	mov dword [rbp - 24], eax
+	mov dword [rbp - 28], eax
 	mov eax, dword [rbp + 20]
-	mov dword [rbp - 20], eax
+	mov dword [rbp - 24], eax
 	mov eax, dword [rbp + 24]
-	mov dword [rbp - 16], eax
+	mov dword [rbp - 20], eax
 	mov eax, dword [rbp + 28]
-	mov dword [rbp - 12], eax
+	mov dword [rbp - 16], eax
 
+	#Check if monks's state or the syscall's state are
+	#set to 0, and if so, skip calling the pre-hook
+	mov eax, [0x1010101010101010] #[&monks_state]
+	cmp eax, 1
+	jne skip_pre32
+	mov eax, [0x1010101010101010] #[&iter->state]
+	cmp eax, 1
+	jne skip_pre32
+
+	#Call pre-hook
+	mov rax, 0x1010101010101010 #&iter->pre
+	call rax
+
+skip_pre32:
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov dword [rbp - 8], eax
+	mov dword [rbp - 12], eax
 
 	#Check if monks's state or the syscall's state are
-	#set to 0, and if so, skip calling the fake syscall
+	#set to 0, and if so, skip calling the post-hook
 	mov eax, [0x1010101010101010] #[&monks_state]
 	cmp eax, 1
-	jne skip_ff32
+	jne skip_post32
 	mov eax, [0x1010101010101010] #[&iter->state]
 	cmp eax, 1
-	jne skip_ff32
+	jne skip_post32
 
-	#Call fake syscall
-	mov rax, 0x1010101010101010 #&iter->ff
+	#Call post-hook
+	mov rax, 0x1010101010101010 #&iter->post
 	call rax
 
-skip_ff32:
+skip_post32:
 	#Restore real syscall result to rax
-	mov eax, dword [rbp - 8]
+	mov eax, dword [rbp - 12]
 
 	#Exit
 	mov rsp, rbp
