@@ -81,6 +81,9 @@ asmlinkage void hooked_sys32_post_close(unsigned int fd){
 
 	__GET_SYSCALL_HOOK_INFO32(i);
 
+	if(!i)
+		return;	
+
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
 		i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
