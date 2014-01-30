@@ -203,18 +203,18 @@ stub_32:
 	sub rsp, 36 #8 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
 
 	#Save args on the stack
-	mov eax, dword [rbp + 8]
-	mov dword [rbp - 36], eax
-	mov eax, dword [rbp + 12]
-	mov dword [rbp - 32], eax
-	mov eax, dword [rbp + 16]
-	mov dword [rbp - 28], eax
-	mov eax, dword [rbp + 20]
-	mov dword [rbp - 24], eax
-	mov eax, dword [rbp + 24]
-	mov dword [rbp - 20], eax
-	mov eax, dword [rbp + 28]
-	mov dword [rbp - 16], eax
+	mov eax, [rbp + 8]
+	mov [rbp - 36], eax
+	mov eax, [rbp + 12]
+	mov [rbp - 32], eax
+	mov eax, [rbp + 16]
+	mov [rbp - 28], eax
+	mov eax, [rbp + 20]
+	mov [rbp - 24], eax
+	mov eax, [rbp + 24]
+	mov [rbp - 20], eax
+	mov eax, [rbp + 28]
+	mov [rbp - 16], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the pre-hook
@@ -233,7 +233,7 @@ skip_pre32:
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov dword [rbp - 12], eax
+	mov [rbp - 12], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the post-hook
@@ -250,7 +250,7 @@ skip_pre32:
 
 skip_post32:
 	#Restore real syscall result to rax
-	mov eax, dword [rbp - 12]
+	mov eax, [rbp - 12]
 
 	#Exit
 	mov rsp, rbp
