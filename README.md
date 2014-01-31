@@ -64,7 +64,7 @@ enabled by default in some distros.
 
 Also, Monks will ```just work```. What this module does to ```just work``` is
 hijack/replace all (relevant/interesting) syscalls from the syscall table.
-While this is risky, it will allow you to have a similar tool to Monks for 
+While this is risky, it will allow you to have a similar tool to Procmon for 
 Windows, without having to recompile the kernel.
 
 Yet another reason: I have fun doing it! I don't seek for this project to be 
