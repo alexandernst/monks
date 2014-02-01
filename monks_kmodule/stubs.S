@@ -200,21 +200,30 @@ stub_32:
 	#Create stack frame
 	push rbp
 	mov rbp, rsp
-	sub rsp, 36 #8 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
+	sub rsp, 84 #8 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
+	#... and an extra 48 bytes for 6 registers
 
 	#Save args on the stack
 	mov eax, [rbp + 8]
-	mov [rbp - 36], eax
+	mov [rbp - 84], eax
 	mov eax, [rbp + 12]
-	mov [rbp - 32], eax
+	mov [rbp - 80], eax
 	mov eax, [rbp + 16]
-	mov [rbp - 28], eax
+	mov [rbp - 76], eax
 	mov eax, [rbp + 20]
-	mov [rbp - 24], eax
+	mov [rbp - 72], eax
 	mov eax, [rbp + 24]
-	mov [rbp - 20], eax
+	mov [rbp - 68], eax
 	mov eax, [rbp + 28]
-	mov [rbp - 16], eax
+	mov [rbp - 64], eax
+
+	#Save registers. Why? Don't know, don't care...
+	mov [rbp - 48], rdi
+	mov [rbp - 40], rsi
+	mov [rbp - 32], rdx
+	mov [rbp - 24], rcx
+	mov [rbp - 16], r8
+	mov [rbp - 8], r9
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the pre-hook
@@ -229,11 +238,19 @@ stub_32:
 	mov rax, 0x1010101010101010 #&iter->pre
 	call rax
 
+	#Restore registers. Why? Don't know, don't care...
+	mov rdi, [rbp - 48]
+	mov rsi, [rbp - 40]
+	mov rdx, [rbp - 32]
+	mov rcx, [rbp - 24]
+	mov r8, [rbp - 16]
+	mov r9, [rbp - 8]
+
 skip_pre32:
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov [rbp - 12], eax
+	mov [rbp - 40], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the post-hook
@@ -248,9 +265,17 @@ skip_pre32:
 	mov rax, 0x1010101010101010 #&iter->post
 	call rax
 
+	#Restore registers. Why? Don't know, don't care...
+	mov rdi, [rbp - 48]
+	mov rsi, [rbp - 40]
+	mov rdx, [rbp - 32]
+	mov rcx, [rbp - 24]
+	mov r8, [rbp - 16]
+	mov r9, [rbp - 8]
+
 skip_post32:
 	#Restore real syscall result to rax
-	mov eax, [rbp - 12]
+	mov eax, [rbp - 40]
 
 	#Exit
 	mov rsp, rbp
