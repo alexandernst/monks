@@ -32,8 +32,10 @@ asmlinkage void hooked_sys_post_close(unsigned int fd){
 	syscall_intercept_info *i;
 
 	__GET_SYSCALL_RESULT(r);
-
 	__GET_SYSCALL_HOOK_INFO(i);
+
+	if(!i)
+		return;
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
@@ -78,11 +80,10 @@ asmlinkage void hooked_sys32_post_close(unsigned int fd){
 	syscall_intercept_info *i;
 
 	__GET_SYSCALL_RESULT32(r);
-
 	__GET_SYSCALL_HOOK_INFO32(i);
 
 	if(!i)
-		return;	
+		return;
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
