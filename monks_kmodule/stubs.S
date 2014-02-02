@@ -63,6 +63,8 @@ stub:
 	sub esp, 32 #4 bytes for hook info, 4 bytes for result, 24 bytes for 6 args
 
 	#Save args on the stack
+	mov eax, 0x00000000
+	mov [ebp - 4], eax
 	mov eax, [ebp + 8]
 	mov [ebp - 32], eax
 	mov eax, [ebp + 12]
@@ -127,6 +129,8 @@ stub:
 	sub rsp, 64 #8 bytes for hook info, 8 bytes for result, 48 bytes for 6 args
 
 	#Save args on the stack
+	mov rax, 0x0000000000000000
+	mov [rbp - 8], rax
 	mov [rbp - 24], rdi
 	mov [rbp - 32], rsi
 	mov [rbp - 40], rdx
@@ -204,6 +208,8 @@ stub_32:
 	#... and an extra 48 bytes for 6 registers
 
 	#Save args on the stack
+	mov rax, 0x0000000000000000
+	mov [rbp - 56], rax
 	mov eax, [rbp + 8]
 	mov [rbp - 84], eax
 	mov eax, [rbp + 12]
