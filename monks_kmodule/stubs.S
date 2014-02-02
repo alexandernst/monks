@@ -256,7 +256,7 @@ skip_pre32:
 	#Call real syscall and save return value
 	mov rax, 0x1010101010101010 #&iter->rf
 	call rax
-	mov [rbp - 40], eax
+	mov [rbp - 60], eax
 
 	#Check if monks's state or the syscall's state are
 	#set to 0, and if so, skip calling the post-hook
@@ -281,7 +281,7 @@ skip_pre32:
 
 skip_post32:
 	#Restore real syscall result to rax
-	mov eax, [rbp - 40]
+	mov eax, [rbp - 60]
 
 	#Exit
 	mov rsp, rbp
