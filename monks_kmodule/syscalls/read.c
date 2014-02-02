@@ -39,10 +39,10 @@ asmlinkage void hooked_sys_post_read(unsigned int fd, char __user *buf, size_t c
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
-		i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
+		i->details = kasprintf(GFP_KERNEL, "Errno %d", (int)r);
 	}else{
 		i->result = "Ok";
-		i->details = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
+		i->details = kasprintf(GFP_KERNEL, "Read %d bytes (was requested to read %zd)", (int)r, count);
 	}
 
 	nl_send(i);
@@ -87,10 +87,10 @@ asmlinkage void hooked_sys32_post_read(unsigned int fd, char __user *buf, size_t
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
-		i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
+		i->details = kasprintf(GFP_KERNEL, "Errno %d", (int)r);
 	}else{
 		i->result = "Ok";
-		i->details = kasprintf(GFP_KERNEL, "Read %zd bytes (was requested to read %zd)", r, count);
+		i->details = kasprintf(GFP_KERNEL, "Read %d bytes (was requested to read %zd)", (int)r, count);
 	}
 
 	nl_send(i);
