@@ -39,7 +39,7 @@ asmlinkage void hooked_sys_post_close(unsigned int fd){
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
-		i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
+		i->details = kasprintf(GFP_KERNEL, "Errno %d", (int)r);
 	}else{
 		i->result = "Ok";
 		i->details = kasprintf(GFP_KERNEL, "N/A");
@@ -87,7 +87,7 @@ asmlinkage void hooked_sys32_post_close(unsigned int fd){
 
 	if(IS_ERR((void *)r)){
 		i->result = "Error";
-		i->details = kasprintf(GFP_KERNEL, "Errno %zd", r);
+		i->details = kasprintf(GFP_KERNEL, "Errno %d", (int)r);
 	}else{
 		i->result = "Ok";
 		i->details = kasprintf(GFP_KERNEL, "N/A");
