@@ -1,7 +1,5 @@
 #include "sct_hook.h"
 
-#define __NR_syscall_max	512	/* TODO: find out real value */
-
 void **sys_call_table = NULL;
 static void **sct_map = NULL;
 #ifdef CONFIG_IA32_EMULATION
@@ -184,7 +182,7 @@ void hook_calls(void){
 	}
 
 #ifdef CONFIG_IA32_EMULATION
-	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
+	ia32_sct_map = map_writable(ia32_sys_call_table, __NR32_syscall_max * sizeof(void *));
 	if(!ia32_sct_map){
 		monks_error("Can't get writable IA32_SCT mapping\n");
 		goto out;
@@ -240,7 +238,7 @@ void unhook_calls(void){
 	}
 
 #ifdef CONFIG_IA32_EMULATION
-	ia32_sct_map = map_writable(ia32_sys_call_table, __NR_syscall_max * sizeof(void *));
+	ia32_sct_map = map_writable(ia32_sys_call_table, __NR32_syscall_max * sizeof(void *));
 	if(!ia32_sct_map){
 		monks_error("Can't get writable IA32_SCT mapping\n");
 		goto out;

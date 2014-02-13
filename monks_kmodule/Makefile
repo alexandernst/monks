@@ -26,9 +26,16 @@ all: _prebuild
 	make -C $(KDIR) M=$(shell pwd)
 	@mv $(NAME).ko ../$(NAME).ko
 
-_prebuild: unistd_32.h
+_prebuild: unistd_32.h max_syscalls.h
 
 unistd_32.h:
-	@echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep --color=never __NR_ | sed s/__NR_/__NR32_/g > $@
+	@echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep __NR_ | sed s/__NR_/__NR32_/g > $@
 
-clean-files	+= unistd_32.h
+max_syscalls.h:
+	@echo "#define __NR_syscall_max " `echo "#include <asm/unistd.h>" | $(CC) -E -dM - | grep __NR_ | wc -l` >> $@
+	@echo "#ifdef CONFIG_IA32_EMULATION" >> $@
+	@echo "#define __NR32_syscall_max " `echo "#include <asm/unistd_32.h>" | $(CC) -E -dM - | grep __NR_ | wc -l` >> $@
+	@echo "#endif" >> $@
+
+
+clean-files	+= unistd_32.h max_syscalls.h

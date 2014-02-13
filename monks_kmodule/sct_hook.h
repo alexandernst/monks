@@ -22,6 +22,8 @@
 #include "unistd_32.h"
 #endif
 
+#include "max_syscalls.h"
+
 #include <linux/preempt.h>
 #include <linux/stop_machine.h>
 
