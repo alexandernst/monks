@@ -62,7 +62,7 @@ systems/methods. Probably all of them work better than Monks, but they have
 one disadvantage: they require you to recompile the kernel or they are not 
 enabled by default in some distros.
 
-Also, Monks will ```just work```. What this module does to ```just work``` is
+Also, Monks will ```just work``` (UI included). What this module does to ```just work``` is
 hijack/replace all (relevant/interesting) syscalls from the syscall table.
 While this is risky, it will allow you to have a similar tool to Procmon for 
 Windows, without having to recompile the kernel.
