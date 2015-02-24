@@ -3,10 +3,9 @@
 What is Monks
 =======
 
-Monks is a kernel module that hijacks sys calls and sends information about which
-processes called which sys calls, with what arguments did they call them with, 
-what was the return value, etc, and sends that information to a nice ncurses 
-interface.
+Monks is a kernel module that hijacks sys calls, tracks which processes called
+which sys calls, with what arguments, what was the return value, etc, and sends
+that information to a nice ncurses interface.
 
 Said in another way, Monks is like ```strace```, but tracing all and every single
 process from any user, at any level.
