@@ -4,9 +4,9 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -31,10 +31,10 @@
         <hr>
 
         <section id="main_content">
-          <p><a href="https://drone.io/github.com/alexandernst/monks/latest"><img src="https://drone.io/github.com/alexandernst/monks/status.png" alt="Build Status"></a> Monks alternative for Linux - <a href="http://alexandernst.github.io/monks" title="Monks's Homepage">Main webpage</a></p>
+          <p><a href="https://drone.io/github.com/alexandernst/monks/latest"><img src="https://drone.io/github.com/alexandernst/monks/status.png" alt="Build Status"></a> Procmon alternative for Linux - <a href="http://alexandernst.github.io/monks" title="Monks's Homepage">Main webpage</a></p>
 
 <h1>
-<a name="what-is-monks" class="anchor" href="#what-is-monks"><span class="octicon octicon-link"></span></a>What is Monks</h1>
+<a id="what-is-monks" class="anchor" href="#what-is-monks" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Monks</h1>
 
 <p>Monks is a kernel module that hijacks sys calls and sends information about which
 processes called which sys calls, with what arguments did they call them with, 
@@ -49,7 +49,14 @@ process from any user, at any level.</p>
 <p><img src="https://raw.github.com/alexandernst/monks/master/screenshots/monks.gif" alt="How it works"></p>
 
 <h1>
-<a name="setting-monks" class="anchor" href="#setting-monks"><span class="octicon octicon-link"></span></a>Setting Monks</h1>
+<a id="why-that-name" class="anchor" href="#why-that-name" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why that name?</h1>
+
+<p>At first I thought naming the project <code>Procmon</code>, but because that name is already
+a registered trademark and I don't want any troubles, I decided to call it <code>Monks</code>,
+which stands for <code>MONitoring Kernel Syscalls</code>.</p>
+
+<h1>
+<a id="setting-monks" class="anchor" href="#setting-monks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting Monks</h1>
 
 <p>Keep in mind that this is a WIP and you can end up with a totally frozen 
 kernel! Do <em>NOT</em> run this in production machines. I'm <em>NOT</em> responsible
@@ -81,16 +88,16 @@ code, just a basic viewer.</p>
 <p><img src="https://raw.github.com/alexandernst/monks/master/screenshots/screenshot1.jpeg" alt="Screenshot"></p>
 
 <h1>
-<a name="why-monks" class="anchor" href="#why-monks"><span class="octicon octicon-link"></span></a>Why Monks</h1>
+<a id="why-monks" class="anchor" href="#why-monks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why Monks</h1>
 
 <p>I'm completely aware of <code>kprobes</code>, <code>perf</code> and all other kernel debug 
 systems/methods. Probably all of them work better than Monks, but they have 
 one disadvantage: they require you to recompile the kernel or they are not 
 enabled by default in some distros.</p>
 
-<p>Also, Monks will <code>just work</code>. What this module does to <code>just work</code> is
+<p>Also, Monks will <code>just work</code> (UI included). What this module does to <code>just work</code> is
 hijack/replace all (relevant/interesting) syscalls from the syscall table.
-While this is risky, it will allow you to have a similar tool to Monks for 
+While this is risky, it will allow you to have a similar tool to Procmon for 
 Windows, without having to recompile the kernel.</p>
 
 <p>Yet another reason: I have fun doing it! I don't seek for this project to be 
@@ -98,14 +105,14 @@ merged into mainline nor being used by every Linux user out there. I'm doing
 it for myself. Anyways, I'd be glad if it works for you too :)</p>
 
 <h1>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h1>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h1>
 
 <p>Just send me patches, if they are ok I'll give you push access :)</p>
 
 <p>About the editing, note that I'm using <code>TAB</code>s, so please keep it that way.</p>
 
 <h1>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
 
 <p>The license is WTFPL (Do What The Fuck You Want To Public License), but keep
 in mind it's good for both sides if you use this project, fix/add things and
